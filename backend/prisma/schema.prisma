@@ -1,0 +1,92 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String?   @unique
+  password      String?
+  name          String?
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  accounts      Account[]
+  projects      Project[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  access_token      String? @db.Text
+  refresh_token     String? @db.Text
+  expires_at        Int?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Project {
+  id          String            @id @default(cuid())
+  name        String
+  description String?
+  userId      String
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  devices     Device[]
+  dashboards  DashboardConfig[]
+}
+
+model Device {
+  id          String    @id @default(cuid())
+  name        String
+  api_key     String    @unique
+  mac_address String?
+  type        String
+  projectId   String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  lastSeenAt  DateTime?
+  project     Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  sensors     Sensor[]
+}
+
+model Sensor {
+  id          String      @id @default(cuid())
+  name        String
+  deviceId    String
+  metadata    Json        @default("{}")
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  device      Device      @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  dataPoints  DataPoint[]
+}
+
+model DataPoint {
+  id        String   @id @default(cuid())
+  sensorId  String
+  timestamp DateTime @default(now())
+  payload   Json
+  sensor    Sensor   @relation(fields: [sensorId], references: [id], onDelete: Cascade)
+
+  @@index([sensorId, timestamp])
+}
+
+model DashboardConfig {
+  id            String   @id @default(cuid())
+  projectId     String
+  layout_config Json
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  project       Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}

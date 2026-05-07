@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  backend:
+    image: iot-backend:latest
+    container_name: stg_backend
+    environment:
+      - NODE_ENV=staging
+      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:postgres@db:5432/iot_db}
+      - REDIS_HOST=redis
+    ports:
+      - "3001:3000"
+    networks:
+      - iot-net
+    depends_on:
+      - redis
+
+  frontend:
+    image: iot-frontend:latest
+    container_name: stg_frontend
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:3001
+    ports:
+      - "3002:3000"
+    networks:
+      - iot-net
+    depends_on:
+      - backend
+
+  redis:
+    image: redis:alpine
+    container_name: stg_redis
+    networks:
+      - iot-net
+
+networks:
+  iot-net:
+    external: true # Usa la red de docker-compose.infra.yml

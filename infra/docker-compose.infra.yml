@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  jenkins:
+    build: 
+      context: ./jenkins
+      dockerfile: Dockerfile
+    container_name: jenkins_master
+    user: root # Necesario para ejecutar docker comandos usando el socket montado
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock # Docker socket para buildear imágenes
+    networks:
+      - iot-net
+    restart: unless-stopped
+
+  sonarqube:
+    image: sonarqube:lts-community
+    container_name: sonarqube
+    ports:
+      - "9000:9000"
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_logs:/opt/sonarqube/logs
+      - sonarqube_extensions:/opt/sonarqube/extensions
+    environment:
+      - SONAR_FORCEAUTHENTICATION=true
+    networks:
+      - iot-net
+    restart: unless-stopped
+
+  ngrok:
+    image: ngrok/ngrok:latest
+    container_name: ngrok
+    environment:
+      - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
+    command: "http jenkins:8080 --log stdout"
+    networks:
+      - iot-net
+    depends_on:
+      - jenkins
+    restart: unless-stopped
+
+networks:
+  iot-net:
+    driver: bridge
+
+volumes:
+  jenkins_home:
+  sonarqube_data:
+  sonarqube_logs:
+  sonarqube_extensions:
