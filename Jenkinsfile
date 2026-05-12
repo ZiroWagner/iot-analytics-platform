@@ -4,7 +4,7 @@ pipeline {
     environment {
         FRONTEND_IMAGE = "iot-frontend:${env.BUILD_ID}"
         BACKEND_IMAGE = "iot-backend:${env.BUILD_ID}"
-        // SCANNER_HOME = tool 'SonarQubeScanner' // Descomentar cuando Sonar Scanner esté configurado en Global Tools
+        SCANNER_HOME = tool 'SonarQubeScanner' // Descomentar cuando Sonar Scanner esté configurado en Global Tools
     }
 
     options {
@@ -53,8 +53,6 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 echo "Ejecutando análisis de SonarQube..."
-                // Descomentar lo siguiente una vez configurado en Jenkins UI (Server: SonarQubeServer)
-                /*
                 withSonarQubeEnv('SonarQubeServer') { 
                     sh "${SCANNER_HOME}/bin/sonar-scanner \
                         -Dsonar.projectKey=iot-platform \
@@ -62,7 +60,6 @@ pipeline {
                         -Dsonar.host.url=http://sonarqube:9000 \
                         -Dsonar.javascript.lcov.reportPaths=frontend/coverage/lcov.info,backend/coverage/lcov.info"
                 }
-                */
             }
         }
 
@@ -89,11 +86,20 @@ pipeline {
             steps {
                 dir('deploy') {
                     // Usamos docker-compose para reiniciar los servicios con las nuevas imágenes
+                    // sh 'docker-compose -f docker-compose.stg.yml up -d --build'
                     sh 'docker-compose -f docker-compose.stg.yml down'
                     sh 'docker-compose -f docker-compose.stg.yml up -d'
                 }
             }
         }
+
+        stage("Quality Gate") {
+            steps {
+                timeout(time: 5, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }   
 
         stage('Health Checks') {
             steps {
