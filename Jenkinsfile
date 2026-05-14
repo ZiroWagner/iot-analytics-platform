@@ -26,8 +26,8 @@ pipeline {
                     steps {
                         dir('frontend') {
                             sh 'npm ci'
-                            sh 'npm run lint || true'
-                            sh 'npm run test:unit || true' // Ignorar fallos si no hay tests
+                            sh 'npm run lint'
+                            sh 'npm run test'
                         }
                     }
                 }
@@ -35,8 +35,8 @@ pipeline {
                     steps {
                         dir('backend') {
                             sh 'npm ci'
-                            sh 'npm run lint || true'
-                            sh 'npm run test || true'
+                            sh 'npm run lint'
+                            sh 'npm run test:cov'
                         }
                     }
                 }
@@ -45,8 +45,8 @@ pipeline {
 
         stage('Security Scan') {
             steps {
-                dir('backend') { sh 'npm audit --audit-level=high || true' }
-                dir('frontend') { sh 'npm audit --audit-level=high || true' }
+                dir('backend') { sh 'npm audit --audit-level=high' }
+                dir('frontend') { sh 'npm audit --audit-level=high' }
             }
         }
 
@@ -62,6 +62,14 @@ pipeline {
                 }
             }
         }
+
+        stage("Quality Gate") {
+            steps {
+                timeout(time: 5, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }   
 
         stage('Docker Build') {
             parallel {
@@ -84,29 +92,15 @@ pipeline {
 
         stage('Deploy Local (Staging)') {
             steps {
-                dir('deploy') {
-                    // Usamos docker-compose para reiniciar los servicios con las nuevas imágenes
-                    // sh 'docker-compose -f docker-compose.stg.yml up -d --build'
-                    sh 'docker-compose -f docker-compose.stg.yml down'
-                    sh 'docker-compose -f docker-compose.stg.yml up -d'
-                }
+                sh 'docker-compose -f deploy/docker-compose.stg.yml up -d --force-recreate'
             }
         }
-
-        stage("Quality Gate") {
-            steps {
-                timeout(time: 5, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
-                }
-            }
-        }   
 
         stage('Health Checks') {
             steps {
                 sleep time: 15, unit: 'SECONDS'
-                // Ajustar puertos si es necesario
-                sh "curl -f http://stg_backend:3000/api/health || true"
-                sh "curl -f http://stg_frontend:3000/ || true"
+                sh "curl -f http://stg_backend:3000/api/v1/health"
+                sh "curl -f http://stg_frontend:3000/api/health"
             }
         }
     }
@@ -117,9 +111,7 @@ pipeline {
         }
         failure {
             echo "❌ Pipeline falló. Iniciando Rollback automático."
-            dir('deploy') {
-                sh 'docker-compose -f docker-compose.stg.yml down'
-            }
+            sh 'docker-compose -f deploy/docker-compose.stg.yml down'
         }
     }
 }

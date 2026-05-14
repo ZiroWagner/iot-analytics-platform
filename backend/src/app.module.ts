@@ -14,6 +14,7 @@ import { RedisModule } from './redis/redis.module';
 import { ObservabilityModule } from './observability/observability.module';
 import { TelemetryModule } from './telemetry/telemetry.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { HealthModule } from './health/health.module';
 
 @Module({
     imports: [
@@ -43,6 +44,7 @@ import { ScheduleModule } from '@nestjs/schedule';
         RedisModule,
         ObservabilityModule,
         TelemetryModule,
+        HealthModule,
     ],
 })
 export class AppModule {}

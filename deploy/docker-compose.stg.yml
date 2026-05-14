@@ -1,21 +1,41 @@
-version: '3.8'
-
 services:
   backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
     image: iot-backend:latest
     container_name: stg_backend
     environment:
-      - NODE_ENV=staging
-      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:postgres@db:5432/iot_db}
+      - NODE_ENV=production
+      - PORT=3000
+      - DATABASE_URL=${DATABASE_URL:?DATABASE_URL de Supabase es requerida}
+      - JWT_SECRET=${JWT_SECRET:?JWT_SECRET es requerido}
+      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN:-7d}
+      - FRONTEND_URL=${FRONTEND_URL:-http://localhost:3002}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID:?GOOGLE_CLIENT_ID es requerido}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET:?GOOGLE_CLIENT_SECRET es requerido}
+      - GOOGLE_CALLBACK_URL=${GOOGLE_CALLBACK_URL:?GOOGLE_CALLBACK_URL es requerido}
+      - GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID:?GITHUB_CLIENT_ID es requerido}
+      - GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET:?GITHUB_CLIENT_SECRET es requerido}
+      - GITHUB_CALLBACK_URL=${GITHUB_CALLBACK_URL:?GITHUB_CALLBACK_URL es requerido}
       - REDIS_HOST=redis
+      - REDIS_PORT=6379
     ports:
       - "3001:3000"
     networks:
       - iot-net
     depends_on:
       - redis
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/v1/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
 
   frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
     image: iot-frontend:latest
     container_name: stg_frontend
     environment:
@@ -26,13 +46,29 @@ services:
       - iot-net
     depends_on:
       - backend
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
 
   redis:
     image: redis:alpine
     container_name: stg_redis
+    command: redis-server --appendonly yes
+    volumes:
+      - stg_redis_data:/data
     networks:
       - iot-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
 
 networks:
   iot-net:
     external: true # Usa la red de docker-compose.infra.yml
+
+volumes:
+  stg_redis_data:
