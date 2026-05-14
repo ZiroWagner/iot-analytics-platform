@@ -4,7 +4,6 @@ pipeline {
     tools {
         nodejs 'NodeJS_24'
     }
-
     stages {
         stage('Docker Test') {
             steps {
