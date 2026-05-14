@@ -17,34 +17,34 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { HealthModule } from './health/health.module';
 
 @Module({
-    imports: [
-        ConfigModule.forRoot({
-            isGlobal: true,
-            load: [configuration],
-            validationSchema,
-        }),
-        ScheduleModule.forRoot(),
-        BullModule.forRootAsync({
-            useFactory: (config: ConfigService) => ({
-                connection: {
-                    host: config.get('REDIS_HOST'),
-                    port: config.get('REDIS_PORT'),
-                },
-            }),
-            inject: [ConfigService],
-        }),
-        AuthModule, 
-        PrismaModule, 
-        ProjectsModule, 
-        SensorsModule, 
-        DevicesModule, 
-        IngestModule,
-        AnalyticsModule,
-        DashboardsModule,
-        RedisModule,
-        ObservabilityModule,
-        TelemetryModule,
-        HealthModule,
-    ],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [configuration],
+      validationSchema,
+    }),
+    ScheduleModule.forRoot(),
+    BullModule.forRootAsync({
+      useFactory: (config: ConfigService) => ({
+        connection: {
+          host: config.get('REDIS_HOST'),
+          port: config.get('REDIS_PORT'),
+        },
+      }),
+      inject: [ConfigService],
+    }),
+    AuthModule,
+    PrismaModule,
+    ProjectsModule,
+    SensorsModule,
+    DevicesModule,
+    IngestModule,
+    AnalyticsModule,
+    DashboardsModule,
+    RedisModule,
+    ObservabilityModule,
+    TelemetryModule,
+    HealthModule,
+  ],
 })
 export class AppModule {}

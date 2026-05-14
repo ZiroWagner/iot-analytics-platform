@@ -17,6 +17,12 @@ export class GetTimeseriesUseCase {
     metric: string,
     limit = 50,
   ): Promise<TimeseriesPoint[]> {
-    return this.analyticsRepository.getTimeseries(userId, projectId, sensorId, metric, limit);
+    return this.analyticsRepository.getTimeseries(
+      userId,
+      projectId,
+      sensorId,
+      metric,
+      limit,
+    );
   }
 }

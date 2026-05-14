@@ -12,7 +12,11 @@ export class CreateSensorUseCase {
 
   async execute(
     userId: string,
-    data: { name: string; deviceId: string; metadata?: Record<string, unknown> },
+    data: {
+      name: string;
+      deviceId: string;
+      metadata?: Record<string, unknown>;
+    },
   ): Promise<Sensor> {
     return this.sensorRepository.create({
       userId,

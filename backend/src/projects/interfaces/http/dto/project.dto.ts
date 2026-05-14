@@ -8,7 +8,10 @@ export class CreateProjectDto {
   @MinLength(3)
   name: string;
 
-  @ApiProperty({ example: 'Project for monitoring temperature sensors', required: false })
+  @ApiProperty({
+    example: 'Project for monitoring temperature sensors',
+    required: false,
+  })
   @IsString()
   @IsOptional()
   description?: string;

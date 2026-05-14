@@ -18,6 +18,13 @@ export class GetStatsUseCase {
     from?: Date,
     to?: Date,
   ): Promise<MetricStats> {
-    return this.analyticsRepository.getStats(userId, projectId, sensorId, metric, from, to);
+    return this.analyticsRepository.getStats(
+      userId,
+      projectId,
+      sensorId,
+      metric,
+      from,
+      to,
+    );
   }
 }

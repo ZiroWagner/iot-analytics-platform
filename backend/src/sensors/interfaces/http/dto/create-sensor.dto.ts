@@ -12,7 +12,10 @@ export class CreateSensorDto {
   @IsNotEmpty()
   deviceId: string;
 
-  @ApiProperty({ example: { unit: 'Celsius', range: [0, 100] }, required: false })
+  @ApiProperty({
+    example: { unit: 'Celsius', range: [0, 100] },
+    required: false,
+  })
   @IsOptional()
   @IsObject()
   metadata?: Record<string, unknown>;

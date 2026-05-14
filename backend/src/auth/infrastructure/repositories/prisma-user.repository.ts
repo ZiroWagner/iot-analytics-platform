@@ -15,7 +15,11 @@ export class PrismaUserRepository implements UserRepositoryInterface {
     return user ? this.mapToDomain(user) : null;
   }
 
-  async create(data: { email: string; password: string; name?: string }): Promise<User> {
+  async create(data: {
+    email: string;
+    password: string;
+    name?: string;
+  }): Promise<User> {
     const hashedPassword = await bcrypt.hash(data.password, BCRYPT_SALT_ROUNDS);
     const user = await this.prisma.user.create({
       data: {
@@ -27,7 +31,10 @@ export class PrismaUserRepository implements UserRepositoryInterface {
     return this.mapToDomain(user);
   }
 
-  async findAccountByProvider(provider: string, providerAccountId: string): Promise<{ user: User } | null> {
+  async findAccountByProvider(
+    provider: string,
+    providerAccountId: string,
+  ): Promise<{ user: User } | null> {
     const account = await this.prisma.account.findUnique({
       where: {
         provider_providerAccountId: { provider, providerAccountId },
@@ -48,7 +55,10 @@ export class PrismaUserRepository implements UserRepositoryInterface {
     refreshToken: string | null;
   }): Promise<User> {
     // Check if account already exists
-    const existing = await this.findAccountByProvider(data.provider, data.providerAccountId);
+    const existing = await this.findAccountByProvider(
+      data.provider,
+      data.providerAccountId,
+    );
     if (existing) return existing.user;
 
     // Find or create user by email

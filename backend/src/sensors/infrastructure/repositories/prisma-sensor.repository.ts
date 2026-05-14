@@ -1,6 +1,13 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
-import { SensorRepositoryInterface, SENSOR_REPOSITORY_TOKEN } from '../../domain/repositories/sensor.repository.interface';
+import {
+  SensorRepositoryInterface,
+  SENSOR_REPOSITORY_TOKEN,
+} from '../../domain/repositories/sensor.repository.interface';
 import { Sensor } from '../../domain/entities/sensor.entity';
 
 @Injectable()
@@ -34,7 +41,7 @@ export class PrismaSensorRepository implements SensorRepositoryInterface {
       orderBy: { createdAt: 'desc' },
     });
 
-    return sensors.map(s => this.mapToDomain(s));
+    return sensors.map((s) => this.mapToDomain(s));
   }
 
   async findById(id: string, userId: string): Promise<Sensor | null> {
@@ -107,7 +114,10 @@ export class PrismaSensorRepository implements SensorRepositoryInterface {
     return dataPoints;
   }
 
-  private async verifyDeviceOwnership(userId: string, deviceId: string): Promise<void> {
+  private async verifyDeviceOwnership(
+    userId: string,
+    deviceId: string,
+  ): Promise<void> {
     const device = await this.prisma.device.findUnique({
       where: { id: deviceId },
       include: { project: true },
@@ -116,7 +126,9 @@ export class PrismaSensorRepository implements SensorRepositoryInterface {
       throw new NotFoundException('Device no encontrado');
     }
     if (device.project.userId !== userId) {
-      throw new ForbiddenException('No tienes acceso a este device para añadir sensores');
+      throw new ForbiddenException(
+        'No tienes acceso a este device para añadir sensores',
+      );
     }
   }
 

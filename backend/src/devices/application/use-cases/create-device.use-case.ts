@@ -12,7 +12,12 @@ export class CreateDeviceUseCase {
 
   async execute(
     userId: string,
-    data: { name: string; type: string; macAddress?: string; projectId: string },
+    data: {
+      name: string;
+      type: string;
+      macAddress?: string;
+      projectId: string;
+    },
   ): Promise<Device> {
     return this.deviceRepository.create({
       userId,

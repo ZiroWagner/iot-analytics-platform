@@ -9,7 +9,14 @@ import { NotFoundException, ForbiddenException } from '@nestjs/common';
 
 describe('Remaining Use Cases', () => {
   let repository: any;
-  const mockProject = new Project('proj-1', 'Name', 'Desc', 'user-1', new Date(), new Date());
+  const mockProject = new Project(
+    'proj-1',
+    'Name',
+    'Desc',
+    'user-1',
+    new Date(),
+    new Date(),
+  );
 
   beforeEach(() => {
     repository = {
@@ -25,7 +32,10 @@ describe('Remaining Use Cases', () => {
     let useCase: DeleteProjectUseCase;
     beforeEach(async () => {
       const module = await Test.createTestingModule({
-        providers: [DeleteProjectUseCase, { provide: PROJECT_REPOSITORY_TOKEN, useValue: repository }],
+        providers: [
+          DeleteProjectUseCase,
+          { provide: PROJECT_REPOSITORY_TOKEN, useValue: repository },
+        ],
       }).compile();
       useCase = module.get<DeleteProjectUseCase>(DeleteProjectUseCase);
     });
@@ -38,7 +48,9 @@ describe('Remaining Use Cases', () => {
 
     it('should throw NotFoundException if not found', async () => {
       repository.findById.mockResolvedValue(null);
-      await expect(useCase.execute('user-1', 'proj-1')).rejects.toThrow(NotFoundException);
+      await expect(useCase.execute('user-1', 'proj-1')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -46,7 +58,10 @@ describe('Remaining Use Cases', () => {
     let useCase: UpdateProjectUseCase;
     beforeEach(async () => {
       const module = await Test.createTestingModule({
-        providers: [UpdateProjectUseCase, { provide: PROJECT_REPOSITORY_TOKEN, useValue: repository }],
+        providers: [
+          UpdateProjectUseCase,
+          { provide: PROJECT_REPOSITORY_TOKEN, useValue: repository },
+        ],
       }).compile();
       useCase = module.get<UpdateProjectUseCase>(UpdateProjectUseCase);
     });
@@ -54,7 +69,9 @@ describe('Remaining Use Cases', () => {
     it('should update project if valid', async () => {
       repository.findById.mockResolvedValue(mockProject);
       repository.update.mockResolvedValue({ ...mockProject, name: 'Updated' });
-      const result = await useCase.execute('user-1', 'proj-1', { name: 'Updated' });
+      const result = await useCase.execute('user-1', 'proj-1', {
+        name: 'Updated',
+      });
       expect(repository.update).toHaveBeenCalled();
       expect(result.name).toBe('Updated');
     });
@@ -64,7 +81,10 @@ describe('Remaining Use Cases', () => {
     let useCase: GetProjectsUseCase;
     beforeEach(async () => {
       const module = await Test.createTestingModule({
-        providers: [GetProjectsUseCase, { provide: PROJECT_REPOSITORY_TOKEN, useValue: repository }],
+        providers: [
+          GetProjectsUseCase,
+          { provide: PROJECT_REPOSITORY_TOKEN, useValue: repository },
+        ],
       }).compile();
       useCase = module.get<GetProjectsUseCase>(GetProjectsUseCase);
     });
@@ -81,9 +101,14 @@ describe('Remaining Use Cases', () => {
     let useCase: GetProjectOverviewUseCase;
     beforeEach(async () => {
       const module = await Test.createTestingModule({
-        providers: [GetProjectOverviewUseCase, { provide: PROJECT_REPOSITORY_TOKEN, useValue: repository }],
+        providers: [
+          GetProjectOverviewUseCase,
+          { provide: PROJECT_REPOSITORY_TOKEN, useValue: repository },
+        ],
       }).compile();
-      useCase = module.get<GetProjectOverviewUseCase>(GetProjectOverviewUseCase);
+      useCase = module.get<GetProjectOverviewUseCase>(
+        GetProjectOverviewUseCase,
+      );
     });
 
     it('should return overview metrics', async () => {

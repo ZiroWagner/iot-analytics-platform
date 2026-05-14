@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { DeviceRepositoryInterface } from '../../domain/repositories/device.repository.interface';
 import { Device } from '../../domain/entities/device.entity';
@@ -42,7 +46,7 @@ export class PrismaDeviceRepository implements DeviceRepositoryInterface {
       include: { sensors: true },
     });
 
-    return devices.map(d => this.mapToDomain(d));
+    return devices.map((d) => this.mapToDomain(d));
   }
 
   async findById(id: string, userId: string): Promise<Device | null> {
@@ -88,13 +92,20 @@ export class PrismaDeviceRepository implements DeviceRepositoryInterface {
     });
   }
 
-  private async verifyProjectOwnership(userId: string, projectId: string): Promise<void> {
-    const project = await this.prisma.project.findUnique({ where: { id: projectId } });
+  private async verifyProjectOwnership(
+    userId: string,
+    projectId: string,
+  ): Promise<void> {
+    const project = await this.prisma.project.findUnique({
+      where: { id: projectId },
+    });
     if (!project) {
       throw new NotFoundException('Proyecto no encontrado');
     }
     if (project.userId !== userId) {
-      throw new ForbiddenException('No tienes acceso a este proyecto para gestionar devices');
+      throw new ForbiddenException(
+        'No tienes acceso a este proyecto para gestionar devices',
+      );
     }
   }
 

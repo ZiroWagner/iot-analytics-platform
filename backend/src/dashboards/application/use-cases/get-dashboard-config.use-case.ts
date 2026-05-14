@@ -10,7 +10,10 @@ export class GetDashboardConfigUseCase {
     private readonly dashboardRepository: DashboardRepositoryInterface,
   ) {}
 
-  async execute(userId: string, projectId: string): Promise<DashboardConfig | null> {
+  async execute(
+    userId: string,
+    projectId: string,
+  ): Promise<DashboardConfig | null> {
     return this.dashboardRepository.getConfig(projectId, userId);
   }
 }

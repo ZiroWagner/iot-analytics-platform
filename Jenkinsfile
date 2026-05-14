@@ -9,6 +9,7 @@ pipeline {
         FRONTEND_IMAGE = "iot-frontend:${env.BUILD_ID}"
         BACKEND_IMAGE = "iot-backend:${env.BUILD_ID}"
         SCANNER_HOME = tool 'SonarQubeScanner' // Descomentar cuando Sonar Scanner esté configurado en Global Tools
+        DEPLOY_STARTED = "false"
     }
 
     options {
@@ -46,6 +47,7 @@ pipeline {
                     steps {
                         dir('backend') {
                             sh 'npm ci'
+                            sh 'npx prisma generate'
                             sh 'npm run lint'
                             sh 'npm run test:cov'
                         }
@@ -103,7 +105,10 @@ pipeline {
 
         stage('Deploy Local (Staging)') {
             steps {
-                sh 'docker-compose -f deploy/docker-compose.stg.yml up -d --force-recreate'
+                script {
+                    env.DEPLOY_STARTED = "true"
+                }
+                sh 'docker compose -f deploy/docker-compose.stg.yml up -d --force-recreate'
             }
         }
 
@@ -121,8 +126,15 @@ pipeline {
             echo "✅ Pipeline completado exitosamente."
         }
         failure {
-            echo "❌ Pipeline falló. Iniciando Rollback automático."
-            sh 'docker-compose -f deploy/docker-compose.stg.yml down'
+            echo "❌ Pipeline falló."
+            script {
+                if (env.DEPLOY_STARTED == "true") {
+                    echo "Iniciando rollback automático porque el deploy alcanzó a iniciar."
+                    sh 'docker compose -f deploy/docker-compose.stg.yml down'
+                } else {
+                    echo "No se ejecuta rollback porque el fallo ocurrió antes del deploy."
+                }
+            }
         }
     }
 }

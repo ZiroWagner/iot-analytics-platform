@@ -24,35 +24,35 @@ import { JwtStrategy } from './infrastructure/strategies/jwt.strategy';
 import { LocalStrategy } from './infrastructure/strategies/local.strategy';
 
 @Module({
-    imports: [
-        PrismaModule,
-        PassportModule,
-        JwtModule.registerAsync({
-            imports: [ConfigModule],
-            useFactory: async (config: ConfigService) => ({
-                secret: config.get('JWT_SECRET'),
-                signOptions: { expiresIn: config.get('JWT_EXPIRES_IN') || '7d' },
-            }),
-            inject: [ConfigService],
-        }),
-    ],
-    controllers: [AuthController],
-    providers: [
-        // Repositories
-        {
-            provide: USER_REPOSITORY_TOKEN,
-            useClass: PrismaUserRepository,
-        },
-        // Use Cases
-        RegisterUserUseCase,
-        ValidateUserUseCase,
-        ValidateOAuthUseCase,
-        GenerateTokenUseCase,
-        // Infrastructure adapters
-        GoogleStrategy,
-        GithubStrategy,
-        JwtStrategy,
-        LocalStrategy,
-    ],
+  imports: [
+    PrismaModule,
+    PassportModule,
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: async (config: ConfigService) => ({
+        secret: config.get('JWT_SECRET'),
+        signOptions: { expiresIn: config.get('JWT_EXPIRES_IN') || '7d' },
+      }),
+      inject: [ConfigService],
+    }),
+  ],
+  controllers: [AuthController],
+  providers: [
+    // Repositories
+    {
+      provide: USER_REPOSITORY_TOKEN,
+      useClass: PrismaUserRepository,
+    },
+    // Use Cases
+    RegisterUserUseCase,
+    ValidateUserUseCase,
+    ValidateOAuthUseCase,
+    GenerateTokenUseCase,
+    // Infrastructure adapters
+    GoogleStrategy,
+    GithubStrategy,
+    JwtStrategy,
+    LocalStrategy,
+  ],
 })
 export class AuthModule {}

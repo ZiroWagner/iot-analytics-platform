@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { DashboardRepositoryInterface } from '../../domain/repositories/dashboard.repository.interface';
 import { DashboardConfig } from '../../domain/entities/dashboard-config.entity';
@@ -7,7 +11,10 @@ import { DashboardConfig } from '../../domain/entities/dashboard-config.entity';
 export class PrismaDashboardRepository implements DashboardRepositoryInterface {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getConfig(projectId: string, userId: string): Promise<DashboardConfig | null> {
+  async getConfig(
+    projectId: string,
+    userId: string,
+  ): Promise<DashboardConfig | null> {
     await this.verifyProjectOwnership(userId, projectId);
 
     const config = await this.prisma.dashboardConfig.findFirst({
@@ -51,8 +58,13 @@ export class PrismaDashboardRepository implements DashboardRepositoryInterface {
     return this.mapToDomain(result);
   }
 
-  private async verifyProjectOwnership(userId: string, projectId: string): Promise<void> {
-    const project = await this.prisma.project.findUnique({ where: { id: projectId } });
+  private async verifyProjectOwnership(
+    userId: string,
+    projectId: string,
+  ): Promise<void> {
+    const project = await this.prisma.project.findUnique({
+      where: { id: projectId },
+    });
     if (!project) {
       throw new NotFoundException('Proyecto no encontrado');
     }

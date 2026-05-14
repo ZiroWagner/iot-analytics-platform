@@ -16,18 +16,18 @@ import { RedisIngestRepository } from './infrastructure/repositories/redis-inges
 import { StreamIngestProcessor } from './infrastructure/processors/stream-ingest.processor';
 
 @Module({
-    imports: [PrismaModule, RedisModule],
-    controllers: [IngestController],
-    providers: [
-        // Repositories
-        {
-            provide: INGEST_REPOSITORY_TOKEN,
-            useClass: RedisIngestRepository,
-        },
-        // Use Cases
-        ProcessIngestUseCase,
-        // Infrastructure adapters
-        StreamIngestProcessor,
-    ],
+  imports: [PrismaModule, RedisModule],
+  controllers: [IngestController],
+  providers: [
+    // Repositories
+    {
+      provide: INGEST_REPOSITORY_TOKEN,
+      useClass: RedisIngestRepository,
+    },
+    // Use Cases
+    ProcessIngestUseCase,
+    // Infrastructure adapters
+    StreamIngestProcessor,
+  ],
 })
 export class IngestModule {}

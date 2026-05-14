@@ -4,12 +4,12 @@ import { CheckOfflineDevicesUseCase } from '../../application/use-cases/check-of
 
 @Injectable()
 export class OfflineDevicesScheduler {
-    constructor(
-        private readonly checkOfflineDevicesUseCase: CheckOfflineDevicesUseCase,
-    ) {}
+  constructor(
+    private readonly checkOfflineDevicesUseCase: CheckOfflineDevicesUseCase,
+  ) {}
 
-    @Cron('*/5 * * * * *')
-    async handleCron(): Promise<void> {
-        await this.checkOfflineDevicesUseCase.execute();
-    }
+  @Cron('*/5 * * * * *')
+  async handleCron(): Promise<void> {
+    await this.checkOfflineDevicesUseCase.execute();
+  }
 }

@@ -46,7 +46,9 @@ export class Device {
     }
 
     const apiKey = ApiKey.generate();
-    const macAddress = props.macAddress ? MacAddress.create(props.macAddress).getValue() : null;
+    const macAddress = props.macAddress
+      ? MacAddress.create(props.macAddress).getValue()
+      : null;
 
     return new Device(
       props.id,
@@ -76,7 +78,11 @@ export class Device {
     );
   }
 
-  update(data: { name?: string; type?: string; macAddress?: string | null }): void {
+  update(data: {
+    name?: string;
+    type?: string;
+    macAddress?: string | null;
+  }): void {
     if (data.name !== undefined) {
       if (!data.name || data.name.trim().length === 0) {
         throw new Error('Device name cannot be empty');
@@ -90,7 +96,9 @@ export class Device {
       this.type = data.type;
     }
     if (data.macAddress !== undefined) {
-      this.macAddress = data.macAddress ? MacAddress.create(data.macAddress).getValue() : null;
+      this.macAddress = data.macAddress
+        ? MacAddress.create(data.macAddress).getValue()
+        : null;
     }
   }
 }

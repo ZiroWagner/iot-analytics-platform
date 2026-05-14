@@ -1,9 +1,17 @@
-import { SensorMetric, TimeseriesPoint, SeriesRequest, MetricStats } from '../entities/analytics.entities';
+import {
+  SensorMetric,
+  TimeseriesPoint,
+  SeriesRequest,
+  MetricStats,
+} from '../entities/analytics.entities';
 
 export const ANALYTICS_REPOSITORY_TOKEN = 'ANALYTICS_REPOSITORY_TOKEN';
 
 export interface AnalyticsRepositoryInterface {
-  getAvailableMetrics(userId: string, projectId: string): Promise<SensorMetric[]>;
+  getAvailableMetrics(
+    userId: string,
+    projectId: string,
+  ): Promise<SensorMetric[]>;
   getTimeseries(
     userId: string,
     projectId: string,

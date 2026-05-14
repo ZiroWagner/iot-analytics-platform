@@ -17,7 +17,10 @@ export class HealthController {
 
   @Get('ready')
   @ApiOperation({ summary: 'Public readiness check' })
-  @ApiResponse({ status: 200, description: 'Application is ready to receive traffic' })
+  @ApiResponse({
+    status: 200,
+    description: 'Application is ready to receive traffic',
+  })
   ready() {
     return {
       status: 'ready',

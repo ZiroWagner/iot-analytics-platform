@@ -23,10 +23,16 @@ describe('ProjectsController', () => {
 
   beforeEach(async () => {
     createUseCase = { execute: jest.fn().mockResolvedValue(mockProject) };
-    const getProjectsUseCase = { execute: jest.fn().mockResolvedValue([mockProject]) };
-    const getProjectUseCase = { execute: jest.fn().mockResolvedValue(mockProject) };
+    const getProjectsUseCase = {
+      execute: jest.fn().mockResolvedValue([mockProject]),
+    };
+    const getProjectUseCase = {
+      execute: jest.fn().mockResolvedValue(mockProject),
+    };
     const updateUseCase = { execute: jest.fn().mockResolvedValue(mockProject) };
-    const deleteUseCase = { execute: jest.fn().mockResolvedValue({ success: true }) };
+    const deleteUseCase = {
+      execute: jest.fn().mockResolvedValue({ success: true }),
+    };
     const getOverviewUseCase = { execute: jest.fn().mockResolvedValue({}) };
 
     const module: TestingModule = await Test.createTestingModule({

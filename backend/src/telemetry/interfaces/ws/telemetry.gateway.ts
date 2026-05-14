@@ -43,18 +43,28 @@ export class TelemetryGateway
   afterInit() {
     this.logger.log('TelemetryGateway initialized');
 
-    this.telemetryAdapter.subscribe('telemetry:broadcast', (message: string) => {
-      this.logger.debug(`Received Pub/Sub message: ${message.substring(0, 100)}...`);
-      const event = TelemetryDomainService.parsePubSubMessage(message);
-      if (event) {
-        this.logger.debug(`Parsed event: deviceId=${event.deviceId}, type=${event.type}`);
-        this.bufferEvent(event);
-      } else {
-        this.logger.error('Failed to parse Pub/Sub message');
-      }
-    });
+    this.telemetryAdapter.subscribe(
+      'telemetry:broadcast',
+      (message: string) => {
+        this.logger.debug(
+          `Received Pub/Sub message: ${message.substring(0, 100)}...`,
+        );
+        const event = TelemetryDomainService.parsePubSubMessage(message);
+        if (event) {
+          this.logger.debug(
+            `Parsed event: deviceId=${event.deviceId}, type=${event.type}`,
+          );
+          this.bufferEvent(event);
+        } else {
+          this.logger.error('Failed to parse Pub/Sub message');
+        }
+      },
+    );
 
-    this.flushInterval = setInterval(() => this.flushBuffer(), FLUSH_INTERVAL_MS);
+    this.flushInterval = setInterval(
+      () => this.flushBuffer(),
+      FLUSH_INTERVAL_MS,
+    );
   }
 
   handleConnection(client: Socket) {
@@ -78,10 +88,14 @@ export class TelemetryGateway
     this.logger.log(`Client ${client.id} joined room ${room}`);
 
     try {
-      const initialState = await this.telemetryAdapter.buildInitialState(projectId);
+      const initialState =
+        await this.telemetryAdapter.buildInitialState(projectId);
       client.emit('initial_state', initialState);
     } catch (error) {
-      this.logger.error(`Failed to build initial state for project ${projectId}`, error);
+      this.logger.error(
+        `Failed to build initial state for project ${projectId}`,
+        error,
+      );
     }
   }
 
@@ -115,8 +129,13 @@ export class TelemetryGateway
       if (events.length === 0) continue;
 
       const room = `project:${projectId}`;
-      const batch = TelemetryDomainService.buildTelemetryBatch(projectId, events);
-      this.logger.debug(`Emitting telemetry_batch to room ${room}, events: ${batch.events.length}`);
+      const batch = TelemetryDomainService.buildTelemetryBatch(
+        projectId,
+        events,
+      );
+      this.logger.debug(
+        `Emitting telemetry_batch to room ${room}, events: ${batch.events.length}`,
+      );
       this.server.to(room).emit('telemetry_batch', batch);
     }
     this.buffer.clear();

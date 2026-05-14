@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Req,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { CreateProjectDto, UpdateProjectDto } from './dto/project.dto';
 import { CreateProjectUseCase } from '../../application/use-cases/create-project.use-case';
@@ -7,7 +17,14 @@ import { GetProjectUseCase } from '../../application/use-cases/get-project.use-c
 import { UpdateProjectUseCase } from '../../application/use-cases/update-project.use-case';
 import { DeleteProjectUseCase } from '../../application/use-cases/delete-project.use-case';
 import { GetProjectOverviewUseCase } from '../../application/use-cases/get-project-overview.use-case';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBody,
+  ApiParam,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 
 interface JwtUser {
   sub: string;
@@ -44,7 +61,7 @@ export class ProjectsController {
   @Get()
   async findAll(@Req() req: { user: JwtUser }) {
     const projects = await this.getProjectsUseCase.execute(req.user.sub);
-    return projects.map(p => ({
+    return projects.map((p) => ({
       id: p.id,
       name: p.name,
       description: p.description,
@@ -52,9 +69,9 @@ export class ProjectsController {
       createdAt: p.createdAt,
       updatedAt: p.updatedAt,
       _count: {
-        devices: p._deviceCount || 0
+        devices: p._deviceCount || 0,
       },
-      devices: p.devices || []
+      devices: p.devices || [],
     }));
   }
 
@@ -82,9 +99,9 @@ export class ProjectsController {
       createdAt: p.createdAt,
       updatedAt: p.updatedAt,
       _count: {
-        devices: p._deviceCount || 0
+        devices: p._deviceCount || 0,
       },
-      devices: p.devices || []
+      devices: p.devices || [],
     };
   }
 
@@ -96,7 +113,11 @@ export class ProjectsController {
   @ApiParam({ name: 'id', description: 'Project ID' })
   @ApiBody({ type: UpdateProjectDto })
   @Patch(':id')
-  async update(@Req() req: { user: JwtUser }, @Param('id') id: string, @Body() body: UpdateProjectDto) {
+  async update(
+    @Req() req: { user: JwtUser },
+    @Param('id') id: string,
+    @Body() body: UpdateProjectDto,
+  ) {
     return this.updateProjectUseCase.execute(req.user.sub, id, body);
   }
 

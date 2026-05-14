@@ -1,7 +1,12 @@
 import { Controller, Get, Req, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { GetSystemMetricsUseCase } from '../../application/use-cases/get-system-metrics.use-case';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 
 interface JwtUser {
   sub: string;
@@ -13,9 +18,13 @@ interface JwtUser {
 @UseGuards(AuthGuard('jwt'))
 @Controller('observability')
 export class ObservabilityController {
-  constructor(private readonly getSystemMetricsUseCase: GetSystemMetricsUseCase) {}
+  constructor(
+    private readonly getSystemMetricsUseCase: GetSystemMetricsUseCase,
+  ) {}
 
-  @ApiOperation({ summary: 'Get system metrics scoped to the authenticated user' })
+  @ApiOperation({
+    summary: 'Get system metrics scoped to the authenticated user',
+  })
   @ApiResponse({ status: 200, description: 'System metrics' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @Get('metrics')

@@ -1,18 +1,34 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { AnalyticsRepositoryInterface } from '../../domain/repositories/analytics.repository.interface';
-import { SensorMetric, TimeseriesPoint, SeriesRequest, MetricStats } from '../../domain/entities/analytics.entities';
+import {
+  SensorMetric,
+  TimeseriesPoint,
+  SeriesRequest,
+  MetricStats,
+} from '../../domain/entities/analytics.entities';
 
 @Injectable()
 export class PrismaAnalyticsRepository implements AnalyticsRepositoryInterface {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getAvailableMetrics(userId: string, projectId: string): Promise<SensorMetric[]> {
+  async getAvailableMetrics(
+    userId: string,
+    projectId: string,
+  ): Promise<SensorMetric[]> {
     await this.verifyProjectOwnership(userId, projectId);
 
     const sensors = await this.prisma.sensor.findMany({
       where: { device: { projectId } },
-      select: { id: true, name: true, device: { select: { id: true, name: true } } },
+      select: {
+        id: true,
+        name: true,
+        device: { select: { id: true, name: true } },
+      },
     });
 
     const metrics: SensorMetric[] = [];
@@ -25,7 +41,9 @@ export class PrismaAnalyticsRepository implements AnalyticsRepositoryInterface {
 
       if (latestData?.payload) {
         const payloadObj = latestData.payload as Record<string, unknown>;
-        const numericKeys = Object.keys(payloadObj).filter(key => typeof payloadObj[key] === 'number');
+        const numericKeys = Object.keys(payloadObj).filter(
+          (key) => typeof payloadObj[key] === 'number',
+        );
 
         metrics.push(
           SensorMetric.create({
@@ -67,7 +85,7 @@ export class PrismaAnalyticsRepository implements AnalyticsRepositoryInterface {
 
     return dataPoints
       .reverse()
-      .map(dp => {
+      .map((dp) => {
         const payloadObj = dp.payload as Record<string, unknown>;
         return {
           timestamp: dp.timestamp,
@@ -76,10 +94,10 @@ export class PrismaAnalyticsRepository implements AnalyticsRepositoryInterface {
         };
       })
       .map(
-        props =>
+        (props) =>
           new TimeseriesPoint({
-            timestamp: props.timestamp as Date,
-            timeLabel: props.timeLabel as string,
+            timestamp: props.timestamp,
+            timeLabel: props.timeLabel,
             [metric]: props[metric],
           }),
       );
@@ -112,7 +130,9 @@ export class PrismaAnalyticsRepository implements AnalyticsRepositoryInterface {
       const dataPoints = await this.prisma.dataPoint.findMany({
         where: {
           sensorId: req.sensorId,
-          ...(Object.keys(timeFilter).length > 0 ? { timestamp: timeFilter } : {}),
+          ...(Object.keys(timeFilter).length > 0
+            ? { timestamp: timeFilter }
+            : {}),
         },
         orderBy: { timestamp: 'desc' },
         take: Number(limit),
@@ -171,7 +191,9 @@ export class PrismaAnalyticsRepository implements AnalyticsRepositoryInterface {
     const dataPoints = await this.prisma.dataPoint.findMany({
       where: {
         sensorId,
-        ...(Object.keys(timeFilter).length > 0 ? { timestamp: timeFilter } : {}),
+        ...(Object.keys(timeFilter).length > 0
+          ? { timestamp: timeFilter }
+          : {}),
       },
       orderBy: { timestamp: 'desc' },
       take: 500,
@@ -203,11 +225,24 @@ export class PrismaAnalyticsRepository implements AnalyticsRepositoryInterface {
     const variance = values.reduce((sum, v) => sum + (v - avg) ** 2, 0) / count;
     const stddev = Math.sqrt(variance);
 
-    return MetricStats.create({ sensorId, metric, min, max, avg, stddev, count });
+    return MetricStats.create({
+      sensorId,
+      metric,
+      min,
+      max,
+      avg,
+      stddev,
+      count,
+    });
   }
 
-  private async verifyProjectOwnership(userId: string, projectId: string): Promise<void> {
-    const project = await this.prisma.project.findUnique({ where: { id: projectId } });
+  private async verifyProjectOwnership(
+    userId: string,
+    projectId: string,
+  ): Promise<void> {
+    const project = await this.prisma.project.findUnique({
+      where: { id: projectId },
+    });
     if (!project) {
       throw new NotFoundException('Proyecto no encontrado');
     }

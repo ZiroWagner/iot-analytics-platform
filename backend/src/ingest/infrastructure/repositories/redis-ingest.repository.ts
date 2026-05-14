@@ -12,85 +12,100 @@ const EPS_COUNTER_TTL = 10;
 
 @Injectable()
 export class RedisIngestRepository implements IngestRepositoryInterface {
-    constructor(
-        private readonly prisma: PrismaService,
-        private readonly redisService: RedisService,
-    ) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly redisService: RedisService,
+  ) {}
 
-    async resolveDeviceId(apiKey: string): Promise<string> {
-        const cacheKey = `device:apikey:${apiKey}`;
-        const cachedId = await this.redisService.client.get(cacheKey);
-        if (cachedId) return cachedId;
+  async resolveDeviceId(apiKey: string): Promise<string> {
+    const cacheKey = `device:apikey:${apiKey}`;
+    const cachedId = await this.redisService.client.get(cacheKey);
+    if (cachedId) return cachedId;
 
-        const deviceRecord = await this.prisma.device.findUnique({
-            where: { api_key: apiKey },
-            select: { id: true, projectId: true },
-        });
-        if (!deviceRecord) {
-            throw new UnauthorizedException('Invalid API Key');
-        }
-
-        await this.redisService.client.setex(cacheKey, API_KEY_CACHE_TTL, deviceRecord.id);
-        await this.redisService.client.setex(
-            `device:${deviceRecord.id}:project`,
-            API_KEY_CACHE_TTL,
-            deviceRecord.projectId,
-        );
-        return deviceRecord.id;
+    const deviceRecord = await this.prisma.device.findUnique({
+      where: { api_key: apiKey },
+      select: { id: true, projectId: true },
+    });
+    if (!deviceRecord) {
+      throw new UnauthorizedException('Invalid API Key');
     }
 
-    async resolveProjectId(deviceId: string): Promise<string> {
-        return (await this.redisService.client.get(`device:${deviceId}:project`)) || 'unknown';
-    }
+    await this.redisService.client.setex(
+      cacheKey,
+      API_KEY_CACHE_TTL,
+      deviceRecord.id,
+    );
+    await this.redisService.client.setex(
+      `device:${deviceRecord.id}:project`,
+      API_KEY_CACHE_TTL,
+      deviceRecord.projectId,
+    );
+    return deviceRecord.id;
+  }
 
-    async publishToStream(data: {
-        deviceId: string;
-        projectId: string;
-        timestamp: string;
-        sensors: SensorReading[];
-    }): Promise<void> {
-        const sensorsJson = IngestDomainService.serializeSensorsForStream(data.sensors);
-        await this.redisService.client.xadd(
-            'telemetry:ingest',
-            'MAXLEN', '~', STREAM_MAX_LENGTH,
-            '*',
-            'deviceId', data.deviceId,
-            'projectId', data.projectId,
-            'timestamp', data.timestamp,
-            'sensors', sensorsJson,
-        );
-    }
+  async resolveProjectId(deviceId: string): Promise<string> {
+    return (
+      (await this.redisService.client.get(`device:${deviceId}:project`)) ||
+      'unknown'
+    );
+  }
 
-    async updateDeviceState(deviceId: string, timestamp: string): Promise<void> {
-        await this.redisService.client.hset(`device:state:${deviceId}`, {
-            lastSeenAt: timestamp,
-            status: 'online',
-        });
-    }
+  async publishToStream(data: {
+    deviceId: string;
+    projectId: string;
+    timestamp: string;
+    sensors: SensorReading[];
+  }): Promise<void> {
+    const sensorsJson = IngestDomainService.serializeSensorsForStream(
+      data.sensors,
+    );
+    await this.redisService.client.xadd(
+      'telemetry:ingest',
+      'MAXLEN',
+      '~',
+      STREAM_MAX_LENGTH,
+      '*',
+      'deviceId',
+      data.deviceId,
+      'projectId',
+      data.projectId,
+      'timestamp',
+      data.timestamp,
+      'sensors',
+      sensorsJson,
+    );
+  }
 
-    async broadcastTelemetry(data: {
-        deviceId: string;
-        projectId: string;
-        timestamp: string;
-        sensors: SensorReading[];
-    }): Promise<void> {
-        await this.redisService.client.publish(
-            'telemetry:broadcast',
-            JSON.stringify({
-                type: 'device_data',
-                deviceId: data.deviceId,
-                projectId: data.projectId,
-                timestamp: data.timestamp,
-                sensors: data.sensors.map((s) => s.toPlain()),
-            }),
-        );
-    }
+  async updateDeviceState(deviceId: string, timestamp: string): Promise<void> {
+    await this.redisService.client.hset(`device:state:${deviceId}`, {
+      lastSeenAt: timestamp,
+      status: 'online',
+    });
+  }
 
-    async incrementEps(): Promise<void> {
-        const epsKey = `obs:eps:${Math.floor(Date.now() / 1000)}`;
-        const pipeline = this.redisService.client.pipeline();
-        pipeline.incr(epsKey);
-        pipeline.expire(epsKey, EPS_COUNTER_TTL);
-        await pipeline.exec();
-    }
+  async broadcastTelemetry(data: {
+    deviceId: string;
+    projectId: string;
+    timestamp: string;
+    sensors: SensorReading[];
+  }): Promise<void> {
+    await this.redisService.client.publish(
+      'telemetry:broadcast',
+      JSON.stringify({
+        type: 'device_data',
+        deviceId: data.deviceId,
+        projectId: data.projectId,
+        timestamp: data.timestamp,
+        sensors: data.sensors.map((s) => s.toPlain()),
+      }),
+    );
+  }
+
+  async incrementEps(): Promise<void> {
+    const epsKey = `obs:eps:${Math.floor(Date.now() / 1000)}`;
+    const pipeline = this.redisService.client.pipeline();
+    pipeline.incr(epsKey);
+    pipeline.expire(epsKey, EPS_COUNTER_TTL);
+    await pipeline.exec();
+  }
 }

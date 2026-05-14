@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Req,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { CreateDeviceDto } from './dto/create-device.dto';
 import { UpdateDeviceDto } from './dto/update-device.dto';
@@ -7,7 +17,14 @@ import { GetDevicesByProjectUseCase } from '../../application/use-cases/get-devi
 import { GetDeviceUseCase } from '../../application/use-cases/get-device.use-case';
 import { UpdateDeviceUseCase } from '../../application/use-cases/update-device.use-case';
 import { DeleteDeviceUseCase } from '../../application/use-cases/delete-device.use-case';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBody,
+  ApiParam,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 
 interface JwtUser {
   sub: string;
@@ -42,7 +59,10 @@ export class DevicesController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiParam({ name: 'projectId', description: 'Project ID' })
   @Get('project/:projectId')
-  async findByProject(@Req() req: { user: JwtUser }, @Param('projectId') projectId: string) {
+  async findByProject(
+    @Req() req: { user: JwtUser },
+    @Param('projectId') projectId: string,
+  ) {
     return this.getDevicesByProjectUseCase.execute(req.user.sub, projectId);
   }
 
@@ -64,7 +84,11 @@ export class DevicesController {
   @ApiParam({ name: 'id', description: 'Device ID' })
   @ApiBody({ type: UpdateDeviceDto })
   @Patch(':id')
-  async update(@Req() req: { user: JwtUser }, @Param('id') id: string, @Body() body: UpdateDeviceDto) {
+  async update(
+    @Req() req: { user: JwtUser },
+    @Param('id') id: string,
+    @Body() body: UpdateDeviceDto,
+  ) {
     return this.updateDeviceUseCase.execute(req.user.sub, id, body);
   }
 

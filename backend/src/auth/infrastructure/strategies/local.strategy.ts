@@ -5,15 +5,15 @@ import { ValidateUserUseCase } from '../../application/use-cases/validate-user.u
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
-    constructor(private readonly validateUserUseCase: ValidateUserUseCase) {
-        super({ usernameField: 'email' });
-    }
+  constructor(private readonly validateUserUseCase: ValidateUserUseCase) {
+    super({ usernameField: 'email' });
+  }
 
-    async validate(email: string, pass: string): Promise<any> {
-        try {
-            return await this.validateUserUseCase.execute(email, pass);
-        } catch {
-            throw new UnauthorizedException('Credenciales inválidas');
-        }
+  async validate(email: string, pass: string): Promise<any> {
+    try {
+      return await this.validateUserUseCase.execute(email, pass);
+    } catch {
+      throw new UnauthorizedException('Credenciales inválidas');
     }
+  }
 }

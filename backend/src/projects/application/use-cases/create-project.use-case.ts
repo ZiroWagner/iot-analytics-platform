@@ -10,7 +10,10 @@ export class CreateProjectUseCase {
     private readonly projectRepository: ProjectRepositoryInterface,
   ) {}
 
-  async execute(userId: string, data: { name: string; description?: string }): Promise<Project> {
+  async execute(
+    userId: string,
+    data: { name: string; description?: string },
+  ): Promise<Project> {
     // Domain validation inside entity factory if needed
     return this.projectRepository.create({
       userId,

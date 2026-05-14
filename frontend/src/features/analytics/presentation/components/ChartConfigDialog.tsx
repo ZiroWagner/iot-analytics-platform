@@ -44,6 +44,9 @@ export function ChartConfigDialog({
   const [yAxisAuto, setYAxisAuto] = useState(existingConfig?.yAxisAutoRange ?? true)
   const [yMin, setYMin] = useState<string>(existingConfig?.yAxisMin?.toString() ?? '')
   const [yMax, setYMax] = useState<string>(existingConfig?.yAxisMax?.toString() ?? '')
+  const [selGateway, setSelGateway] = useState('')
+  const [selSensor, setSelSensor] = useState('')
+  const [selMetric, setSelMetric] = useState('')
 
   useEffect(() => {
     if (open) {
@@ -62,10 +65,6 @@ export function ChartConfigDialog({
       setSelMetric('')
     }
   }, [open, existingConfig])
-
-  const [selGateway, setSelGateway] = useState('')
-  const [selSensor, setSelSensor] = useState('')
-  const [selMetric, setSelMetric] = useState('')
 
   const uniqueGateways = useMemo(() => {
     const map = new Map<string, string>()

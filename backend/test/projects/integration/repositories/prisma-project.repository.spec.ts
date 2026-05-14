@@ -55,7 +55,11 @@ describe('PrismaProjectRepository Integration', () => {
       };
       prismaMock.project.create.mockResolvedValue(dbProject);
 
-      const result = await repository.create({ name: 'Test', description: 'Desc', userId: 'u1' });
+      const result = await repository.create({
+        name: 'Test',
+        description: 'Desc',
+        userId: 'u1',
+      });
 
       expect(result).toBeInstanceOf(Project);
       expect(result.id).toBe('1');
@@ -92,7 +96,15 @@ describe('PrismaProjectRepository Integration', () => {
   describe('findAllByUserId', () => {
     it('should return array of domain projects', async () => {
       const dbProjects = [
-        { id: '1', name: 'P1', userId: 'u1', createdAt: new Date(), updatedAt: new Date(), _count: { devices: 0 }, devices: [] },
+        {
+          id: '1',
+          name: 'P1',
+          userId: 'u1',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          _count: { devices: 0 },
+          devices: [],
+        },
       ];
       prismaMock.project.findMany.mockResolvedValue(dbProjects);
 

@@ -5,7 +5,10 @@ import { RedisModule } from '../redis/redis.module';
 import { TelemetryGateway } from './interfaces/ws/telemetry.gateway';
 
 // Infrastructure adapters
-import { TELEMETRY_ADAPTER_TOKEN, RedisTelemetryAdapter } from './infrastructure/adapters/redis-telemetry.adapter';
+import {
+  TELEMETRY_ADAPTER_TOKEN,
+  RedisTelemetryAdapter,
+} from './infrastructure/adapters/redis-telemetry.adapter';
 
 @Module({
   imports: [RedisModule],

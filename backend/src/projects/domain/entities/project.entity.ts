@@ -13,7 +13,8 @@ export class Project {
 
   public update(name?: string, description?: string | null): void {
     if (name) {
-      if (name.length < 3) throw new Error("Project name must be at least 3 characters");
+      if (name.length < 3)
+        throw new Error('Project name must be at least 3 characters');
       this.name = name;
     }
     if (description !== undefined) {
@@ -33,7 +34,7 @@ export class Project {
     devices?: any[];
   }): Project {
     if (!props.name || props.name.trim().length < 3) {
-      throw new Error("Project name must be at least 3 characters");
+      throw new Error('Project name must be at least 3 characters');
     }
     return new Project(
       props.id,
@@ -43,7 +44,7 @@ export class Project {
       props.createdAt,
       props.updatedAt,
       props.deviceCount,
-      props.devices
+      props.devices,
     );
   }
 }

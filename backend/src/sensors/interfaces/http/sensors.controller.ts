@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Req,
+  Query,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { CreateSensorDto } from './dto/create-sensor.dto';
 import { UpdateSensorDto } from './dto/update-sensor.dto';
@@ -8,7 +19,15 @@ import { GetSensorUseCase } from '../../application/use-cases/get-sensor.use-cas
 import { UpdateSensorUseCase } from '../../application/use-cases/update-sensor.use-case';
 import { DeleteSensorUseCase } from '../../application/use-cases/delete-sensor.use-case';
 import { GetSensorDataPointsUseCase } from '../../application/use-cases/get-sensor-data-points.use-case';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiParam, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBody,
+  ApiParam,
+  ApiBearerAuth,
+  ApiQuery,
+} from '@nestjs/swagger';
 
 interface JwtUser {
   sub: string;
@@ -44,7 +63,10 @@ export class SensorsController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiParam({ name: 'deviceId', description: 'Device ID' })
   @Get('device/:deviceId')
-  async findByDevice(@Req() req: { user: JwtUser }, @Param('deviceId') deviceId: string) {
+  async findByDevice(
+    @Req() req: { user: JwtUser },
+    @Param('deviceId') deviceId: string,
+  ) {
     return this.getSensorsByDeviceUseCase.execute(req.user.sub, deviceId);
   }
 
@@ -63,9 +85,17 @@ export class SensorsController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 404, description: 'Sensor not found' })
   @ApiParam({ name: 'id', description: 'Sensor ID' })
-  @ApiQuery({ name: 'from', required: false, description: 'Start date (ISO 8601)' })
+  @ApiQuery({
+    name: 'from',
+    required: false,
+    description: 'Start date (ISO 8601)',
+  })
   @ApiQuery({ name: 'to', required: false, description: 'End date (ISO 8601)' })
-  @ApiQuery({ name: 'limit', required: false, description: 'Max number of points' })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    description: 'Max number of points',
+  })
   @Get(':id/data')
   async getDataPoints(
     @Req() req: { user: JwtUser },
@@ -89,7 +119,11 @@ export class SensorsController {
   @ApiParam({ name: 'id', description: 'Sensor ID' })
   @ApiBody({ type: UpdateSensorDto })
   @Patch(':id')
-  async update(@Req() req: { user: JwtUser }, @Param('id') id: string, @Body() body: UpdateSensorDto) {
+  async update(
+    @Req() req: { user: JwtUser },
+    @Param('id') id: string,
+    @Body() body: UpdateSensorDto,
+  ) {
     return this.updateSensorUseCase.execute(req.user.sub, id, body);
   }
 

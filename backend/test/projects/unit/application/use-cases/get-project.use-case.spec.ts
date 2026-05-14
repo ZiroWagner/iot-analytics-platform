@@ -47,12 +47,16 @@ describe('GetProjectUseCase', () => {
   it('should throw NotFoundException if project does not exist', async () => {
     repository.findById.mockResolvedValue(null);
 
-    await expect(useCase.execute('user-456', 'proj-123')).rejects.toThrow(NotFoundException);
+    await expect(useCase.execute('user-456', 'proj-123')).rejects.toThrow(
+      NotFoundException,
+    );
   });
 
   it('should throw ForbiddenException if project is not owned by user', async () => {
     repository.findById.mockResolvedValue(mockProject);
 
-    await expect(useCase.execute('other-user', 'proj-123')).rejects.toThrow(ForbiddenException);
+    await expect(useCase.execute('other-user', 'proj-123')).rejects.toThrow(
+      ForbiddenException,
+    );
   });
 });

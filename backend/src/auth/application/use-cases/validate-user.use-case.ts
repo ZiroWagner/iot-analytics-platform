@@ -6,22 +6,22 @@ import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class ValidateUserUseCase {
-    constructor(
-        @Inject(USER_REPOSITORY_TOKEN)
-        private readonly userRepository: UserRepositoryInterface,
-    ) {}
+  constructor(
+    @Inject(USER_REPOSITORY_TOKEN)
+    private readonly userRepository: UserRepositoryInterface,
+  ) {}
 
-    async execute(email: string, password: string): Promise<User> {
-        const user = await this.userRepository.findByEmail(email);
-        if (!user || !user.hasPassword()) {
-            throw new UnauthorizedException('Credenciales inválidas');
-        }
-
-        const isMatch = await bcrypt.compare(password, user.password!);
-        if (!isMatch) {
-            throw new UnauthorizedException('Credenciales inválidas');
-        }
-
-        return user;
+  async execute(email: string, password: string): Promise<User> {
+    const user = await this.userRepository.findByEmail(email);
+    if (!user || !user.hasPassword()) {
+      throw new UnauthorizedException('Credenciales inválidas');
     }
+
+    const isMatch = await bcrypt.compare(password, user.password!);
+    if (!isMatch) {
+      throw new UnauthorizedException('Credenciales inválidas');
+    }
+
+    return user;
+  }
 }

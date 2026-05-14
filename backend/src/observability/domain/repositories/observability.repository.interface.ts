@@ -1,6 +1,8 @@
 import { SystemMetrics } from '../entities/system-metrics.entity';
 
-export const OBSERVABILITY_REPOSITORY_TOKEN = Symbol('ObservabilityRepositoryInterface');
+export const OBSERVABILITY_REPOSITORY_TOKEN = Symbol(
+  'ObservabilityRepositoryInterface',
+);
 
 export interface ObservabilityRepositoryInterface {
   getStreamLength(): Promise<number>;
@@ -9,12 +11,14 @@ export interface ObservabilityRepositoryInterface {
   countOnlineDevices(): Promise<number>;
   countOnlineDevicesForUser(userId: string): Promise<number>;
   scanActiveDeviceIds(): Promise<string[]>;
-  getDeviceStates(deviceIds: string[]): Promise<Array<{
-    deviceId: string;
-    status: string | null;
-    lastSeenAt: string | null;
-    projectId: string | null;
-  }>>;
+  getDeviceStates(deviceIds: string[]): Promise<
+    Array<{
+      deviceId: string;
+      status: string | null;
+      lastSeenAt: string | null;
+      projectId: string | null;
+    }>
+  >;
   markDeviceOffline(deviceId: string): Promise<void>;
   broadcastOfflineEvent(deviceId: string, projectId: string): Promise<void>;
 }
