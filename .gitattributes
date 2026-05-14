@@ -1,0 +1,9 @@
+# Texto normalizado a LF en el repositorio
+* text=auto eol=lf
+
+# Scripts Windows
+*.bat eol=crlf
+*.cmd eol=crlf
+
+# Scripts Unix
+*.sh eol=lf
