@@ -71,15 +71,48 @@ pipeline {
                         -Dsonar.projectKey=iot-platform \
                         -Dsonar.sources=frontend/src,backend/src \
                         -Dsonar.host.url=http://sonarqube:9000 \
-                        -Dsonar.javascript.lcov.reportPaths=frontend/coverage/lcov.info,backend/coverage/lcov.info"
+                        -Dsonar.typescript.tsconfigPaths=frontend/tsconfig.sonar.json,backend/tsconfig.sonar.json \
+                        -Dsonar.javascript.lcov.reportPaths=frontend/coverage/lcov.info,backend/coverage/lcov.info \
+                        -Dsonar.qualitygate.wait=false"
                 }
             }
         }
 
         stage("Quality Gate") {
             steps {
-                timeout(time: 15, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
+                withSonarQubeEnv('SonarQubeServer') {
+                    timeout(time: 15, unit: 'MINUTES') {
+                        sh '''
+                            TASK_URL=$(grep '^ceTaskUrl=' .scannerwork/report-task.txt | cut -d= -f2-)
+
+                            while true; do
+                                RESPONSE=$(curl -sf "$TASK_URL")
+                                STATUS=$(echo "$RESPONSE" | node -pe "JSON.parse(require('fs').readFileSync(0, 'utf8')).task.status")
+                                echo "SonarQube Compute Engine task status: $STATUS"
+
+                                if [ "$STATUS" = "SUCCESS" ]; then
+                                    ANALYSIS_ID=$(echo "$RESPONSE" | node -pe "JSON.parse(require('fs').readFileSync(0, 'utf8')).task.analysisId")
+                                    break
+                                fi
+
+                                if [ "$STATUS" = "FAILED" ] || [ "$STATUS" = "CANCELED" ]; then
+                                    echo "$RESPONSE"
+                                    exit 1
+                                fi
+
+                                sleep 10
+                            done
+
+                            GATE_RESPONSE=$(curl -sf "$SONAR_HOST_URL/api/qualitygates/project_status?analysisId=$ANALYSIS_ID")
+                            GATE_STATUS=$(echo "$GATE_RESPONSE" | node -pe "JSON.parse(require('fs').readFileSync(0, 'utf8')).projectStatus.status")
+                            echo "SonarQube Quality Gate status: $GATE_STATUS"
+
+                            if [ "$GATE_STATUS" != "OK" ]; then
+                                echo "$GATE_RESPONSE"
+                                exit 1
+                            fi
+                        '''
+                    }
                 }
             }
         }   
