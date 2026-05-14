@@ -4,14 +4,6 @@ pipeline {
     tools {
         nodejs 'NodeJS_24'
     }
-    stages {
-        stage('Docker Test') {
-            steps {
-                sh 'docker version'
-                sh 'docker ps'
-            }
-        }
-    }
 
     environment {
         FRONTEND_IMAGE = "iot-frontend:${env.BUILD_ID}"
@@ -26,6 +18,13 @@ pipeline {
     }
 
     stages {
+        stage('Docker Test') {
+            steps {
+                sh 'docker version'
+                sh 'docker ps'
+            }
+        }
+        
         stage('Checkout') {
             steps {
                 checkout scm
