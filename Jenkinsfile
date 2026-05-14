@@ -84,9 +84,14 @@ pipeline {
                     timeout(time: 15, unit: 'MINUTES') {
                         sh '''
                             TASK_URL=$(grep '^ceTaskUrl=' .scannerwork/report-task.txt | cut -d= -f2-)
+                            AUTH_ARGS=""
+
+                            if [ -n "$SONAR_AUTH_TOKEN" ]; then
+                                AUTH_ARGS="-u ${SONAR_AUTH_TOKEN}:"
+                            fi
 
                             while true; do
-                                RESPONSE=$(curl -sf "$TASK_URL")
+                                RESPONSE=$(curl -sf $AUTH_ARGS "$TASK_URL")
                                 STATUS=$(echo "$RESPONSE" | node -pe "JSON.parse(require('fs').readFileSync(0, 'utf8')).task.status")
                                 echo "SonarQube Compute Engine task status: $STATUS"
 
@@ -103,7 +108,7 @@ pipeline {
                                 sleep 10
                             done
 
-                            GATE_RESPONSE=$(curl -sf "$SONAR_HOST_URL/api/qualitygates/project_status?analysisId=$ANALYSIS_ID")
+                            GATE_RESPONSE=$(curl -sf $AUTH_ARGS "$SONAR_HOST_URL/api/qualitygates/project_status?analysisId=$ANALYSIS_ID")
                             GATE_STATUS=$(echo "$GATE_RESPONSE" | node -pe "JSON.parse(require('fs').readFileSync(0, 'utf8')).projectStatus.status")
                             echo "SonarQube Quality Gate status: $GATE_STATUS"
 
