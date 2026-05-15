@@ -1,9 +1,9 @@
-import { describe, expect, it, beforeEach, vi } from 'vitest'
+import { describe, expect, it, beforeEach } from 'vitest'
 import { tokenStorage } from '../infrastructure/http/token-storage'
 
 describe('tokenStorage', () => {
   beforeEach(() => {
-    window.localStorage.clear()
+    globalThis.localStorage.clear()
   })
 
   it('returns null when no token is stored', () => {

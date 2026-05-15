@@ -71,7 +71,7 @@ describe('Project Entity', () => {
 
     it('does not change name when undefined is passed', () => {
       const project = Project.create(validProps);
-      project.update(undefined);
+      project.update();
       expect(project.name).toBe('IoT Farm');
     });
   });
