@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker'
 import { describe, expect, it } from 'vitest'
-import { loginSchema, registerSchema } from '../domain/credentials.schema'
+import { PASSWORD_MIN_LENGTH, loginSchema, registerSchema } from '../domain/credentials.schema'
 
 describe('loginSchema', () => {
   it('accepts a valid email and password', () => {
@@ -21,8 +21,10 @@ describe('loginSchema', () => {
   })
 
   it('rejects passwords below the minimum length', () => {
+    const email = faker.internet.email()
+    const password = faker.string.alphanumeric(PASSWORD_MIN_LENGTH - 1)
     expect(() =>
-      loginSchema.parse({ email: 'user@example.com', password: '123' }),
+      loginSchema.parse({ email, password }),
     ).toThrowError(/contrase/i)
   })
 })

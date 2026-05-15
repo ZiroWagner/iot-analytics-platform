@@ -1,6 +1,7 @@
 import { faker } from '@faker-js/faker'
 import { describe, expect, it, vi } from 'vitest'
 import { loginUseCase } from '../application/use-cases/login'
+import { PASSWORD_MIN_LENGTH } from '../domain/credentials.schema'
 import type { AuthRepository } from '../infrastructure/auth.repository'
 
 function buildDeps(overrides: Partial<{ token: string; throwOnLogin: boolean }> = {}) {
@@ -35,9 +36,10 @@ describe('loginUseCase', () => {
   })
 
   it('rejects invalid input before reaching the repository', async () => {
+    const password = faker.string.alphanumeric(PASSWORD_MIN_LENGTH - 1)
     const { repository, storage } = buildDeps()
     await expect(
-      loginUseCase({ email: 'nope', password: '123' }, { repository, storage }),
+      loginUseCase({ email: 'nope', password }, { repository, storage }),
     ).rejects.toThrow()
     expect(repository.login).not.toHaveBeenCalled()
     expect(storage.set).not.toHaveBeenCalled()
