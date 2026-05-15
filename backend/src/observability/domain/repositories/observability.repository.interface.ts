@@ -1,5 +1,3 @@
-import { SystemMetrics } from '../entities/system-metrics.entity';
-
 export const OBSERVABILITY_REPOSITORY_TOKEN = Symbol(
   'ObservabilityRepositoryInterface',
 );

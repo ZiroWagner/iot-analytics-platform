@@ -116,61 +116,105 @@ export class PrismaAnalyticsRepository implements AnalyticsRepositoryInterface {
     const allPoints = new Map<number, Record<string, unknown>>();
 
     for (const req of seriesRequests) {
-      const sensor = await this.prisma.sensor.findFirst({
-        where: { id: req.sensorId, device: { projectId } },
-        select: { id: true, name: true },
-      });
-
-      if (!sensor) continue;
-
-      const timeFilter: Record<string, unknown> = {};
-      if (from) (timeFilter as any).gte = from;
-      if (to) (timeFilter as any).lte = to;
-
-      const dataPoints = await this.prisma.dataPoint.findMany({
-        where: {
-          sensorId: req.sensorId,
-          ...(Object.keys(timeFilter).length > 0
-            ? { timestamp: timeFilter }
-            : {}),
-        },
-        orderBy: { timestamp: 'desc' },
-        take: Number(limit),
-      });
-
-      const seriesKey = `${sensor.name}:${req.metric}`;
-
-      for (const dp of dataPoints) {
-        const ts = dp.timestamp.getTime();
-        const payloadObj = dp.payload as Record<string, unknown>;
-        const value = payloadObj[req.metric];
-
-        if (allPoints.has(ts)) {
-          const existing = allPoints.get(ts)!;
-          existing[seriesKey] = typeof value === 'number' ? value : null;
-        } else {
-          allPoints.set(ts, {
-            timestamp: dp.timestamp,
-            timeLabel: new Date(dp.timestamp).toLocaleTimeString(),
-            [seriesKey]: typeof value === 'number' ? value : null,
-          });
-        }
-      }
+      await this.collectSeriesPoints(projectId, req, allPoints, from, to, limit);
     }
 
-    return Array.from(allPoints.entries())
-      .map(([_, props]) => {
-        const entry: Record<string, unknown> = {};
-        for (const key of Object.keys(props)) {
-          entry[key] = props[key];
-        }
-        const ts = props.timestamp as Date;
-        return new TimeseriesPoint({
-          timestamp: ts,
-          timeLabel: props.timeLabel as string,
-          ...entry,
-        });
-      })
+    return this.sortTimeseriesMap(allPoints);
+  }
+
+  /**
+   * Fetches data points for a single series request and merges them into the
+   * shared timestamp map.
+   */
+  private async collectSeriesPoints(
+    projectId: string,
+    req: SeriesRequest,
+    allPoints: Map<number, Record<string, unknown>>,
+    from?: Date,
+    to?: Date,
+    limit = 100,
+  ): Promise<void> {
+    const sensor = await this.prisma.sensor.findFirst({
+      where: { id: req.sensorId, device: { projectId } },
+      select: { id: true, name: true },
+    });
+
+    if (!sensor) return;
+
+    const dataPoints = await this.prisma.dataPoint.findMany({
+      where: this.buildTimeseriesWhereClause(req.sensorId, from, to),
+      orderBy: { timestamp: 'desc' },
+      take: Number(limit),
+    });
+
+    const seriesKey = `${sensor.name}:${req.metric}`;
+
+    for (const dp of dataPoints) {
+      const payloadObj = dp.payload as Record<string, unknown>;
+      const value = typeof payloadObj[req.metric] === 'number' ? payloadObj[req.metric] : null;
+      this.mergeDataPointIntoMap(allPoints, dp, seriesKey, value);
+    }
+  }
+
+  /** Builds a Prisma `where` clause with optional time range filters. */
+  private buildTimeseriesWhereClause(
+    sensorId: string,
+    from?: Date,
+    to?: Date,
+  ): Record<string, unknown> {
+    const where: Record<string, unknown> = { sensorId };
+    const timeFilter = this.buildTimeFilter(from, to);
+    if (timeFilter) {
+      where.timestamp = timeFilter;
+    }
+    return where;
+  }
+
+  /** Returns a Prisma date range filter or `null` if no bounds are set. */
+  private buildTimeFilter(
+    from?: Date,
+    to?: Date,
+  ): Record<string, Date> | null {
+    if (!from && !to) return null;
+    const filter: Record<string, Date> = {};
+    if (from) filter.gte = from;
+    if (to) filter.lte = to;
+    return filter;
+  }
+
+  /** Merges a single data point into the aggregated timestamp map. */
+  private mergeDataPointIntoMap(
+    map: Map<number, Record<string, unknown>>,
+    dp: { timestamp: Date; payload: unknown },
+    seriesKey: string,
+    value: unknown,
+  ): void {
+    const ts = (dp.timestamp as Date).getTime();
+    const existing = map.get(ts);
+    if (existing) {
+      existing[seriesKey] = value;
+    } else {
+      map.set(ts, {
+        timestamp: dp.timestamp,
+        timeLabel: new Date(dp.timestamp).toLocaleTimeString(),
+        [seriesKey]: value,
+      });
+    }
+  }
+
+  /** Converts the aggregated map into a sorted array of TimeseriesPoint. */
+  private sortTimeseriesMap(
+    map: Map<number, Record<string, unknown>>,
+  ): TimeseriesPoint[] {
+    return Array.from(map.values())
+      .map(
+        (props) =>
+          new TimeseriesPoint({
+            timestamp: props.timestamp as Date,
+            timeLabel: props.timeLabel as string,
+            ...props,
+          }),
+      )
       .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
   }
 
@@ -184,17 +228,8 @@ export class PrismaAnalyticsRepository implements AnalyticsRepositoryInterface {
   ): Promise<MetricStats> {
     await this.verifyProjectOwnership(userId, projectId);
 
-    const timeFilter: Record<string, unknown> = {};
-    if (from) (timeFilter as any).gte = from;
-    if (to) (timeFilter as any).lte = to;
-
     const dataPoints = await this.prisma.dataPoint.findMany({
-      where: {
-        sensorId,
-        ...(Object.keys(timeFilter).length > 0
-          ? { timestamp: timeFilter }
-          : {}),
-      },
+      where: this.buildTimeseriesWhereClause(sensorId, from, to),
       orderBy: { timestamp: 'desc' },
       take: 500,
     });

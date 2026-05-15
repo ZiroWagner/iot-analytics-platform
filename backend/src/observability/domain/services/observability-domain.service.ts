@@ -1,5 +1,4 @@
 import { SystemMetrics } from '../entities/system-metrics.entity';
-import { DeviceStatus } from '../entities/device-status.entity';
 
 export class ObservabilityDomainService {
   static buildSystemMetrics(props: {

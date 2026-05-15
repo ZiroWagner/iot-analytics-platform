@@ -6,7 +6,6 @@ import {
   Logger,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { Observable } from 'rxjs';
 
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {

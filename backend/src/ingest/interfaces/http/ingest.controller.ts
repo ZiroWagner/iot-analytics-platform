@@ -5,8 +5,6 @@ import {
   HttpCode,
   HttpStatus,
   UnauthorizedException,
-  UsePipes,
-  ValidationPipe,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { ProcessIngestUseCase } from '../../application/use-cases/process-ingest.use-case';

@@ -8,6 +8,7 @@ import {
   UseGuards,
   HttpCode,
   HttpStatus,
+  ValidationPipe,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { RegisterDto } from './dto/auth.dto';
@@ -16,7 +17,6 @@ import { GenerateTokenUseCase } from '../../application/use-cases/generate-token
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
 import { ConfigService } from '@nestjs/config';
-import { ValidationPipe } from '@nestjs/common';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -56,31 +56,34 @@ export class AuthController {
   @ApiOperation({ summary: 'Autenticación con Google' })
   @Get('google')
   @UseGuards(AuthGuard('google'))
-  googleAuth() {}
+  googleAuth() {
+    // Passport redirects to Google; no body needed.
+  }
 
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
   googleAuthRedirect(@Req() req: Request, @Res() res: Response) {
-    const user = req.user as {
-      id: string;
-      email: string;
-      name?: string;
-      image?: string;
-    };
-    const jwt = this.generateTokenUseCase.execute(user);
-    const frontendUrl =
-      this.configService.get<string>('FRONTEND_URL') || 'http://localhost:3000';
-    res.redirect(`${frontendUrl}/auth/callback?token=${jwt.access_token}`);
+    this.handleOAuthCallback(req, res);
   }
 
   @ApiOperation({ summary: 'Autenticación con GitHub' })
   @Get('github')
   @UseGuards(AuthGuard('github'))
-  githubAuth() {}
+  githubAuth() {
+    // Passport redirects to GitHub; no body needed.
+  }
 
   @Get('github/callback')
   @UseGuards(AuthGuard('github'))
   githubAuthRedirect(@Req() req: Request, @Res() res: Response) {
+    this.handleOAuthCallback(req, res);
+  }
+
+  /**
+   * Shared handler for OAuth provider callbacks (Google / GitHub).
+   * Generates a JWT and redirects the user to the frontend callback page.
+   */
+  private handleOAuthCallback(req: Request, res: Response): void {
     const user = req.user as {
       id: string;
       email: string;

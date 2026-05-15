@@ -4,10 +4,7 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
-import {
-  SensorRepositoryInterface,
-  SENSOR_REPOSITORY_TOKEN,
-} from '../../domain/repositories/sensor.repository.interface';
+import { SensorRepositoryInterface } from '../../domain/repositories/sensor.repository.interface';
 import { Sensor } from '../../domain/entities/sensor.entity';
 
 @Injectable()
