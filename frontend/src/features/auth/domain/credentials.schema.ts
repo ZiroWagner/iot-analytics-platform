@@ -4,14 +4,14 @@ import { z } from 'zod'
 export const PASSWORD_MIN_LENGTH = 6
 
 export const loginSchema = z.object({
-  email: z.string().email('Correo electrónico inválido'),
+  email: z.email('Correo electrónico inválido'),
   password: z
     .string()
     .min(PASSWORD_MIN_LENGTH, `La contraseña debe tener al menos ${PASSWORD_MIN_LENGTH} caracteres`),
 })
 
 export const registerSchema = z.object({
-  email: z.string().email('Correo electrónico inválido'),
+  email: z.email('Correo electrónico inválido'),
   password: z
     .string()
     .min(PASSWORD_MIN_LENGTH, `La contraseña debe tener al menos ${PASSWORD_MIN_LENGTH} caracteres`),

@@ -1,5 +1,6 @@
 "use client"
 
+import type React from "react"
 import {
   Dialog,
   DialogContent,
@@ -27,6 +28,40 @@ interface Props {
 export function SensorDataModal({ sensor, onClose }: Props) {
   const { dataPoints, loading } = useSensorData(sensor.id)
 
+  let tableContent: React.ReactNode = dataPoints.map((dp) => (
+    <TableRow
+      key={dp.id}
+      className="hover:bg-surface-container-lowest/50"
+    >
+      <TableCell className="font-mono text-xs text-muted-foreground">
+        {new Date(dp.timestamp).toLocaleString()}
+      </TableCell>
+      <TableCell>
+        <pre className="text-[10px] font-mono bg-black/50 p-2 rounded-md border border-border text-emerald-400">
+          {JSON.stringify(dp.payload, null, 2)}
+        </pre>
+      </TableCell>
+    </TableRow>
+  ))
+
+  if (loading && dataPoints.length === 0) {
+    tableContent = (
+      <TableRow>
+        <TableCell colSpan={2} className="text-center h-24">
+          Cargando datos...
+        </TableCell>
+      </TableRow>
+    )
+  } else if (dataPoints.length === 0) {
+    tableContent = (
+      <TableRow>
+        <TableCell colSpan={2} className="text-center h-24 text-muted-foreground">
+          Sin telemetría registrada aún.
+        </TableCell>
+      </TableRow>
+    )
+  }
+
   return (
     <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-[700px] bg-background border-border">
@@ -49,35 +84,7 @@ export function SensorDataModal({ sensor, onClose }: Props) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {loading && dataPoints.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={2} className="text-center h-24">
-                    Cargando datos...
-                  </TableCell>
-                </TableRow>
-              ) : dataPoints.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={2} className="text-center h-24 text-muted-foreground">
-                    Sin telemetría registrada aún.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                dataPoints.map((dp) => (
-                  <TableRow
-                    key={dp.id}
-                    className="hover:bg-surface-container-lowest/50"
-                  >
-                    <TableCell className="font-mono text-xs text-muted-foreground">
-                      {new Date(dp.timestamp).toLocaleString()}
-                    </TableCell>
-                    <TableCell>
-                      <pre className="text-[10px] font-mono bg-black/50 p-2 rounded-md border border-border text-emerald-400">
-                        {JSON.stringify(dp.payload, null, 2)}
-                      </pre>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
+              {tableContent}
             </TableBody>
           </Table>
         </div>

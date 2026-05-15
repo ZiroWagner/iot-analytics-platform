@@ -157,8 +157,21 @@ export function ChartConfigDialog({
     { key: 'advanced', label: 'Avanzado', num: 3 },
   ]
 
+  function getChartTypeIcon(type: ChartSeriesType) {
+    if (type === 'line') return <LineChart className="h-3.5 w-3.5" />
+    if (type === 'bar') return <BarChart3 className="h-3.5 w-3.5" />
+    return <AreaChart className="h-3.5 w-3.5" />
+  }
+
+  const handleOpenChange = (nextOpen: boolean) => {
+    if (!nextOpen) {
+      resetForm()
+    }
+    onOpenChange(nextOpen)
+  }
+
   return (
-    <Dialog open={open} onOpenChange={(o) => { if (!o) resetForm(); onOpenChange(o) }}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-[560px] p-0 gap-0 overflow-hidden bg-card border-border">
         <DialogHeader className="px-6 pt-6 pb-4 border-b border-border bg-gradient-to-b from-purple-500/5 to-transparent">
           <DialogTitle className="text-lg">
@@ -324,9 +337,7 @@ export function ChartConfigDialog({
                               onClick={() => updateSeries(s.id, { chartType: type })}
                               title={CHART_TYPE_LABELS[type]}
                             >
-                              {type === 'line' ? <LineChart className="h-3.5 w-3.5" /> :
-                               type === 'bar' ? <BarChart3 className="h-3.5 w-3.5" /> :
-                               <AreaChart className="h-3.5 w-3.5" />}
+                              {getChartTypeIcon(type)}
                             </Button>
                           ))}
                         </div>

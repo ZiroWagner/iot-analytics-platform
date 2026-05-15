@@ -90,7 +90,7 @@ export function ChartWidget({ projectId, config, globalTimeRange, globalCustomDa
       }
       return { from: config.customFrom, to: config.customTo }
     }
-    const ms = TIME_RANGE_MS[effectiveTimeRange as Exclude<TimeRangePreset, 'custom'>]
+    const ms = TIME_RANGE_MS[effectiveTimeRange]
     const now = Date.now()
     return {
       from: new Date(now - ms).toISOString(),
@@ -217,6 +217,79 @@ export function ChartWidget({ projectId, config, globalTimeRange, globalCustomDa
     })
   }
 
+  let chartContent = (
+    <div className="w-full h-[280px]">
+      <ResponsiveContainer width="100%" height="100%">
+        <ComposedChart data={data} margin={{ top: 10, right: hasMultipleYAxes ? 40 : 10, left: -10, bottom: 0 }}>
+          {showGrid && (
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border) / 0.3)" />
+          )}
+          <XAxis
+            dataKey="timeLabel"
+            tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.8 }}
+            tickMargin={8}
+            stroke="hsl(var(--border))"
+            axisLine={{ strokeOpacity: 0.3 }}
+          />
+          <YAxis
+            yAxisId="left"
+            tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.8 }}
+            stroke="hsl(var(--border))"
+            axisLine={{ strokeOpacity: 0.3 }}
+            domain={config.yAxisAutoRange ? ['auto', 'auto'] : [config.yAxisMin ?? 'auto', config.yAxisMax ?? 'auto']}
+          />
+          {hasMultipleYAxes && (
+            <YAxis
+              yAxisId="right"
+              orientation="right"
+              tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.8 }}
+              stroke="hsl(var(--border))"
+              axisLine={{ strokeOpacity: 0.3 }}
+              domain={['auto', 'auto']}
+            />
+          )}
+          <Tooltip content={<CustomTooltip series={config.series} />} />
+          {config.showLegend && (
+            <Legend
+              wrapperStyle={{ fontSize: 10, paddingTop: 8 }}
+              iconSize={8}
+              iconType="circle"
+            />
+          )}
+          {renderSeries()}
+          {renderReferenceLines()}
+          {data.length > 20 && (
+            <Brush
+              dataKey="timeLabel"
+              height={22}
+              stroke="hsl(var(--border))"
+              fill="hsl(var(--card))"
+              travellerWidth={8}
+              startIndex={Math.max(0, data.length - 50)}
+            />
+          )}
+        </ComposedChart>
+      </ResponsiveContainer>
+    </div>
+  )
+
+  if (loading && data.length === 0) {
+    chartContent = (
+      <div className="h-full w-full flex items-center justify-center">
+        <div className="flex flex-col items-center gap-2">
+          <div className="h-8 w-8 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
+          <span className="text-xs text-muted-foreground">Cargando datos...</span>
+        </div>
+      </div>
+    )
+  } else if (data.length === 0) {
+    chartContent = (
+      <div className="h-full w-full flex items-center justify-center text-muted-foreground text-xs">
+        Sin datos para el rango seleccionado.
+      </div>
+    )
+  }
+
   return (
     <Card className="border-border/60 shadow-md hover:shadow-lg transition-shadow duration-300 flex flex-col group relative overflow-hidden bg-card/50 backdrop-blur-sm">
       <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-purple-500/60 via-emerald-500/40 to-cyan-500/60" />
@@ -292,72 +365,7 @@ export function ChartWidget({ projectId, config, globalTimeRange, globalCustomDa
       </CardHeader>
 
       <CardContent className="flex-1 min-h-[260px] p-2 pt-0">
-        {loading && data.length === 0 ? (
-          <div className="h-full w-full flex items-center justify-center">
-            <div className="flex flex-col items-center gap-2">
-              <div className="h-8 w-8 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
-              <span className="text-xs text-muted-foreground">Cargando datos...</span>
-            </div>
-          </div>
-        ) : data.length === 0 ? (
-          <div className="h-full w-full flex items-center justify-center text-muted-foreground text-xs">
-            Sin datos para el rango seleccionado.
-          </div>
-        ) : (
-          <div className="w-full h-[280px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <ComposedChart data={data} margin={{ top: 10, right: hasMultipleYAxes ? 40 : 10, left: -10, bottom: 0 }}>
-              {showGrid && (
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border) / 0.3)" />
-              )}
-              <XAxis
-                dataKey="timeLabel"
-                tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.8 }}
-                tickMargin={8}
-                stroke="hsl(var(--border))"
-                axisLine={{ strokeOpacity: 0.3 }}
-              />
-              <YAxis
-                yAxisId="left"
-                tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.8 }}
-                stroke="hsl(var(--border))"
-                axisLine={{ strokeOpacity: 0.3 }}
-                domain={config.yAxisAutoRange ? ['auto', 'auto'] : [config.yAxisMin ?? 'auto', config.yAxisMax ?? 'auto']}
-              />
-              {hasMultipleYAxes && (
-                <YAxis
-                  yAxisId="right"
-                  orientation="right"
-                  tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.8 }}
-                  stroke="hsl(var(--border))"
-                  axisLine={{ strokeOpacity: 0.3 }}
-                  domain={['auto', 'auto']}
-                />
-              )}
-              <Tooltip content={<CustomTooltip series={config.series} />} />
-              {config.showLegend && (
-                <Legend
-                  wrapperStyle={{ fontSize: 10, paddingTop: 8 }}
-                  iconSize={8}
-                  iconType="circle"
-                />
-              )}
-              {renderSeries()}
-              {renderReferenceLines()}
-              {data.length > 20 && (
-                <Brush
-                  dataKey="timeLabel"
-                  height={22}
-                  stroke="hsl(var(--border))"
-                  fill="hsl(var(--card))"
-                  travellerWidth={8}
-                  startIndex={Math.max(0, data.length - 50)}
-                />
-              )}
-            </ComposedChart>
-            </ResponsiveContainer>
-          </div>
-        )}
+        {chartContent}
       </CardContent>
     </Card>
   )

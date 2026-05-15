@@ -47,23 +47,34 @@ export async function apiClient<T>(
   })
 
   if (!res.ok) {
-    let message = `API Error ${res.status}: Unknown error`
     const errorTextResponse = res.clone()
+    let errorJson: unknown
     try {
-      const errorJson = await res.json()
-      if (errorJson?.details && Array.isArray(errorJson.details)) {
-        message = errorJson.details.join(", ")
-      } else if (errorJson?.message) {
-        message = errorJson.message
-      } else {
-        message = `API Error ${res.status}: ${JSON.stringify(errorJson)}`
-      }
+      errorJson = await res.json()
     } catch {
-      // response body not JSON, keep the text fallback
       const text = await errorTextResponse.text().catch(() => "Unknown error")
-      message = `API Error ${res.status}: ${text}`
+      throw new Error(`API Error ${res.status}: ${text}`)
     }
-    throw new Error(message)
+
+    if (
+      errorJson &&
+      typeof errorJson === 'object' &&
+      'details' in errorJson &&
+      Array.isArray(errorJson.details)
+    ) {
+      throw new Error(errorJson.details.join(", "))
+    }
+
+    if (
+      errorJson &&
+      typeof errorJson === 'object' &&
+      'message' in errorJson &&
+      typeof errorJson.message === 'string'
+    ) {
+      throw new Error(errorJson.message)
+    }
+
+    throw new Error(`API Error ${res.status}: ${JSON.stringify(errorJson)}`)
   }
 
   const response = await res.json()
