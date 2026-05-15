@@ -29,10 +29,13 @@ export function useSensorData(
   }, [sensorId])
 
   useEffect(() => {
-    fetchData()
-    if (pollMs <= 0) return
+    const timeout = setTimeout(fetchData, 0)
+    if (pollMs <= 0) return () => clearTimeout(timeout)
     const interval = setInterval(fetchData, pollMs)
-    return () => clearInterval(interval)
+    return () => {
+      clearTimeout(timeout)
+      clearInterval(interval)
+    }
   }, [fetchData, pollMs])
 
   return { dataPoints, loading }

@@ -154,6 +154,194 @@ export function ProjectDetailPage() {
     setNewApiKey(null)
   }
 
+  let devicesTableContent: React.ReactNode = devices.map((device) => {
+    const active = isDeviceActive(device.id, device.lastSeenAt, realtimeDevices)
+    const expanded = expandedDeviceIds.has(device.id)
+    return (
+      <React.Fragment key={device.id}>
+        <TableRow
+          className="hover:bg-surface-container-low/50 group cursor-pointer"
+          onClick={() => toggleRow(device.id)}
+        >
+          <TableCell>
+            {expanded ? (
+              <ChevronDown className="h-4 w-4 text-muted-foreground" />
+            ) : (
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            )}
+          </TableCell>
+          <TableCell className="font-medium flex items-center gap-3">
+            <div className="p-2 rounded-md bg-blue-500/10">
+              <Cpu className="h-4 w-4 text-blue-500" />
+            </div>
+            {device.name}
+          </TableCell>
+          <TableCell className="text-xs text-muted-foreground">
+            {device.type} {device.mac_address && `(${device.mac_address})`}
+          </TableCell>
+          <TableCell>
+            <Badge variant="secondary" className="bg-primary/10 text-primary">
+              {device.sensors.length} Sensores
+            </Badge>
+          </TableCell>
+          <TableCell>
+            {active ? (
+              <Badge
+                variant="outline"
+                className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 flex w-max items-center gap-1"
+              >
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                </span>
+                Activo
+              </Badge>
+            ) : (
+              <Badge
+                variant="outline"
+                className="bg-muted text-muted-foreground border-border/50 flex w-max items-center gap-1"
+              >
+                <span className="h-2 w-2 rounded-full bg-muted-foreground/50" />
+                Inactivo
+              </Badge>
+            )}
+          </TableCell>
+          <TableCell className="text-right">
+            <Dialog
+              open={activeDeviceIdForSensor === device.id}
+              onOpenChange={(open) => !open && setActiveDeviceIdForSensor(null)}
+            >
+              <DialogTrigger
+                render={
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-primary hover:bg-primary/10 hover:text-primary"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setActiveDeviceIdForSensor(device.id)
+                    }}
+                  >
+                    <Plus className="h-4 w-4 mr-1" /> Nuevo Sensor
+                  </Button>
+                }
+              />
+              <DialogContent className="sm:max-w-[400px]">
+                <DialogHeader>
+                  <DialogTitle>Anexar Sensor al Gateway</DialogTitle>
+                  <DialogDescription>
+                    Agrega una fuente de datos lógica a <b>{device.name}</b>.
+                  </DialogDescription>
+                </DialogHeader>
+                <Form {...sensorForm}>
+                  <form
+                    onSubmit={sensorForm.handleSubmit(onSubmitSensor)}
+                    className="space-y-4 pt-4"
+                  >
+                    <FormField
+                      control={sensorForm.control}
+                      name="name"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>ID/Nombre del Sensor</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Ej. sensor_temp_01"
+                              {...field}
+                              className="bg-surface-container-lowest"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={sensorForm.control}
+                      name="metadata"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Etiquetas</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="outdoor, dht22"
+                              {...field}
+                              className="bg-surface-container-lowest"
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    <div className="flex justify-end gap-3 pt-4">
+                      <Button type="submit">Agregar Sensor</Button>
+                    </div>
+                  </form>
+                </Form>
+              </DialogContent>
+            </Dialog>
+          </TableCell>
+        </TableRow>
+        {expanded && (
+          <TableRow className="bg-surface-container-lowest/50 hover:bg-surface-container-lowest/50">
+            <TableCell colSpan={6} className="p-0 border-b-0">
+              <div className="pl-14 pr-4 py-4 bg-surface-container-low/20 inner-shadow-sm border-b">
+                <h4 className="text-sm font-semibold mb-3 flex items-center gap-2 text-muted-foreground">
+                  <Radio className="h-4 w-4" /> Sensores Conectados
+                </h4>
+                {device.sensors.length === 0 ? (
+                  <p className="text-xs text-muted-foreground italic">
+                    No hay sensores configurados para este dispositivo.
+                  </p>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                    {device.sensors.map((sensor) => (
+                      <div
+                        key={sensor.id}
+                        onClick={() => setInspectingSensor(sensor)}
+                        className="flex items-center justify-between p-3 rounded-md bg-background border border-border/50 hover:border-emerald-500/50 cursor-pointer transition-colors group"
+                      >
+                        <div>
+                          <p
+                            className={`font-medium text-sm transition-colors ${active ? "text-foreground group-hover:text-emerald-500" : "text-muted-foreground"}`}
+                          >
+                            {sensor.name}
+                          </p>
+                          <p className="text-[10px] text-muted-foreground font-mono">
+                            ID: {sensor.id}
+                          </p>
+                        </div>
+                        <Activity
+                          className={`h-4 w-4 ${active ? "text-emerald-500/50 group-hover:text-emerald-500 group-hover:animate-pulse" : "text-muted-foreground/30"}`}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </TableCell>
+          </TableRow>
+        )}
+      </React.Fragment>
+    )
+  })
+
+  if (loading) {
+    devicesTableContent = (
+      <TableRow>
+        <TableCell colSpan={6} className="h-24 text-center">
+          Cargando...
+        </TableCell>
+      </TableRow>
+    )
+  } else if (devices.length === 0) {
+    devicesTableContent = (
+      <TableRow>
+        <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
+          No tienes Gateways en este proyecto.
+        </TableCell>
+      </TableRow>
+    )
+  }
+
   return (
     <div className="flex flex-col h-full space-y-6">
       <div className="flex items-center gap-4 mb-2">
@@ -341,189 +529,7 @@ export function ProjectDetailPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {loading ? (
-                  <TableRow>
-                    <TableCell colSpan={6} className="h-24 text-center">
-                      Cargando...
-                    </TableCell>
-                  </TableRow>
-                ) : devices.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
-                      No tienes Gateways en este proyecto.
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  devices.map((device) => {
-                    const active = isDeviceActive(device.id, device.lastSeenAt, realtimeDevices)
-                    const expanded = expandedDeviceIds.has(device.id)
-                    return (
-                      <React.Fragment key={device.id}>
-                        <TableRow
-                          className="hover:bg-surface-container-low/50 group cursor-pointer"
-                          onClick={() => toggleRow(device.id)}
-                        >
-                          <TableCell>
-                            {expanded ? (
-                              <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                            ) : (
-                              <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                            )}
-                          </TableCell>
-                          <TableCell className="font-medium flex items-center gap-3">
-                            <div className="p-2 rounded-md bg-blue-500/10">
-                              <Cpu className="h-4 w-4 text-blue-500" />
-                            </div>
-                            {device.name}
-                          </TableCell>
-                          <TableCell className="text-xs text-muted-foreground">
-                            {device.type} {device.mac_address && `(${device.mac_address})`}
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant="secondary" className="bg-primary/10 text-primary">
-                              {device.sensors.length} Sensores
-                            </Badge>
-                          </TableCell>
-                          <TableCell>
-                            {active ? (
-                              <Badge
-                                variant="outline"
-                                className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 flex w-max items-center gap-1"
-                              >
-                                <span className="relative flex h-2 w-2">
-                                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
-                                </span>
-                                Activo
-                              </Badge>
-                            ) : (
-                              <Badge
-                                variant="outline"
-                                className="bg-muted text-muted-foreground border-border/50 flex w-max items-center gap-1"
-                              >
-                                <span className="h-2 w-2 rounded-full bg-muted-foreground/50" />
-                                Inactivo
-                              </Badge>
-                            )}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <Dialog
-                              open={activeDeviceIdForSensor === device.id}
-                              onOpenChange={(open) => !open && setActiveDeviceIdForSensor(null)}
-                            >
-                              <DialogTrigger
-                                render={
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="text-primary hover:bg-primary/10 hover:text-primary"
-                                    onClick={(e) => {
-                                      e.stopPropagation()
-                                      setActiveDeviceIdForSensor(device.id)
-                                    }}
-                                  >
-                                    <Plus className="h-4 w-4 mr-1" /> Nuevo Sensor
-                                  </Button>
-                                }
-                              />
-                              <DialogContent className="sm:max-w-[400px]">
-                                <DialogHeader>
-                                  <DialogTitle>Anexar Sensor al Gateway</DialogTitle>
-                                  <DialogDescription>
-                                    Agrega una fuente de datos lógica a <b>{device.name}</b>.
-                                  </DialogDescription>
-                                </DialogHeader>
-                                <Form {...sensorForm}>
-                                  <form
-                                    onSubmit={sensorForm.handleSubmit(onSubmitSensor)}
-                                    className="space-y-4 pt-4"
-                                  >
-                                    <FormField
-                                      control={sensorForm.control}
-                                      name="name"
-                                      render={({ field }) => (
-                                        <FormItem>
-                                          <FormLabel>ID/Nombre del Sensor</FormLabel>
-                                          <FormControl>
-                                            <Input
-                                              placeholder="Ej. sensor_temp_01"
-                                              {...field}
-                                              className="bg-surface-container-lowest"
-                                            />
-                                          </FormControl>
-                                          <FormMessage />
-                                        </FormItem>
-                                      )}
-                                    />
-                                    <FormField
-                                      control={sensorForm.control}
-                                      name="metadata"
-                                      render={({ field }) => (
-                                        <FormItem>
-                                          <FormLabel>Etiquetas</FormLabel>
-                                          <FormControl>
-                                            <Input
-                                              placeholder="outdoor, dht22"
-                                              {...field}
-                                              className="bg-surface-container-lowest"
-                                            />
-                                          </FormControl>
-                                        </FormItem>
-                                      )}
-                                    />
-                                    <div className="flex justify-end gap-3 pt-4">
-                                      <Button type="submit">Agregar Sensor</Button>
-                                    </div>
-                                  </form>
-                                </Form>
-                              </DialogContent>
-                            </Dialog>
-                          </TableCell>
-                        </TableRow>
-                        {expanded && (
-                          <TableRow className="bg-surface-container-lowest/50 hover:bg-surface-container-lowest/50">
-                            <TableCell colSpan={6} className="p-0 border-b-0">
-                              <div className="pl-14 pr-4 py-4 bg-surface-container-low/20 inner-shadow-sm border-b">
-                                <h4 className="text-sm font-semibold mb-3 flex items-center gap-2 text-muted-foreground">
-                                  <Radio className="h-4 w-4" /> Sensores Conectados
-                                </h4>
-                                {device.sensors.length === 0 ? (
-                                  <p className="text-xs text-muted-foreground italic">
-                                    No hay sensores configurados para este dispositivo.
-                                  </p>
-                                ) : (
-                                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                                    {device.sensors.map((sensor) => (
-                                      <div
-                                        key={sensor.id}
-                                        onClick={() => setInspectingSensor(sensor)}
-                                        className="flex items-center justify-between p-3 rounded-md bg-background border border-border/50 hover:border-emerald-500/50 cursor-pointer transition-colors group"
-                                      >
-                                        <div>
-                                          <p
-                                            className={`font-medium text-sm transition-colors ${active ? "text-foreground group-hover:text-emerald-500" : "text-muted-foreground"}`}
-                                          >
-                                            {sensor.name}
-                                          </p>
-                                          <p className="text-[10px] text-muted-foreground font-mono">
-                                            ID: {sensor.id}
-                                          </p>
-                                        </div>
-                                        <Activity
-                                          className={`h-4 w-4 ${active ? "text-emerald-500/50 group-hover:text-emerald-500 group-hover:animate-pulse" : "text-muted-foreground/30"}`}
-                                        />
-                                      </div>
-                                    ))}
-                                  </div>
-                                )}
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        )}
-                      </React.Fragment>
-                    )
-                  })
-                )}
+                {devicesTableContent}
               </TableBody>
             </Table>
           </div>

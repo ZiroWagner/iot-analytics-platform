@@ -26,13 +26,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [user, setUser] = useState<Session | null>(null)
 
   useEffect(() => {
-    const session = getCurrentSessionUseCase()
-    if (!session) {
-      logoutUseCase()
-      router.push("/login")
-      return
-    }
-    setUser(session)
+    const timeout = setTimeout(() => {
+      const session = getCurrentSessionUseCase()
+      if (!session) {
+        logoutUseCase()
+        router.push("/login")
+        return
+      }
+      setUser(session)
+    }, 0)
+    return () => clearTimeout(timeout)
   }, [router])
 
   if (!user) {

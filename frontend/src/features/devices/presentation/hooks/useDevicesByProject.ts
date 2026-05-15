@@ -41,7 +41,9 @@ export function useDevicesByProject(projectId: string): UseDevicesByProjectResul
   }, [projectId])
 
   useEffect(() => {
-    if (projectId) fetchDevices()
+    if (!projectId) return
+    const timeout = setTimeout(fetchDevices, 0)
+    return () => clearTimeout(timeout)
   }, [projectId, fetchDevices])
 
   return { devices, loading, unauthorized, error, refetch: fetchDevices }

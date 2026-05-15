@@ -38,10 +38,13 @@ export function useOverview(pollMs: number = DEFAULT_POLL_MS): UseOverviewResult
   }, [])
 
   useEffect(() => {
-    fetchOverview()
-    if (pollMs <= 0) return
+    const timeout = setTimeout(fetchOverview, 0)
+    if (pollMs <= 0) return () => clearTimeout(timeout)
     const interval = setInterval(fetchOverview, pollMs)
-    return () => clearInterval(interval)
+    return () => {
+      clearTimeout(timeout)
+      clearInterval(interval)
+    }
   }, [fetchOverview, pollMs])
 
   return { stats, loading, unauthorized }

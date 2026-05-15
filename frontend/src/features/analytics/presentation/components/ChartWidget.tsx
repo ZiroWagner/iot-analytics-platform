@@ -139,10 +139,15 @@ export function ChartWidget({ projectId, config, globalTimeRange, globalCustomDa
   }, [projectId, config.series, showRefLines, getTimeParams])
 
   useEffect(() => {
-    fetchData()
-    fetchStats()
+    const timeout = setTimeout(() => {
+      fetchData()
+      fetchStats()
+    }, 0)
     const interval = setInterval(fetchData, config.refreshInterval)
-    return () => clearInterval(interval)
+    return () => {
+      clearTimeout(timeout)
+      clearInterval(interval)
+    }
   }, [fetchData, fetchStats, config.refreshInterval])
 
   const hasMultipleYAxes = useMemo(() => {

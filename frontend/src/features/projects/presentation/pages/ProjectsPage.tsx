@@ -65,6 +65,67 @@ export function ProjectsPage() {
     }
   }
 
+  let projectsContent = (
+    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      {projects.map((project) => {
+        const active = countActiveDevices(project)
+        return (
+          <Card
+            key={project.id}
+            className="group hover:border-primary/50 transition-all duration-300 bg-surface-container-low border-border/50"
+          >
+            <CardHeader>
+              <CardTitle className="text-xl flex items-center justify-between">
+                {project.name}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-baseline gap-2">
+                <span className="text-4xl font-bold text-primary">
+                  {active}
+                  <span className="text-xl text-muted-foreground ml-1">
+                    / {project._count?.devices || 0}
+                  </span>
+                </span>
+                <span className="text-sm text-muted-foreground">Devices Activos</span>
+              </div>
+              <p className="text-xs text-muted-foreground mt-4">
+                Creado el {new Date(project.createdAt).toLocaleDateString()}
+              </p>
+            </CardContent>
+            <CardFooter className="pt-4 border-t border-border/50">
+              <Button
+                variant="ghost"
+                className="w-full justify-between hover:bg-primary/10 hover:text-primary group-hover:translate-x-1 transition-transform"
+                onClick={() => router.push(`/dashboard/projects/${project.id}`)}
+              >
+                Gestionar Sensores
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </CardFooter>
+          </Card>
+        )
+      })}
+    </div>
+  )
+
+  if (loading) {
+    projectsContent = (
+      <div className="flex items-center justify-center h-48">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+      </div>
+    )
+  } else if (projects.length === 0) {
+    projectsContent = (
+      <div className="flex flex-col items-center justify-center h-64 border border-dashed rounded-lg bg-surface-container-low/50">
+        <p className="text-muted-foreground mb-4">No tienes proyectos creados aún.</p>
+        <Button variant="outline" onClick={() => setIsDialogOpen(true)}>
+          Crear mi primer proyecto
+        </Button>
+      </div>
+    )
+  }
+
   return (
     <div className="flex flex-col h-full space-y-6">
       <div className="flex justify-between items-center">
@@ -129,60 +190,7 @@ export function ProjectsPage() {
         </Dialog>
       </div>
 
-      {loading ? (
-        <div className="flex items-center justify-center h-48">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
-        </div>
-      ) : projects.length === 0 ? (
-        <div className="flex flex-col items-center justify-center h-64 border border-dashed rounded-lg bg-surface-container-low/50">
-          <p className="text-muted-foreground mb-4">No tienes proyectos creados aún.</p>
-          <Button variant="outline" onClick={() => setIsDialogOpen(true)}>
-            Crear mi primer proyecto
-          </Button>
-        </div>
-      ) : (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {projects.map((project) => {
-            const active = countActiveDevices(project)
-            return (
-              <Card
-                key={project.id}
-                className="group hover:border-primary/50 transition-all duration-300 bg-surface-container-low border-border/50"
-              >
-                <CardHeader>
-                  <CardTitle className="text-xl flex items-center justify-between">
-                    {project.name}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-4xl font-bold text-primary">
-                      {active}
-                      <span className="text-xl text-muted-foreground ml-1">
-                        / {project._count?.devices || 0}
-                      </span>
-                    </span>
-                    <span className="text-sm text-muted-foreground">Devices Activos</span>
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-4">
-                    Creado el {new Date(project.createdAt).toLocaleDateString()}
-                  </p>
-                </CardContent>
-                <CardFooter className="pt-4 border-t border-border/50">
-                  <Button
-                    variant="ghost"
-                    className="w-full justify-between hover:bg-primary/10 hover:text-primary group-hover:translate-x-1 transition-transform"
-                    onClick={() => router.push(`/dashboard/projects/${project.id}`)}
-                  >
-                    Gestionar Sensores
-                    <ArrowRight className="h-4 w-4" />
-                  </Button>
-                </CardFooter>
-              </Card>
-            )
-          })}
-        </div>
-      )}
+      {projectsContent}
     </div>
   )
 }

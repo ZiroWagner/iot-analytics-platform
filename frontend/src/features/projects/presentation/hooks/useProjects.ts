@@ -46,10 +46,13 @@ export function useProjects(pollMs: number = DEFAULT_POLL_MS): UseProjectsResult
   }, [])
 
   useEffect(() => {
-    fetchProjects()
-    if (pollMs <= 0) return
+    const timeout = setTimeout(() => fetchProjects(), 0)
+    if (pollMs <= 0) return () => clearTimeout(timeout)
     const interval = setInterval(() => fetchProjects(true), pollMs)
-    return () => clearInterval(interval)
+    return () => {
+      clearTimeout(timeout)
+      clearInterval(interval)
+    }
   }, [fetchProjects, pollMs])
 
   return {

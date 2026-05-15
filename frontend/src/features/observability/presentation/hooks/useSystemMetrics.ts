@@ -31,10 +31,13 @@ export function useSystemMetrics(
   }, [])
 
   useEffect(() => {
-    fetch()
-    if (pollMs <= 0) return
+    const timeout = setTimeout(fetch, 0)
+    if (pollMs <= 0) return () => clearTimeout(timeout)
     const interval = setInterval(fetch, pollMs)
-    return () => clearInterval(interval)
+    return () => {
+      clearTimeout(timeout)
+      clearInterval(interval)
+    }
   }, [fetch, pollMs])
 
   return { metrics, loading, refresh: fetch }

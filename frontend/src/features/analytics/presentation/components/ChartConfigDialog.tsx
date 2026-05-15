@@ -30,6 +30,12 @@ interface ChartConfigDialogProps {
   onSave: (config: ChartWidgetConfig) => void
 }
 
+function getInitialTitle(currentTitle: string, currentSeriesCount: number, metric: string, sensorName: string) {
+  if (currentTitle) return currentTitle
+  if (currentSeriesCount === 0) return `${metric.toUpperCase()} — ${sensorName}`
+  return 'Dashboard Comparativo'
+}
+
 export function ChartConfigDialog({
   open, onOpenChange, metrics, existingConfig, onSave
 }: ChartConfigDialogProps) {
@@ -49,7 +55,8 @@ export function ChartConfigDialog({
   const [selMetric, setSelMetric] = useState('')
 
   useEffect(() => {
-    if (open) {
+    if (!open) return
+    const timeout = setTimeout(() => {
       setStep('series')
       setTitle(existingConfig?.title ?? '')
       setSeries(existingConfig?.series ?? [])
@@ -63,7 +70,8 @@ export function ChartConfigDialog({
       setSelGateway('')
       setSelSensor('')
       setSelMetric('')
-    }
+    }, 0)
+    return () => clearTimeout(timeout)
   }, [open, existingConfig])
 
   const uniqueGateways = useMemo(() => {
@@ -105,12 +113,7 @@ export function ChartConfigDialog({
     setSeries([...series, newSeries])
     setSelMetric('')
 
-    if (!title) {
-      setTitle(series.length === 0
-        ? `${selMetric.toUpperCase()} — ${sensorInfo.sensorName}`
-        : 'Dashboard Comparativo'
-      )
-    }
+    setTitle(getInitialTitle(title, series.length, selMetric, sensorInfo.sensorName))
   }
 
   const removeSeries = (id: string) => {
@@ -123,7 +126,7 @@ export function ChartConfigDialog({
 
   const handleSave = () => {
     const config: ChartWidgetConfig = {
-      id: existingConfig?.id ?? `w_${Date.now()}`,
+      id: existingConfig?.id ?? `w_${crypto.randomUUID()}`,
       title: title || 'Sin título',
       series,
       size,

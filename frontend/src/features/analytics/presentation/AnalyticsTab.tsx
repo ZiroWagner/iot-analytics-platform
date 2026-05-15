@@ -87,7 +87,9 @@ export function AnalyticsTab({ projectId }: { projectId: string }) {
   }, [projectId, fetchMetrics, persistConfig])
 
   useEffect(() => {
-    if (dialogOpen) fetchMetrics()
+    if (!dialogOpen) return
+    const timeout = setTimeout(fetchMetrics, 0)
+    return () => clearTimeout(timeout)
   }, [dialogOpen, fetchMetrics])
 
   const handleSaveWidget = (config: ChartWidgetConfig) => {
