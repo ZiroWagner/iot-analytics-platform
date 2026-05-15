@@ -21,5 +21,18 @@ export default defineConfig({
       'src/**/tests/**/*.{test,spec}.{ts,tsx}',
     ],
     css: false,
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'lcov', 'json-summary'],
+      include: ['src/**/*.{ts,tsx}'],
+      exclude: [
+        'src/**/*.test.{ts,tsx}',
+        'src/**/tests/**',
+        'src/test/**',
+        'src/**/*.d.ts',
+        'src/app/**',
+        'src/components/ui/**',
+      ],
+    },
   },
 })

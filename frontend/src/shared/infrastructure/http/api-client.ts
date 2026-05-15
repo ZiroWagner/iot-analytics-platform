@@ -48,6 +48,7 @@ export async function apiClient<T>(
 
   if (!res.ok) {
     let message = `API Error ${res.status}: Unknown error`
+    const errorTextResponse = res.clone()
     try {
       const errorJson = await res.json()
       if (errorJson?.details && Array.isArray(errorJson.details)) {
@@ -59,7 +60,7 @@ export async function apiClient<T>(
       }
     } catch {
       // response body not JSON, keep the text fallback
-      const text = await res.text().catch(() => "Unknown error")
+      const text = await errorTextResponse.text().catch(() => "Unknown error")
       message = `API Error ${res.status}: ${text}`
     }
     throw new Error(message)
