@@ -9,12 +9,12 @@ describe('createProjectSchema', () => {
   })
 
   it('rejects names shorter than 2 chars', () => {
-    expect(() => createProjectSchema.parse({ name: 'x' })).toThrowError(/al menos 2/)
+    expect(() => createProjectSchema.parse({ name: 'x' })).toThrow(/al menos 2/)
   })
 
   it('rejects names longer than 50 chars', () => {
     expect(() =>
       createProjectSchema.parse({ name: 'x'.repeat(51) }),
-    ).toThrowError(/m\u00e1s de 50|más de 50/)
+    ).toThrow(/m\u00e1s de 50|más de 50/)
   })
 })

@@ -3,7 +3,7 @@ import { cn } from '@/shared/lib'
 
 describe('cn', () => {
   it('joins truthy class names', () => {
-    expect(cn('a', 'b', false && 'c', null, undefined, 'd')).toBe('a b d')
+    expect(cn('a', 'b', false, null, undefined, 'd')).toBe('a b d')
   })
 
   it('dedupes conflicting tailwind utilities (last wins)', () => {

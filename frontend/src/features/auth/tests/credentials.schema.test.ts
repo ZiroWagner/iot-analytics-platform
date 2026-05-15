@@ -17,7 +17,7 @@ describe('loginSchema', () => {
     const password = faker.internet.password({ length: 12 })
     expect(() =>
       loginSchema.parse({ email: 'not-an-email', password }),
-    ).toThrowError(/Correo electr/)
+    ).toThrow(/Correo electr/)
   })
 
   it('rejects passwords below the minimum length', () => {
@@ -25,7 +25,7 @@ describe('loginSchema', () => {
     const password = faker.string.alphanumeric(PASSWORD_MIN_LENGTH - 1)
     expect(() =>
       loginSchema.parse({ email, password }),
-    ).toThrowError(/contrase/i)
+    ).toThrow(/contrase/i)
   })
 })
 
@@ -49,6 +49,6 @@ describe('registerSchema', () => {
         password,
         name: '',
       }),
-    ).toThrowError(/Nombre requerido/)
+    ).toThrow(/Nombre requerido/)
   })
 })
