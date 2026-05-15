@@ -18,6 +18,12 @@ interface ParticleNetworkProps {
   className?: string
 }
 
+const randomNumber = () => {
+  const values = new Uint32Array(1)
+  crypto.getRandomValues(values)
+  return values[0] / 0xffffffff
+}
+
 export function ParticleNetwork({
   particleCount = 45,
   className = "",
@@ -56,8 +62,8 @@ export function ParticleNetwork({
       `
       container.appendChild(el)
 
-      const x = Math.random() * width
-      const y = Math.random() * height
+      const x = randomNumber() * width
+      const y = randomNumber() * height
 
       particles.push({
         element: el,
@@ -65,7 +71,7 @@ export function ParticleNetwork({
         y,
         baseX: x,
         baseY: y,
-        size: Math.random() * 3 + 2,
+        size: randomNumber() * 3 + 2,
         animation: null,
       })
     }
@@ -92,9 +98,9 @@ export function ParticleNetwork({
       p.element.style.width = `${p.size}px`
       p.element.style.height = `${p.size}px`
 
-      const duration = 3000 + Math.random() * 4000
-      const distanceX = (Math.random() - 0.5) * 80
-      const distanceY = (Math.random() - 0.5) * 80
+      const duration = 3000 + randomNumber() * 4000
+      const distanceX = (randomNumber() - 0.5) * 80
+      const distanceY = (randomNumber() - 0.5) * 80
 
       p.animation = animate(p.element, {
         translateX: [0, distanceX, -distanceX * 0.5, 0],

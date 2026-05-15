@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker'
 import { describe, expect, it } from 'vitest'
 import { decodeSessionFromToken } from '../domain/session'
 
@@ -22,17 +23,23 @@ describe('decodeSessionFromToken', () => {
   })
 
   it('decodes a valid token payload', () => {
+    const payload = {
+      sub: faker.string.uuid(),
+      email: faker.internet.email(),
+      name: faker.person.firstName(),
+      image: faker.image.avatar(),
+    }
     const token = makeJwt({
-      sub: 'user-123',
-      email: 'a@b.com',
-      name: 'Alice',
-      image: 'http://img',
+      sub: payload.sub,
+      email: payload.email,
+      name: payload.name,
+      image: payload.image,
     })
     expect(decodeSessionFromToken(token)).toEqual({
-      sub: 'user-123',
-      email: 'a@b.com',
-      name: 'Alice',
-      image: 'http://img',
+      sub: payload.sub,
+      email: payload.email,
+      name: payload.name,
+      image: payload.image,
     })
   })
 

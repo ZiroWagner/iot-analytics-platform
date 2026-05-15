@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker'
 import { describe, expect, it, vi } from 'vitest'
 import { loginUseCase } from '../application/use-cases/login'
 import type { AuthRepository } from '../infrastructure/auth.repository'
@@ -16,17 +17,21 @@ function buildDeps(overrides: Partial<{ token: string; throwOnLogin: boolean }> 
 
 describe('loginUseCase', () => {
   it('validates credentials, calls the repository and persists the token', async () => {
-    const { repository, storage } = buildDeps()
+    const email = faker.internet.email()
+    const password = faker.internet.password({ length: 12 })
+    const token = faker.string.alphanumeric(24)
+    const { repository, storage } = buildDeps({ token })
+
     const result = await loginUseCase(
-      { email: 'a@b.com', password: 'secret123' },
+      { email, password },
       { repository, storage },
     )
     expect(repository.login).toHaveBeenCalledWith({
-      email: 'a@b.com',
-      password: 'secret123',
+      email,
+      password,
     })
-    expect(storage.set).toHaveBeenCalledWith('token-abc')
-    expect(result).toEqual({ token: 'token-abc' })
+    expect(storage.set).toHaveBeenCalledWith(token)
+    expect(result).toEqual({ token })
   })
 
   it('rejects invalid input before reaching the repository', async () => {
@@ -39,10 +44,12 @@ describe('loginUseCase', () => {
   })
 
   it('throws when the API responds without a token', async () => {
+    const email = faker.internet.email()
+    const password = faker.internet.password({ length: 12 })
     const { repository, storage } = buildDeps({ token: '' })
     await expect(
       loginUseCase(
-        { email: 'a@b.com', password: 'secret123' },
+        { email, password },
         { repository, storage },
       ),
     ).rejects.toThrow(/token de acceso/)

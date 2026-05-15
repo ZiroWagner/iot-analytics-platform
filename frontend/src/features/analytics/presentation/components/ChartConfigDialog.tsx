@@ -93,7 +93,7 @@ export function ChartConfigDialog({
     if (!sensorInfo) return
 
     const newSeries: SeriesConfig = {
-      id: `s_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      id: `s_${Date.now()}_${crypto.randomUUID()}`,
       sensorId: selSensor,
       sensorName: sensorInfo.sensorName,
       metric: selMetric,
