@@ -99,28 +99,44 @@ describe('PrismaUserRepository Integration', () => {
       expect(prismaMock.user.create).not.toHaveBeenCalled();
     });
 
-    it('should create user and link account if new', async () => {
+    it('should link to existing user if email matches but account is new', async () => {
       prismaMock.account.findUnique.mockResolvedValue(null);
-      prismaMock.user.findUnique.mockResolvedValue(null);
-      prismaMock.user.create.mockResolvedValue({
-        id: 'u2',
-        email: 'new@o.com',
-      });
+      prismaMock.user.findUnique.mockResolvedValue({ id: 'u1', email: 'existing@o.com' });
       prismaMock.account.create.mockResolvedValue({});
 
       const result = await repository.findOrCreateOAuthUser({
-        provider: 'github',
-        providerAccountId: 'gh1',
-        email: 'new@o.com',
-        name: 'New',
+        provider: 'google',
+        providerAccountId: 'g1',
+        email: 'existing@o.com',
+        name: 'Existing',
         image: null,
+        accessToken: null,
+        refreshToken: null,
+      });
+
+      expect(result.id).toBe('u1');
+      expect(prismaMock.user.create).not.toHaveBeenCalled();
+      expect(prismaMock.account.create).toHaveBeenCalled();
+    });
+
+    it('should handle OAuth without email', async () => {
+      prismaMock.account.findUnique.mockResolvedValue(null);
+      prismaMock.user.create.mockResolvedValue({ id: 'u3', email: '' });
+      
+      const result = await repository.findOrCreateOAuthUser({
+        provider: 'github',
+        providerAccountId: 'gh2',
+        email: null,
+        name: 'NoEmail',
+        image: 'img',
         accessToken: 'tk',
         refreshToken: 'rt',
       });
 
-      expect(result.id).toBe('u2');
-      expect(prismaMock.user.create).toHaveBeenCalled();
-      expect(prismaMock.account.create).toHaveBeenCalled();
+      expect(result.id).toBe('u3');
+      expect(prismaMock.user.create).toHaveBeenCalledWith(expect.objectContaining({
+        data: expect.objectContaining({ email: '' })
+      }));
     });
   });
 });

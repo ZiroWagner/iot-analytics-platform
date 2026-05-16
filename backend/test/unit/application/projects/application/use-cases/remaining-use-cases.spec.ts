@@ -52,6 +52,12 @@ describe('Remaining Use Cases', () => {
         NotFoundException,
       );
     });
+    it('should throw ForbiddenException if user is not the owner', async () => {
+      repository.findById.mockResolvedValue(mockProject);
+      await expect(useCase.execute('other-user', 'proj-1')).rejects.toThrow(
+        ForbiddenException,
+      );
+    });
   });
 
   describe('UpdateProjectUseCase', () => {
@@ -74,6 +80,13 @@ describe('Remaining Use Cases', () => {
       });
       expect(repository.update).toHaveBeenCalled();
       expect(result.name).toBe('Updated');
+    });
+
+    it('should throw ForbiddenException if user is not the owner', async () => {
+      repository.findById.mockResolvedValue(mockProject);
+      await expect(useCase.execute('other-user', 'proj-1', {})).rejects.toThrow(
+        ForbiddenException,
+      );
     });
   });
 

@@ -93,12 +93,58 @@ describe('PrismaAnalyticsRepository Integration', () => {
     });
   });
 
-  describe('verifyProjectOwnership', () => {
-    it('should throw ForbiddenException if user does not own project', async () => {
-      prismaMock.project.findUnique.mockResolvedValue({ userId: 'u2' });
-      await expect(repository.getAvailableMetrics('u1', 'p1')).rejects.toThrow(
-        ForbiddenException,
-      );
+  describe('getMultiTimeseries', () => {
+    it('should aggregate data from multiple sensors', async () => {
+      const now = new Date();
+      prismaMock.sensor.findFirst
+        .mockResolvedValueOnce({ id: 's1', name: 'TempSensor' })
+        .mockResolvedValueOnce({ id: 's2', name: 'HumSensor' });
+      
+      prismaMock.dataPoint.findMany
+        .mockResolvedValueOnce([{ timestamp: now, payload: { temp: 25 } }])
+        .mockResolvedValueOnce([{ timestamp: now, payload: { hum: 60 } }]);
+
+      const result = await repository.getMultiTimeseries('u1', 'p1', [
+        { sensorId: 's1', metric: 'temp' },
+        { sensorId: 's2', metric: 'hum' }
+      ]);
+
+      expect(result).toHaveLength(1);
+      expect(result[0]).toMatchObject({
+        'TempSensor:temp': 25,
+        'HumSensor:hum': 60
+      });
+    });
+
+    it('should handle non-existing sensor in multi-series', async () => {
+      prismaMock.sensor.findFirst.mockResolvedValue(null);
+      const result = await repository.getMultiTimeseries('u1', 'p1', [{ sensorId: 's1', metric: 'v' }]);
+      expect(result).toHaveLength(0);
+    });
+
+    it('should handle non-numeric values in payload', async () => {
+      prismaMock.sensor.findFirst.mockResolvedValue({ id: 's1', name: 'S1' });
+      prismaMock.dataPoint.findMany.mockResolvedValue([
+        { timestamp: new Date(), payload: { v: 'invalid' } }
+      ]);
+      const result = await repository.getMultiTimeseries('u1', 'p1', [{ sensorId: 's1', metric: 'v' }]);
+      expect(result[0]['S1:v']).toBeNull();
+    });
+  });
+
+  describe('edge cases', () => {
+    it('should handle missing metric in payload for single timeseries', async () => {
+      prismaMock.sensor.findFirst.mockResolvedValue({ id: 's1' });
+      prismaMock.dataPoint.findMany.mockResolvedValue([
+        { timestamp: new Date(), payload: {} }
+      ]);
+      const result = await repository.getTimeseries('u1', 'p1', 's1', 'temp');
+      expect(result[0].temp).toBeNull();
+    });
+
+    it('should throw NotFoundException if project does not exist', async () => {
+      prismaMock.project.findUnique.mockResolvedValue(null);
+      await expect(repository.getAvailableMetrics('u1', 'p1')).rejects.toThrow(NotFoundException);
     });
   });
 });

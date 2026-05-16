@@ -21,6 +21,11 @@ describe('IngestDomainService', () => {
       expect(result.isValid).toBe(false);
       expect(result.error).toBe('API Key missing');
     });
+    it('should use current date if timestamp missing', () => {
+      const payload = { device: { apiKey: 'k' }, sensors: [] };
+      const result = IngestDomainService.validatePayload(payload);
+      expect(result.timestamp).toBeDefined();
+    });
   });
 
   describe('parseStreamMessages', () => {
@@ -41,6 +46,35 @@ describe('IngestDomainService', () => {
       const result = IngestDomainService.parseStreamMessages(messages);
       expect(result).toHaveLength(1);
       expect(result[0].deviceId).toBe('d1');
+    });
+  });
+
+  describe('prepareDataPoints', () => {
+    it('should ignore sensors not in db map', () => {
+      const messages: any = [
+        {
+          deviceId: 'd1',
+          timestamp: new Date(),
+          sensors: [{ sensorId: 's1', payload: { v: 1 } }],
+          id: 'm1',
+        },
+      ];
+      const result = IngestDomainService.prepareDataPoints(messages, new Map());
+      expect(result.dataPoints).toHaveLength(0);
+      expect(result.messageIds).toEqual(['m1']);
+    });
+  });
+
+  describe('getLatestTimestamps', () => {
+    it('should return latest timestamp per device', () => {
+      const now = new Date();
+      const earlier = new Date(now.getTime() - 1000);
+      const messages: any = [
+        { deviceId: 'd1', timestamp: earlier },
+        { deviceId: 'd1', timestamp: now },
+      ];
+      const result = IngestDomainService.getLatestTimestamps(messages);
+      expect(result.get('d1')).toEqual(now);
     });
   });
 

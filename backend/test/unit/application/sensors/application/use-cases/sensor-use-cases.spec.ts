@@ -48,6 +48,18 @@ describe('Sensor Use Cases', () => {
       });
       expect(result).toEqual(mockSensor);
     });
+    it('should create a sensor without metadata', async () => {
+      repository.create.mockResolvedValue(mockSensor);
+      const data = { name: 'Sensor', deviceId: 'd1' };
+      await useCase.execute('u1', data);
+
+      expect(repository.create).toHaveBeenCalledWith({
+        userId: 'u1',
+        name: 'Sensor',
+        deviceId: 'd1',
+        metadata: {},
+      });
+    });
   });
 
   describe('DeleteSensorUseCase', () => {
