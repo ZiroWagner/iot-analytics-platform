@@ -112,9 +112,9 @@ describe('ObservabilityDomainService', () => {
       ).toBe(500);
     });
 
-    it('returns 0 when length key is not found', () => {
+    it('returns 0 when length value is not a number', () => {
       expect(
-        ObservabilityDomainService.extractStreamLength(['groups', '1']),
+        ObservabilityDomainService.extractStreamLength(['length', 'nan']),
       ).toBe(0);
     });
   });
