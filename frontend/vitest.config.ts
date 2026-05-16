@@ -10,15 +10,17 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(rootDir, './src'),
+      '@tests': path.resolve(rootDir, './src/tests'),
     },
   },
   test: {
     environment: 'jsdom',
     globals: true,
-    setupFiles: ['./src/test/setup.ts'],
+    setupFiles: ['./src/tests/setup/setup.ts'],
     include: [
       'src/**/*.test.{ts,tsx}',
       'src/**/tests/**/*.{test,spec}.{ts,tsx}',
+      'src/tests/**/*.{test,spec}.{ts,tsx}',
     ],
     css: false,
     coverage: {
@@ -29,6 +31,10 @@ export default defineConfig({
         'src/**/*.test.{ts,tsx}',
         'src/**/tests/**',
         'src/test/**',
+        'src/tests/setup/**',
+        'src/tests/builders/**',
+        'src/tests/fixtures/**',
+        'src/tests/mocks/**',
         'src/**/*.d.ts',
         'src/app/**',
         'src/components/ui/**',
