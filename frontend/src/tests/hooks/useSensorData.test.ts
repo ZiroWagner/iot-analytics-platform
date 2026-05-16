@@ -25,7 +25,7 @@ describe('useSensorData hook', () => {
       timestamp: faker.date.recent().toISOString(), 
       value: faker.number.float({ min: 0, max: 100 }) 
     }]
-    vi.mocked(httpSensorsRepository.getData).mockResolvedValue(mockData as any)
+    vi.mocked(httpSensorsRepository.getData).mockResolvedValue(mockData as unknown as never)
 
     const { result } = renderHook(() => useSensorData('s1'))
     

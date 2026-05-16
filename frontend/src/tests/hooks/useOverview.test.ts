@@ -45,7 +45,7 @@ describe('useOverview hook', () => {
       eventsLast24h: faker.number.int({ min: 1000, max: 5000 }), 
       recentEvents: [] 
     }
-    vi.mocked(httpProjectsRepository.overview).mockResolvedValue(mockStats as any)
+    vi.mocked(httpProjectsRepository.overview).mockResolvedValue(mockStats as unknown as never)
 
     const { result } = renderHook(() => useOverview())
     
@@ -77,7 +77,7 @@ describe('useOverview hook', () => {
 
   it('should poll for overview stats', async () => {
     vi.mocked(isAuthenticated).mockReturnValue(true)
-    vi.mocked(httpProjectsRepository.overview).mockResolvedValue({} as any)
+    vi.mocked(httpProjectsRepository.overview).mockResolvedValue({} as unknown as never)
 
     renderHook(() => useOverview(1000))
 

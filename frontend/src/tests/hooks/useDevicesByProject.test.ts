@@ -43,7 +43,7 @@ describe('useDevicesByProject hook', () => {
       name: faker.commerce.productName(), 
       sensors: [] 
     }]
-    vi.mocked(httpDevicesRepository.listByProject).mockResolvedValue(mockDevices as any)
+    vi.mocked(httpDevicesRepository.listByProject).mockResolvedValue(mockDevices as unknown as never)
 
     const { result } = renderHook(() => useDevicesByProject('p1'))
     

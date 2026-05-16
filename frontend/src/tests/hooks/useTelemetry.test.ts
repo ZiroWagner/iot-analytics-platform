@@ -13,8 +13,19 @@ vi.mock('@/features/telemetry/presentation/store', () => ({
 }))
 
 describe('useTelemetry hook', () => {
-  let mockSocket: any
-  let mockStore: any
+  let mockSocket: {
+    on: ReturnType<typeof vi.fn>
+    off: ReturnType<typeof vi.fn>
+    emit: ReturnType<typeof vi.fn>
+    connected: boolean
+  }
+  let mockStore: {
+    setConnected: ReturnType<typeof vi.fn>
+    setInitialState: ReturnType<typeof vi.fn>
+    applyBatch: ReturnType<typeof vi.fn>
+    clearDevices: ReturnType<typeof vi.fn>
+    connected: boolean
+  }
 
   beforeEach(() => {
     vi.clearAllMocks()
@@ -24,7 +35,7 @@ describe('useTelemetry hook', () => {
       emit: vi.fn(),
       connected: false,
     }
-    vi.mocked(getSocket).mockReturnValue(mockSocket)
+    vi.mocked(getSocket).mockReturnValue(mockSocket as unknown as never)
 
     mockStore = {
       setConnected: vi.fn(),
@@ -33,7 +44,8 @@ describe('useTelemetry hook', () => {
       clearDevices: vi.fn(),
       connected: false,
     }
-
+    
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     vi.mocked(useTelemetryStore).mockImplementation((selector: any) => selector(mockStore))
   })
 
@@ -59,7 +71,7 @@ describe('useTelemetry hook', () => {
   it('should emit subscribeToProject on connect if projectId provided', () => {
     renderHook(() => useTelemetry('p1'))
 
-    const onConnect = mockSocket.on.mock.calls.find((call: any) => call[0] === 'connect')[1]
+    const onConnect = (mockSocket.on.mock.calls.find((call) => call[0] === 'connect') as unknown as never[])[1] as unknown as () => void
     onConnect()
 
     expect(mockStore.setConnected).toHaveBeenCalledWith(true)
@@ -69,7 +81,7 @@ describe('useTelemetry hook', () => {
   it('should handle disconnect event', () => {
     renderHook(() => useTelemetry('p1'))
 
-    const onDisconnect = mockSocket.on.mock.calls.find((call: any) => call[0] === 'disconnect')[1]
+    const onDisconnect = (mockSocket.on.mock.calls.find((call) => call[0] === 'disconnect') as unknown as never[])[1] as unknown as () => void
     onDisconnect()
 
     expect(mockStore.setConnected).toHaveBeenCalledWith(false)
@@ -78,7 +90,7 @@ describe('useTelemetry hook', () => {
   it('should handle initial_state event', () => {
     renderHook(() => useTelemetry('p1'))
 
-    const onInitialState = mockSocket.on.mock.calls.find((call: any) => call[0] === 'initial_state')[1]
+    const onInitialState = (mockSocket.on.mock.calls.find((call) => call[0] === 'initial_state') as unknown as never[])[1] as unknown as (data: unknown) => void
     const data = { projectId: 'p1', devices: { 'd1': { name: 'D1' } } }
     onInitialState(data)
 
@@ -88,7 +100,7 @@ describe('useTelemetry hook', () => {
   it('should ignore initial_state for different project', () => {
     renderHook(() => useTelemetry('p1'))
 
-    const onInitialState = mockSocket.on.mock.calls.find((call: any) => call[0] === 'initial_state')[1]
+    const onInitialState = (mockSocket.on.mock.calls.find((call) => call[0] === 'initial_state') as unknown as never[])[1] as unknown as (data: unknown) => void
     const data = { projectId: 'p2', devices: {} }
     onInitialState(data)
 
@@ -98,7 +110,7 @@ describe('useTelemetry hook', () => {
   it('should handle telemetry_batch event', () => {
     renderHook(() => useTelemetry('p1'))
 
-    const onTelemetryBatch = mockSocket.on.mock.calls.find((call: any) => call[0] === 'telemetry_batch')[1]
+    const onTelemetryBatch = (mockSocket.on.mock.calls.find((call) => call[0] === 'telemetry_batch') as unknown as never[])[1] as unknown as (data: unknown) => void
     const data = { projectId: 'p1', events: [{ type: 't' }] }
     onTelemetryBatch(data)
 
@@ -108,14 +120,14 @@ describe('useTelemetry hook', () => {
   it('should ignore telemetry_batch for different project or invalid events', () => {
     renderHook(() => useTelemetry('p1'))
 
-    const onTelemetryBatch = mockSocket.on.mock.calls.find((call: any) => call[0] === 'telemetry_batch')[1]
+    const onTelemetryBatch = (mockSocket.on.mock.calls.find((call) => call[0] === 'telemetry_batch') as unknown as never[])[1] as unknown as (data: unknown) => void
     
     // Different project
     onTelemetryBatch({ projectId: 'p2', events: [] })
     expect(mockStore.applyBatch).not.toHaveBeenCalled()
 
     // Invalid events
-    onTelemetryBatch({ projectId: 'p1', events: 'not-an-array' } as any)
+    onTelemetryBatch({ projectId: 'p1', events: 'not-an-array' } as unknown as never)
     expect(mockStore.applyBatch).not.toHaveBeenCalled()
   })
 

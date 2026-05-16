@@ -27,7 +27,7 @@ describe('useSystemMetrics hook', () => {
       uptime: faker.number.int({ min: 1000, max: 5000 }), 
       disk: faker.number.int({ min: 0, max: 100 }) 
     }
-    vi.mocked(httpObservabilityRepository.metrics).mockResolvedValue(mockMetrics as any)
+    vi.mocked(httpObservabilityRepository.metrics).mockResolvedValue(mockMetrics as unknown as never)
 
     const { result } = renderHook(() => useSystemMetrics())
     
@@ -57,7 +57,7 @@ describe('useSystemMetrics hook', () => {
   })
 
   it('should poll for system metrics', async () => {
-    vi.mocked(httpObservabilityRepository.metrics).mockResolvedValue({} as any)
+    vi.mocked(httpObservabilityRepository.metrics).mockResolvedValue({} as unknown as never)
 
     renderHook(() => useSystemMetrics(1000))
 
@@ -73,7 +73,7 @@ describe('useSystemMetrics hook', () => {
   })
 
   it('should refresh manually', async () => {
-    vi.mocked(httpObservabilityRepository.metrics).mockResolvedValue({} as any)
+    vi.mocked(httpObservabilityRepository.metrics).mockResolvedValue({} as unknown as never)
 
     const { result } = renderHook(() => useSystemMetrics(0))
     

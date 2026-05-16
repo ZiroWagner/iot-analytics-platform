@@ -43,7 +43,7 @@ describe('useProjects hook', () => {
       name: faker.commerce.productName(),
       createdAt: faker.date.past().toISOString()
     }]
-    vi.mocked(httpProjectsRepository.list).mockResolvedValue(mockProjects as any)
+    vi.mocked(httpProjectsRepository.list).mockResolvedValue(mockProjects as unknown as never)
 
     const { result } = renderHook(() => useProjects())
     
