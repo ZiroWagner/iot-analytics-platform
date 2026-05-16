@@ -39,7 +39,7 @@ describe('Sensor Use Cases', () => {
       repository.create.mockResolvedValue(mockSensor);
       const data = { name: 'Sensor', deviceId: 'd1', metadata: { unit: 'C' } };
       const result = await useCase.execute('u1', data);
-      
+
       expect(repository.create).toHaveBeenCalledWith({
         userId: 'u1',
         name: 'Sensor',
@@ -98,7 +98,9 @@ describe('Sensor Use Cases', () => {
           { provide: SENSOR_REPOSITORY_TOKEN, useValue: repository },
         ],
       }).compile();
-      useCase = module.get<GetSensorsByDeviceUseCase>(GetSensorsByDeviceUseCase);
+      useCase = module.get<GetSensorsByDeviceUseCase>(
+        GetSensorsByDeviceUseCase,
+      );
     });
 
     it('should get sensors by device', async () => {
@@ -118,13 +120,17 @@ describe('Sensor Use Cases', () => {
           { provide: SENSOR_REPOSITORY_TOKEN, useValue: repository },
         ],
       }).compile();
-      useCase = module.get<GetSensorDataPointsUseCase>(GetSensorDataPointsUseCase);
+      useCase = module.get<GetSensorDataPointsUseCase>(
+        GetSensorDataPointsUseCase,
+      );
     });
 
     it('should get data points', async () => {
       repository.getDataPoints.mockResolvedValue([{ value: 10 }]);
       const result = await useCase.execute('u1', 's1', { limit: 10 });
-      expect(repository.getDataPoints).toHaveBeenCalledWith('s1', 'u1', { limit: 10 });
+      expect(repository.getDataPoints).toHaveBeenCalledWith('s1', 'u1', {
+        limit: 10,
+      });
       expect(result).toHaveLength(1);
     });
   });
@@ -144,7 +150,9 @@ describe('Sensor Use Cases', () => {
     it('should update a sensor', async () => {
       repository.update.mockResolvedValue(mockSensor);
       const result = await useCase.execute('u1', 's1', { name: 'Updated' });
-      expect(repository.update).toHaveBeenCalledWith('s1', 'u1', { name: 'Updated' });
+      expect(repository.update).toHaveBeenCalledWith('s1', 'u1', {
+        name: 'Updated',
+      });
       expect(result).toEqual(mockSensor);
     });
   });

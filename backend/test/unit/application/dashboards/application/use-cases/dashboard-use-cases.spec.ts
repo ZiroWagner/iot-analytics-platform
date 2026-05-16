@@ -16,10 +16,15 @@ describe('Dashboards Use Cases', () => {
   describe('GetDashboardConfigUseCase', () => {
     it('should return config from repository', async () => {
       const module = await Test.createTestingModule({
-        providers: [GetDashboardConfigUseCase, { provide: DASHBOARD_REPOSITORY_TOKEN, useValue: repository }],
+        providers: [
+          GetDashboardConfigUseCase,
+          { provide: DASHBOARD_REPOSITORY_TOKEN, useValue: repository },
+        ],
       }).compile();
-      const useCase = module.get<GetDashboardConfigUseCase>(GetDashboardConfigUseCase);
-      
+      const useCase = module.get<GetDashboardConfigUseCase>(
+        GetDashboardConfigUseCase,
+      );
+
       repository.getConfig.mockResolvedValue({ id: 'c1' });
       const result = await useCase.execute('u1', 'p1');
       expect(result?.id).toBe('c1');
@@ -29,14 +34,21 @@ describe('Dashboards Use Cases', () => {
   describe('SaveDashboardConfigUseCase', () => {
     it('should save config via repository', async () => {
       const module = await Test.createTestingModule({
-        providers: [SaveDashboardConfigUseCase, { provide: DASHBOARD_REPOSITORY_TOKEN, useValue: repository }],
+        providers: [
+          SaveDashboardConfigUseCase,
+          { provide: DASHBOARD_REPOSITORY_TOKEN, useValue: repository },
+        ],
       }).compile();
-      const useCase = module.get<SaveDashboardConfigUseCase>(SaveDashboardConfigUseCase);
-      
+      const useCase = module.get<SaveDashboardConfigUseCase>(
+        SaveDashboardConfigUseCase,
+      );
+
       repository.saveConfig.mockResolvedValue({ id: 'c1' });
       const result = await useCase.execute('u1', 'p1', { widgets: [] });
       expect(result.id).toBe('c1');
-      expect(repository.saveConfig).toHaveBeenCalledWith('p1', 'u1', { widgets: [] });
+      expect(repository.saveConfig).toHaveBeenCalledWith('p1', 'u1', {
+        widgets: [],
+      });
     });
   });
 });

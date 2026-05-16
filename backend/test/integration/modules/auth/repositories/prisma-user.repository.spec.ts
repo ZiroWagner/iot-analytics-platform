@@ -39,7 +39,12 @@ describe('PrismaUserRepository Integration', () => {
 
   describe('findByEmail', () => {
     it('should return user if found', async () => {
-      const dbUser = { id: '1', email: 'test@example.com', name: 'Test', password: 'hash' };
+      const dbUser = {
+        id: '1',
+        email: 'test@example.com',
+        name: 'Test',
+        password: 'hash',
+      };
       prismaMock.user.findUnique.mockResolvedValue(dbUser);
 
       const result = await repository.findByEmail('test@example.com');
@@ -60,7 +65,10 @@ describe('PrismaUserRepository Integration', () => {
       const dbUser = { id: '1', email: 'test@example.com', password: 'hashed' };
       prismaMock.user.create.mockResolvedValue(dbUser);
 
-      const result = await repository.create({ email: 'test@example.com', password: '123' });
+      const result = await repository.create({
+        email: 'test@example.com',
+        password: '123',
+      });
       expect(result).toBeInstanceOf(User);
       expect(prismaMock.user.create).toHaveBeenCalledWith({
         data: {
@@ -94,7 +102,10 @@ describe('PrismaUserRepository Integration', () => {
     it('should create user and link account if new', async () => {
       prismaMock.account.findUnique.mockResolvedValue(null);
       prismaMock.user.findUnique.mockResolvedValue(null);
-      prismaMock.user.create.mockResolvedValue({ id: 'u2', email: 'new@o.com' });
+      prismaMock.user.create.mockResolvedValue({
+        id: 'u2',
+        email: 'new@o.com',
+      });
       prismaMock.account.create.mockResolvedValue({});
 
       const result = await repository.findOrCreateOAuthUser({

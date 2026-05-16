@@ -40,18 +40,34 @@ describe('StreamIngestProcessor', () => {
     });
 
     it('should ignore BUSYGROUP error', async () => {
-      redisClient.xgroup.mockRejectedValue(new Error('BUSYGROUP Consumer Group name already exists'));
-      await expect((processor as any).ensureConsumerGroup()).resolves.not.toThrow();
+      redisClient.xgroup.mockRejectedValue(
+        new Error('BUSYGROUP Consumer Group name already exists'),
+      );
+      await expect(
+        (processor as any).ensureConsumerGroup(),
+      ).resolves.not.toThrow();
     });
   });
 
   describe('processBatch', () => {
     it('should process messages and insert to DB', async () => {
       const messages: any = [
-        ['1-0', ['deviceId', 'd1', 'timestamp', '2026-05-16T10:00:00Z', 'sensors', '[{"sensorId":"s1","payload":{"v":1}}]']]
+        [
+          '1-0',
+          [
+            'deviceId',
+            'd1',
+            'timestamp',
+            '2026-05-16T10:00:00Z',
+            'sensors',
+            '[{"sensorId":"s1","payload":{"v":1}}]',
+          ],
+        ],
       ];
-      
-      prismaService.sensor.findMany.mockResolvedValue([{ id: 'db_s1', name: 's1', deviceId: 'd1' }]);
+
+      prismaService.sensor.findMany.mockResolvedValue([
+        { id: 'db_s1', name: 's1', deviceId: 'd1' },
+      ]);
       prismaService.dataPoint.createMany.mockResolvedValue({ count: 1 });
       prismaService.device.update.mockResolvedValue({});
       redisClient.xack.mockResolvedValue(1);
@@ -64,11 +80,21 @@ describe('StreamIngestProcessor', () => {
     });
 
     it('should skip DB insert if no data points matched', async () => {
-       const messages: any = [
-        ['1-0', ['deviceId', 'd1', 'timestamp', '2026-05-16T10:00:00Z', 'sensors', '[]']]
+      const messages: any = [
+        [
+          '1-0',
+          [
+            'deviceId',
+            'd1',
+            'timestamp',
+            '2026-05-16T10:00:00Z',
+            'sensors',
+            '[]',
+          ],
+        ],
       ];
       prismaService.sensor.findMany.mockResolvedValue([]);
-      
+
       await (processor as any).processBatch(messages);
       expect(prismaService.dataPoint.createMany).not.toHaveBeenCalled();
     });

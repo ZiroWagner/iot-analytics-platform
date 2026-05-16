@@ -10,7 +10,11 @@ describe('PrismaDashboardRepository Integration', () => {
 
   const prismaMock = {
     project: { findUnique: jest.fn() },
-    dashboardConfig: { findFirst: jest.fn(), update: jest.fn(), create: jest.fn() },
+    dashboardConfig: {
+      findFirst: jest.fn(),
+      update: jest.fn(),
+      create: jest.fn(),
+    },
   };
 
   beforeEach(async () => {
@@ -21,9 +25,11 @@ describe('PrismaDashboardRepository Integration', () => {
       ],
     }).compile();
 
-    repository = module.get<PrismaDashboardRepository>(PrismaDashboardRepository);
+    repository = module.get<PrismaDashboardRepository>(
+      PrismaDashboardRepository,
+    );
     prismaService = module.get<PrismaService>(PrismaService);
-    
+
     // Default valid ownership
     prismaMock.project.findUnique.mockResolvedValue({ userId: 'u1' });
   });
@@ -48,7 +54,10 @@ describe('PrismaDashboardRepository Integration', () => {
   describe('saveConfig', () => {
     it('should update existing config', async () => {
       prismaMock.dashboardConfig.findFirst.mockResolvedValue({ id: '1' });
-      prismaMock.dashboardConfig.update.mockResolvedValue({ id: '1', layout_config: { a: 1 } });
+      prismaMock.dashboardConfig.update.mockResolvedValue({
+        id: '1',
+        layout_config: { a: 1 },
+      });
 
       const result = await repository.saveConfig('p1', 'u1', { a: 1 });
       expect(prismaMock.dashboardConfig.update).toHaveBeenCalled();
@@ -57,7 +66,10 @@ describe('PrismaDashboardRepository Integration', () => {
 
     it('should create new config if not exists', async () => {
       prismaMock.dashboardConfig.findFirst.mockResolvedValue(null);
-      prismaMock.dashboardConfig.create.mockResolvedValue({ id: '2', layout_config: { b: 2 } });
+      prismaMock.dashboardConfig.create.mockResolvedValue({
+        id: '2',
+        layout_config: { b: 2 },
+      });
 
       const result = await repository.saveConfig('p1', 'u1', { b: 2 });
       expect(prismaMock.dashboardConfig.create).toHaveBeenCalled();

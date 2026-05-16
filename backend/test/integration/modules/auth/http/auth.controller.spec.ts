@@ -12,7 +12,9 @@ describe('AuthController', () => {
 
   beforeEach(async () => {
     registerUseCase = { execute: jest.fn() };
-    generateTokenUseCase = { execute: jest.fn().mockReturnValue({ access_token: 'tk123' }) };
+    generateTokenUseCase = {
+      execute: jest.fn().mockReturnValue({ access_token: 'tk123' }),
+    };
     configService = { get: jest.fn().mockReturnValue('http://frontend.com') };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -53,7 +55,9 @@ describe('AuthController', () => {
       const res = { redirect: jest.fn() } as any;
 
       controller.googleAuthRedirect(req, res);
-      expect(res.redirect).toHaveBeenCalledWith('http://frontend.com/auth/callback?token=tk123');
+      expect(res.redirect).toHaveBeenCalledWith(
+        'http://frontend.com/auth/callback?token=tk123',
+      );
     });
   });
 
@@ -63,7 +67,9 @@ describe('AuthController', () => {
       const res = { redirect: jest.fn() } as any;
 
       controller.githubAuthRedirect(req, res);
-      expect(res.redirect).toHaveBeenCalledWith('http://frontend.com/auth/callback?token=tk123');
+      expect(res.redirect).toHaveBeenCalledWith(
+        'http://frontend.com/auth/callback?token=tk123',
+      );
     });
   });
 });

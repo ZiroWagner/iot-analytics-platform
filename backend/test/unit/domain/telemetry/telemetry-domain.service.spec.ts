@@ -37,7 +37,13 @@ describe('TelemetryDomainService', () => {
 
   describe('buildTelemetryBatch', () => {
     it('should build a batch payload', () => {
-      const e1 = new TelemetryEvent('device_data', 'd1', 'p1', new Date().toISOString(), []);
+      const e1 = new TelemetryEvent(
+        'device_data',
+        'd1',
+        'p1',
+        new Date().toISOString(),
+        [],
+      );
       const result = TelemetryDomainService.buildTelemetryBatch('p1', [e1]);
       expect(result.projectId).toBe('p1');
       expect(result.count).toBe(1);
@@ -48,9 +54,14 @@ describe('TelemetryDomainService', () => {
   describe('buildTelemetryBatchWithStatus', () => {
     it('should build batch with device statuses', () => {
       const ts = new Date().toISOString();
-      const e1 = new TelemetryEvent('device_data', 'd1', 'p1', ts, [{ sensorId: 's1', payload: { value: 10 } }]);
-      const result = TelemetryDomainService.buildTelemetryBatchWithStatus('p1', [e1]);
-      
+      const e1 = new TelemetryEvent('device_data', 'd1', 'p1', ts, [
+        { sensorId: 's1', payload: { value: 10 } },
+      ]);
+      const result = TelemetryDomainService.buildTelemetryBatchWithStatus(
+        'p1',
+        [e1],
+      );
+
       expect(result.projectId).toBe('p1');
       expect(result.devices['d1'].status).toBe('online');
       expect(result.devices['d1'].sensors).toHaveLength(1);

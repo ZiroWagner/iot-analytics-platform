@@ -26,7 +26,17 @@ describe('IngestDomainService', () => {
   describe('parseStreamMessages', () => {
     it('should parse redis stream messages', () => {
       const messages: Array<[string, string[]]> = [
-        ['1-0', ['deviceId', 'd1', 'timestamp', '2026-05-16T10:00:00Z', 'sensors', '[]']]
+        [
+          '1-0',
+          [
+            'deviceId',
+            'd1',
+            'timestamp',
+            '2026-05-16T10:00:00Z',
+            'sensors',
+            '[]',
+          ],
+        ],
       ];
       const result = IngestDomainService.parseStreamMessages(messages);
       expect(result).toHaveLength(1);
@@ -36,7 +46,9 @@ describe('IngestDomainService', () => {
 
   describe('serializeSensorsForStream', () => {
     it('should stringify sensors data', () => {
-      const readings = [SensorReading.fromPlain({ sensorId: 's1', payload: { v: 1 } })];
+      const readings = [
+        SensorReading.fromPlain({ sensorId: 's1', payload: { v: 1 } }),
+      ];
       const result = IngestDomainService.serializeSensorsForStream(readings);
       const parsed = JSON.parse(result);
       expect(parsed[0].sensorId).toBe('s1');

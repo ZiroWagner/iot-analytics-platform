@@ -34,7 +34,7 @@ describe('ProcessIngestUseCase', () => {
     };
 
     const result = await useCase.execute(payload);
-    
+
     expect(result.status).toBe('accepted');
     expect(repository.resolveDeviceId).toHaveBeenCalledWith('key1');
     expect(repository.publishToStream).toHaveBeenCalled();
@@ -49,7 +49,9 @@ describe('ProcessIngestUseCase', () => {
       sensors: [],
     };
 
-    await expect(useCase.execute(payload)).rejects.toThrow(UnauthorizedException);
+    await expect(useCase.execute(payload)).rejects.toThrow(
+      UnauthorizedException,
+    );
   });
 
   it('should return accepted but do nothing if no sensors', async () => {

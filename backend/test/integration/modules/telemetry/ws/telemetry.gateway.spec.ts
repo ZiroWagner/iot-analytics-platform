@@ -26,7 +26,7 @@ describe('TelemetryGateway', () => {
     }).compile();
 
     gateway = module.get<TelemetryGateway>(TelemetryGateway);
-    gateway.server = mockServer as any;
+    gateway.server = mockServer;
   });
 
   afterEach(() => {
@@ -37,7 +37,10 @@ describe('TelemetryGateway', () => {
     it('should subscribe to telemetry broadcast on init', () => {
       jest.useFakeTimers();
       gateway.afterInit();
-      expect(adapter.subscribe).toHaveBeenCalledWith('telemetry:broadcast', expect.any(Function));
+      expect(adapter.subscribe).toHaveBeenCalledWith(
+        'telemetry:broadcast',
+        expect.any(Function),
+      );
       jest.useRealTimers();
     });
   });
@@ -57,13 +60,19 @@ describe('TelemetryGateway', () => {
   describe('Subscription', () => {
     it('should join room and emit initial state', async () => {
       const client = { id: 'c1', join: jest.fn(), emit: jest.fn() } as any;
-      adapter.buildInitialState.mockResolvedValue({ projectId: 'p1', devices: {} });
+      adapter.buildInitialState.mockResolvedValue({
+        projectId: 'p1',
+        devices: {},
+      });
 
       await gateway.handleSubscribe(client, { projectId: 'p1' });
 
       expect(client.join).toHaveBeenCalledWith('project:p1');
       expect(adapter.buildInitialState).toHaveBeenCalledWith('p1');
-      expect(client.emit).toHaveBeenCalledWith('initial_state', { projectId: 'p1', devices: {} });
+      expect(client.emit).toHaveBeenCalledWith('initial_state', {
+        projectId: 'p1',
+        devices: {},
+      });
     });
 
     it('should do nothing if no projectId provided on subscribe', async () => {
@@ -111,7 +120,10 @@ describe('TelemetryGateway', () => {
       jest.advanceTimersByTime(600);
 
       expect(mockServer.to).toHaveBeenCalledWith('project:p1');
-      expect(mockServer.emit).toHaveBeenCalledWith('telemetry_batch', expect.any(Object));
+      expect(mockServer.emit).toHaveBeenCalledWith(
+        'telemetry_batch',
+        expect.any(Object),
+      );
 
       jest.useRealTimers();
     });

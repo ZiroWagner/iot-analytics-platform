@@ -11,7 +11,11 @@ describe('PrismaService', () => {
         PrismaService,
         {
           provide: ConfigService,
-          useValue: { get: jest.fn().mockReturnValue('postgresql://user:pass@localhost:5432/db') },
+          useValue: {
+            get: jest
+              .fn()
+              .mockReturnValue('postgresql://user:pass@localhost:5432/db'),
+          },
         },
       ],
     }).compile();
@@ -24,7 +28,7 @@ describe('PrismaService', () => {
   });
 
   it('should have lifecycle methods', () => {
-    expect(service.onModuleInit).toBeDefined();
-    expect(service.onModuleDestroy).toBeDefined();
+    expect(typeof service.onModuleInit).toBe('function');
+    expect(typeof service.onModuleDestroy).toBe('function');
   });
 });

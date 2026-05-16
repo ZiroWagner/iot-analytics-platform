@@ -2,7 +2,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaAnalyticsRepository } from '@/analytics/infrastructure/repositories/prisma-analytics.repository';
 import { PrismaService } from '@/prisma/prisma.service';
 import { NotFoundException, ForbiddenException } from '@nestjs/common';
-import { SensorMetric, MetricStats } from '@/analytics/domain/entities/analytics.entities';
+import {
+  SensorMetric,
+  MetricStats,
+} from '@/analytics/domain/entities/analytics.entities';
 
 describe('PrismaAnalyticsRepository Integration', () => {
   let repository: PrismaAnalyticsRepository;
@@ -22,17 +25,23 @@ describe('PrismaAnalyticsRepository Integration', () => {
       ],
     }).compile();
 
-    repository = module.get<PrismaAnalyticsRepository>(PrismaAnalyticsRepository);
+    repository = module.get<PrismaAnalyticsRepository>(
+      PrismaAnalyticsRepository,
+    );
     prismaService = module.get<PrismaService>(PrismaService);
-    
+
     // Default valid ownership
     prismaMock.project.findUnique.mockResolvedValue({ userId: 'u1' });
   });
 
   describe('getAvailableMetrics', () => {
     it('should return metrics with numeric keys from payload', async () => {
-      prismaMock.sensor.findMany.mockResolvedValue([{ id: 's1', name: 'S1', device: { id: 'd1', name: 'D1' } }]);
-      prismaMock.dataPoint.findFirst.mockResolvedValue({ payload: { temp: 25, status: 'ok' } });
+      prismaMock.sensor.findMany.mockResolvedValue([
+        { id: 's1', name: 'S1', device: { id: 'd1', name: 'D1' } },
+      ]);
+      prismaMock.dataPoint.findFirst.mockResolvedValue({
+        payload: { temp: 25, status: 'ok' },
+      });
 
       const result = await repository.getAvailableMetrics('u1', 'p1');
       expect(result).toHaveLength(1);
@@ -45,7 +54,7 @@ describe('PrismaAnalyticsRepository Integration', () => {
     it('should return timeseries points', async () => {
       prismaMock.sensor.findFirst.mockResolvedValue({ id: 's1' });
       prismaMock.dataPoint.findMany.mockResolvedValue([
-        { timestamp: new Date(), payload: { temp: 20 } }
+        { timestamp: new Date(), payload: { temp: 20 } },
       ]);
 
       const result = await repository.getTimeseries('u1', 'p1', 's1', 'temp');
@@ -55,7 +64,9 @@ describe('PrismaAnalyticsRepository Integration', () => {
 
     it('should throw if sensor not found in project', async () => {
       prismaMock.sensor.findFirst.mockResolvedValue(null);
-      await expect(repository.getTimeseries('u1', 'p1', 's1', 'temp')).rejects.toThrow(NotFoundException);
+      await expect(
+        repository.getTimeseries('u1', 'p1', 's1', 'temp'),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -85,7 +96,9 @@ describe('PrismaAnalyticsRepository Integration', () => {
   describe('verifyProjectOwnership', () => {
     it('should throw ForbiddenException if user does not own project', async () => {
       prismaMock.project.findUnique.mockResolvedValue({ userId: 'u2' });
-      await expect(repository.getAvailableMetrics('u1', 'p1')).rejects.toThrow(ForbiddenException);
+      await expect(repository.getAvailableMetrics('u1', 'p1')).rejects.toThrow(
+        ForbiddenException,
+      );
     });
   });
 });

@@ -14,7 +14,9 @@ describe('AnalyticsController', () => {
   beforeEach(async () => {
     getMetricsUseCase = { execute: jest.fn().mockResolvedValue([]) };
     const getTimeseriesUseCase = { execute: jest.fn().mockResolvedValue([]) };
-    const getMultiTimeseriesUseCase = { execute: jest.fn().mockResolvedValue([]) };
+    const getMultiTimeseriesUseCase = {
+      execute: jest.fn().mockResolvedValue([]),
+    };
     const getStatsUseCase = { execute: jest.fn().mockResolvedValue({}) };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -22,7 +24,10 @@ describe('AnalyticsController', () => {
       providers: [
         { provide: GetAvailableMetricsUseCase, useValue: getMetricsUseCase },
         { provide: GetTimeseriesUseCase, useValue: getTimeseriesUseCase },
-        { provide: GetMultiTimeseriesUseCase, useValue: getMultiTimeseriesUseCase },
+        {
+          provide: GetMultiTimeseriesUseCase,
+          useValue: getMultiTimeseriesUseCase,
+        },
         { provide: GetStatsUseCase, useValue: getStatsUseCase },
       ],
     }).compile();

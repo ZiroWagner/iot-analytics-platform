@@ -19,11 +19,19 @@ describe('SensorsController', () => {
 
   beforeEach(async () => {
     createUseCase = { execute: jest.fn().mockResolvedValue(mockSensor) };
-    const getSensorsUseCase = { execute: jest.fn().mockResolvedValue([mockSensor]) };
-    const getSensorUseCase = { execute: jest.fn().mockResolvedValue(mockSensor) };
+    const getSensorsUseCase = {
+      execute: jest.fn().mockResolvedValue([mockSensor]),
+    };
+    const getSensorUseCase = {
+      execute: jest.fn().mockResolvedValue(mockSensor),
+    };
     const updateUseCase = { execute: jest.fn().mockResolvedValue(mockSensor) };
-    const deleteUseCase = { execute: jest.fn().mockResolvedValue({ success: true }) };
-    const getDataPointsUseCase = { execute: jest.fn().mockResolvedValue([{ value: 10 }]) };
+    const deleteUseCase = {
+      execute: jest.fn().mockResolvedValue({ success: true }),
+    };
+    const getDataPointsUseCase = {
+      execute: jest.fn().mockResolvedValue([{ value: 10 }]),
+    };
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [SensorsController],
@@ -69,7 +77,13 @@ describe('SensorsController', () => {
 
   describe('getDataPoints', () => {
     it('should return data points', async () => {
-      const result = await controller.getDataPoints({ user: mockUser }, 'sens-1', undefined, undefined, '10');
+      const result = await controller.getDataPoints(
+        { user: mockUser },
+        'sens-1',
+        undefined,
+        undefined,
+        '10',
+      );
       expect(result).toHaveLength(1);
     });
   });

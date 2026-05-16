@@ -39,16 +39,20 @@ describe('Auth Use Cases', () => {
     it('should register a new user', async () => {
       repository.findByEmail.mockResolvedValue(null);
       repository.create.mockResolvedValue(mockUser);
-      
-      const result = await useCase.execute({ email: 'test@example.com', password: '123' });
+
+      const result = await useCase.execute({
+        email: 'test@example.com',
+        password: '123',
+      });
       expect(result).toEqual(mockUser);
       expect(repository.create).toHaveBeenCalled();
     });
 
     it('should throw ConflictException if user exists', async () => {
       repository.findByEmail.mockResolvedValue(mockUser);
-      await expect(useCase.execute({ email: 'test@example.com', password: '123' }))
-        .rejects.toThrow(ConflictException);
+      await expect(
+        useCase.execute({ email: 'test@example.com', password: '123' }),
+      ).rejects.toThrow(ConflictException);
     });
   });
 
@@ -76,14 +80,16 @@ describe('Auth Use Cases', () => {
       repository.findByEmail.mockResolvedValue(mockUser);
       (bcrypt.compare as jest.Mock).mockResolvedValue(false);
 
-      await expect(useCase.execute('test@example.com', '123'))
-        .rejects.toThrow(UnauthorizedException);
+      await expect(useCase.execute('test@example.com', '123')).rejects.toThrow(
+        UnauthorizedException,
+      );
     });
 
     it('should throw UnauthorizedException if user not found', async () => {
       repository.findByEmail.mockResolvedValue(null);
-      await expect(useCase.execute('test@example.com', '123'))
-        .rejects.toThrow(UnauthorizedException);
+      await expect(useCase.execute('test@example.com', '123')).rejects.toThrow(
+        UnauthorizedException,
+      );
     });
   });
 
@@ -108,7 +114,9 @@ describe('Auth Use Cases', () => {
     it('should generate a token for a user', () => {
       const result = useCase.execute(mockUser);
       expect(result).toEqual({ access_token: 'mock_token' });
-      expect(jwtService.sign).toHaveBeenCalled();
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      const signMock = jwtService.sign as jest.Mock;
+      expect(signMock).toHaveBeenCalled();
     });
   });
 });

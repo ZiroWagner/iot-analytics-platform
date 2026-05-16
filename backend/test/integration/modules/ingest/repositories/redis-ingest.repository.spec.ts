@@ -52,7 +52,10 @@ describe('RedisIngestRepository Integration', () => {
 
     it('should fetch from db and cache if not in redis', async () => {
       redisClient.get.mockResolvedValue(null);
-      prismaService.device.findUnique.mockResolvedValue({ id: 'd2', projectId: 'p2' });
+      prismaService.device.findUnique.mockResolvedValue({
+        id: 'd2',
+        projectId: 'p2',
+      });
 
       const result = await repository.resolveDeviceId('key1');
       expect(result).toBe('d2');
@@ -62,13 +65,17 @@ describe('RedisIngestRepository Integration', () => {
     it('should throw if apiKey invalid', async () => {
       redisClient.get.mockResolvedValue(null);
       prismaService.device.findUnique.mockResolvedValue(null);
-      await expect(repository.resolveDeviceId('bad')).rejects.toThrow(UnauthorizedException);
+      await expect(repository.resolveDeviceId('bad')).rejects.toThrow(
+        UnauthorizedException,
+      );
     });
   });
 
   describe('publishToStream', () => {
     it('should call xadd with correct parameters', async () => {
-      const sensors = [SensorReading.fromPlain({ sensorId: 's1', payload: { v: 1 } })];
+      const sensors = [
+        SensorReading.fromPlain({ sensorId: 's1', payload: { v: 1 } }),
+      ];
       await repository.publishToStream({
         deviceId: 'd1',
         projectId: 'p1',
@@ -102,7 +109,9 @@ describe('RedisIngestRepository Integration', () => {
 
   describe('broadcastTelemetry', () => {
     it('should call publish', async () => {
-      const sensors = [SensorReading.fromPlain({ sensorId: 's1', payload: { v: 1 } })];
+      const sensors = [
+        SensorReading.fromPlain({ sensorId: 's1', payload: { v: 1 } }),
+      ];
       await repository.broadcastTelemetry({
         deviceId: 'd1',
         projectId: 'p1',

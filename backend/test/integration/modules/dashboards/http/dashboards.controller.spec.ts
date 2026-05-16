@@ -27,7 +27,11 @@ describe('DashboardsController', () => {
 
   describe('getConfig', () => {
     it('should return config if found', async () => {
-      getUseCase.execute.mockResolvedValue({ id: 'c1', projectId: 'p1', layoutConfig: [] });
+      getUseCase.execute.mockResolvedValue({
+        id: 'c1',
+        projectId: 'p1',
+        layoutConfig: [],
+      });
       const result = await controller.getConfig({ user: mockUser }, 'p1');
       expect(result.id).toBe('c1');
     });
@@ -41,8 +45,14 @@ describe('DashboardsController', () => {
 
   describe('saveConfig', () => {
     it('should save and return config', async () => {
-      saveUseCase.execute.mockResolvedValue({ id: 'c1', projectId: 'p1', layoutConfig: { a: 1 } });
-      const result = await controller.saveConfig({ user: mockUser }, 'p1', { layoutConfig: { a: 1 } });
+      saveUseCase.execute.mockResolvedValue({
+        id: 'c1',
+        projectId: 'p1',
+        layoutConfig: { a: 1 },
+      });
+      const result = await controller.saveConfig({ user: mockUser }, 'p1', {
+        layoutConfig: { a: 1 },
+      });
       expect(result.layout_config).toEqual({ a: 1 });
     });
   });

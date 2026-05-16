@@ -27,7 +27,9 @@ describe('RedisObservabilityRepository Integration', () => {
       ],
     }).compile();
 
-    repository = module.get<RedisObservabilityRepository>(RedisObservabilityRepository);
+    repository = module.get<RedisObservabilityRepository>(
+      RedisObservabilityRepository,
+    );
   });
 
   describe('getStreamLength', () => {
@@ -48,7 +50,11 @@ describe('RedisObservabilityRepository Integration', () => {
     it('should calculate avg from pipeline results', async () => {
       redisClient.pipeline.mockReturnValue({
         get: jest.fn(),
-        exec: jest.fn().mockResolvedValue([ [null, '10'], [null, '20'], [null, '30'] ]),
+        exec: jest.fn().mockResolvedValue([
+          [null, '10'],
+          [null, '20'],
+          [null, '30'],
+        ]),
       });
       const result = await repository.getEventsPerSecond();
       expect(result).toBe(20);

@@ -37,9 +37,11 @@ describe('PrismaSensorRepository Integration', () => {
 
     repository = module.get<PrismaSensorRepository>(PrismaSensorRepository);
     prismaService = module.get<PrismaService>(PrismaService);
-    
+
     // Default valid ownership
-    prismaMock.device.findUnique.mockResolvedValue({ project: { userId: 'u1' } });
+    prismaMock.device.findUnique.mockResolvedValue({
+      project: { userId: 'u1' },
+    });
   });
 
   describe('create', () => {
@@ -67,8 +69,14 @@ describe('PrismaSensorRepository Integration', () => {
 
     it('should throw if device ownership fails', async () => {
       prismaMock.device.findUnique.mockResolvedValue(null);
-      await expect(repository.create({ name: 'Test', deviceId: 'd1', metadata: {}, userId: 'u1' }))
-        .rejects.toThrow(NotFoundException);
+      await expect(
+        repository.create({
+          name: 'Test',
+          deviceId: 'd1',
+          metadata: {},
+          userId: 'u1',
+        }),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -94,7 +102,9 @@ describe('PrismaSensorRepository Integration', () => {
     it('should throw ForbiddenException if user mismatch', async () => {
       const dbSensor = { device: { project: { userId: 'u2' } } };
       prismaMock.sensor.findUnique.mockResolvedValue(dbSensor);
-      await expect(repository.findById('1', 'u1')).rejects.toThrow(ForbiddenException);
+      await expect(repository.findById('1', 'u1')).rejects.toThrow(
+        ForbiddenException,
+      );
     });
   });
 
@@ -145,7 +155,9 @@ describe('PrismaSensorRepository Integration', () => {
       prismaMock.sensor.delete.mockResolvedValue({ id: '1' });
 
       await repository.delete('1', 'u1');
-      expect(prismaMock.sensor.delete).toHaveBeenCalledWith({ where: { id: '1' } });
+      expect(prismaMock.sensor.delete).toHaveBeenCalledWith({
+        where: { id: '1' },
+      });
     });
   });
 

@@ -20,13 +20,15 @@ describe('IngestController', () => {
 
   it('should call useCase if apiKey is present', async () => {
     const body = { device: { api_key: 'key1' }, sensors: [] };
-    const result = await controller.ingestData(body as any);
+    const result = await controller.ingestData(body);
     expect(result).toEqual({ status: 'accepted' });
     expect(useCase.execute).toHaveBeenCalledWith(body);
   });
 
   it('should throw UnauthorizedException if apiKey is missing', async () => {
     const body = { device: { api_key: '' }, sensors: [] };
-    await expect(controller.ingestData(body as any)).rejects.toThrow(UnauthorizedException);
+    await expect(controller.ingestData(body as any)).rejects.toThrow(
+      UnauthorizedException,
+    );
   });
 });
