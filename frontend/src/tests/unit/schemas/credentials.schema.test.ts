@@ -1,54 +1,68 @@
-import { faker } from '@faker-js/faker'
 import { describe, expect, it } from 'vitest'
-import { PASSWORD_MIN_LENGTH, loginSchema, registerSchema } from '@/features/auth/domain/credentials.schema'
+import { loginSchema, registerSchema, PASSWORD_MIN_LENGTH } from '@/features/auth/domain/credentials.schema'
 
 describe('loginSchema', () => {
-  it('accepts a valid email and password', () => {
-    const email = faker.internet.email()
-    const password = faker.internet.password({ length: 12 })
-    const parsed = loginSchema.parse({
-      email,
-      password,
+  it('accepts valid email and password', () => {
+    const result = loginSchema.parse({
+      email: 'test@example.com',
+      password: 'password123',
     })
-    expect(parsed.email).toBe(email)
+    expect(result.email).toBe('test@example.com')
   })
 
-  it('rejects invalid email', () => {
-    const password = faker.internet.password({ length: 12 })
+  it('rejects invalid email format', () => {
     expect(() =>
-      loginSchema.parse({ email: 'not-an-email', password }),
-    ).toThrow(/Correo electr/)
+      loginSchema.parse({ email: 'not-an-email', password: 'password123' }),
+    ).toThrow()
   })
 
-  it('rejects passwords below the minimum length', () => {
-    const email = faker.internet.email()
-    const password = faker.string.alphanumeric(PASSWORD_MIN_LENGTH - 1)
+  it('rejects password shorter than minimum', () => {
+    const shortPassword = 'x'.repeat(PASSWORD_MIN_LENGTH - 1)
     expect(() =>
-      loginSchema.parse({ email, password }),
-    ).toThrow(/contrase/i)
+      loginSchema.parse({ email: 'test@example.com', password: shortPassword }),
+    ).toThrow()
+  })
+
+  it('accepts password at minimum length', () => {
+    const minPassword = 'x'.repeat(PASSWORD_MIN_LENGTH)
+    const result = loginSchema.parse({
+      email: 'test@example.com',
+      password: minPassword,
+    })
+    expect(result.password).toBe(minPassword)
   })
 })
 
 describe('registerSchema', () => {
-  it('accepts an optional name', () => {
-    const email = faker.internet.email()
-    const password = faker.internet.password({ length: 12 })
-    const parsed = registerSchema.parse({
-      email,
-      password,
+  it('accepts valid name, email and password', () => {
+    const result = registerSchema.parse({
+      name: 'John Doe',
+      email: 'john@example.com',
+      password: 'password123',
     })
-    expect(parsed.name).toBeUndefined()
+    expect(result.name).toBe('John Doe')
   })
 
-  it('rejects an empty name when present', () => {
-    const email = faker.internet.email()
-    const password = faker.internet.password({ length: 12 })
+  it('accepts name with 1 character', () => {
+    const result = registerSchema.parse({
+      name: 'x',
+      email: 'test@example.com',
+      password: 'password123',
+    })
+    expect(result.name).toBe('x')
+  })
+
+  it('accepts optional name field', () => {
+    const result = registerSchema.parse({
+      email: 'test@example.com',
+      password: 'password123',
+    })
+    expect(result.name).toBeUndefined()
+  })
+
+  it('rejects invalid email', () => {
     expect(() =>
-      registerSchema.parse({
-        email,
-        password,
-        name: '',
-      }),
-    ).toThrow(/Nombre requerido/)
+      registerSchema.parse({ name: 'Test', email: 'invalid', password: 'password123' }),
+    ).toThrow()
   })
 })

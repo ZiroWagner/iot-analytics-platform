@@ -7,7 +7,7 @@ import {
 } from '@/features/analytics/domain/types'
 
 describe('TIME_RANGE_MS', () => {
-  it('defines correct milliseconds for each time preset', () => {
+  it('converts preset time ranges to milliseconds', () => {
     expect(TIME_RANGE_MS['5m']).toBe(5 * 60 * 1000)
     expect(TIME_RANGE_MS['15m']).toBe(15 * 60 * 1000)
     expect(TIME_RANGE_MS['1h']).toBe(60 * 60 * 1000)
@@ -15,13 +15,13 @@ describe('TIME_RANGE_MS', () => {
     expect(TIME_RANGE_MS['24h']).toBe(24 * 60 * 60 * 1000)
   })
 
-  it('covers all five non-custom presets', () => {
-    expect(Object.keys(TIME_RANGE_MS)).toHaveLength(5)
+  it('has exactly 5 presets', () => {
+    expect(Object.keys(TIME_RANGE_MS).length).toBe(5)
   })
 })
 
 describe('DEFAULT_WIDGET_CONFIG', () => {
-  it('has expected default values', () => {
+  it('has all required default properties', () => {
     expect(DEFAULT_WIDGET_CONFIG.size).toBe('md')
     expect(DEFAULT_WIDGET_CONFIG.timeRange).toBe('15m')
     expect(DEFAULT_WIDGET_CONFIG.showGrid).toBe(true)
@@ -33,19 +33,26 @@ describe('DEFAULT_WIDGET_CONFIG', () => {
 })
 
 describe('SIZE_LABELS', () => {
-  it('provides labels for all four widget sizes', () => {
-    expect(Object.keys(SIZE_LABELS)).toEqual(['sm', 'md', 'lg', 'full'])
+  it('maps all widget sizes to labels', () => {
     expect(SIZE_LABELS.sm).toBe('1 columna')
     expect(SIZE_LABELS.md).toBe('2 columnas')
     expect(SIZE_LABELS.lg).toBe('3 columnas')
     expect(SIZE_LABELS.full).toBe('Ancho completo')
   })
+
+  it('has exactly 4 size options', () => {
+    expect(Object.keys(SIZE_LABELS).length).toBe(4)
+  })
 })
 
 describe('CHART_TYPE_LABELS', () => {
-  it('provides labels for all three chart types', () => {
+  it('maps all chart types to labels', () => {
     expect(CHART_TYPE_LABELS.line).toBe('Línea')
     expect(CHART_TYPE_LABELS.bar).toBe('Barra')
     expect(CHART_TYPE_LABELS.area).toBe('Área')
+  })
+
+  it('has exactly 3 chart types', () => {
+    expect(Object.keys(CHART_TYPE_LABELS).length).toBe(3)
   })
 })
