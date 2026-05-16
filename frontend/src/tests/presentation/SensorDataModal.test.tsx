@@ -2,6 +2,8 @@ import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { SensorDataModal } from '@/features/sensors/presentation/components/SensorDataModal'
 import { useSensorData } from '@/features/sensors/presentation/hooks/useSensorData'
+import type { Sensor, DataPoint } from '@/features/sensors/domain/types'
+import type { ReactNode } from 'react'
 
 // Mock dependencies
 vi.mock('@/features/sensors/presentation/hooks/useSensorData', () => ({
@@ -9,29 +11,29 @@ vi.mock('@/features/sensors/presentation/hooks/useSensorData', () => ({
 }))
 
 vi.mock('@/components/ui/dialog', () => ({
-  Dialog: ({ children }: any) => <div>{children}</div>,
-  DialogContent: ({ children }: any) => <div>{children}</div>,
-  DialogHeader: ({ children }: any) => <div>{children}</div>,
-  DialogTitle: ({ children }: any) => <div>{children}</div>,
-  DialogDescription: ({ children }: any) => <div>{children}</div>,
+  Dialog: ({ children }: { children: ReactNode }) => <div>{children}</div>,
+  DialogContent: ({ children }: { children: ReactNode }) => <div>{children}</div>,
+  DialogHeader: ({ children }: { children: ReactNode }) => <div>{children}</div>,
+  DialogTitle: ({ children }: { children: ReactNode }) => <div>{children}</div>,
+  DialogDescription: ({ children }: { children: ReactNode }) => <div>{children}</div>,
 }))
 
 vi.mock('@/components/ui/table', () => ({
-  Table: ({ children }: any) => <table>{children}</table>,
-  TableHeader: ({ children }: any) => <thead>{children}</thead>,
-  TableBody: ({ children }: any) => <tbody>{children}</tbody>,
-  TableRow: ({ children }: any) => <tr>{children}</tr>,
-  TableHead: ({ children }: any) => <th>{children}</th>,
-  TableCell: ({ children }: any) => <td>{children}</td>,
+  Table: ({ children }: { children: ReactNode }) => <table>{children}</table>,
+  TableHeader: ({ children }: { children: ReactNode }) => <thead>{children}</thead>,
+  TableBody: ({ children }: { children: ReactNode }) => <tbody>{children}</tbody>,
+  TableRow: ({ children }: { children: ReactNode }) => <tr>{children}</tr>,
+  TableHead: ({ children }: { children: ReactNode }) => <th>{children}</th>,
+  TableCell: ({ children }: { children: ReactNode }) => <td>{children}</td>,
 }))
 
 describe('SensorDataModal', () => {
-  const mockSensor = {
+  const mockSensor: Sensor = {
     id: 's1',
     name: 'Test Sensor',
     metadata: {},
-    created_at: 'now'
-  } as unknown as never
+    createdAt: 'now'
+  }
 
   beforeEach(() => {
     vi.clearAllMocks()
@@ -58,11 +60,11 @@ describe('SensorDataModal', () => {
   })
 
   it('renders data points', () => {
-    const mockData = [
+    const mockData: DataPoint[] = [
       { id: 'dp1', timestamp: '2023-01-01T10:00:00Z', payload: { value: 10 } }
     ]
     vi.mocked(useSensorData).mockReturnValue({
-      dataPoints: mockData as any,
+      dataPoints: mockData,
       loading: false,
     })
 
