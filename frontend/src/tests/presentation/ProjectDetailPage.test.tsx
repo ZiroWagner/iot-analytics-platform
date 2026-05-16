@@ -1,5 +1,6 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { faker } from '@faker-js/faker'
 import { ProjectDetailPage } from '@/features/devices/presentation/pages/ProjectDetailPage'
 import { useDevicesByProject } from '@/features/devices/presentation/hooks/useDevicesByProject'
 import { useSocketStatus, useTelemetryStore } from '@/features/telemetry'
@@ -123,7 +124,9 @@ describe('ProjectDetailPage', () => {
   })
 
   it('opens register gateway dialog and submits form', async () => {
-    vi.mocked(httpDevicesRepository.create).mockResolvedValue({ id: 'new-d', api_key: 'secret-key' } as unknown as never)
+    const deviceName = faker.commerce.productName()
+    const apiKey = faker.string.alphanumeric(32)
+    vi.mocked(httpDevicesRepository.create).mockResolvedValue({ id: 'new-d', api_key: apiKey } as unknown as never)
     
     render(<ProjectDetailPage />)
     
@@ -133,15 +136,15 @@ describe('ProjectDetailPage', () => {
     expect(screen.getByText('Registrar Hardware Gateway')).toBeDefined()
     
     const nameInput = screen.getByPlaceholderText(/Nodo-Central/i)
-    fireEvent.change(nameInput, { target: { value: 'New Node' } })
+    fireEvent.change(nameInput, { target: { value: deviceName } })
     
     const submitBtn = screen.getByText('Generar Credenciales')
     fireEvent.click(submitBtn)
     
     await waitFor(() => {
-      expect(httpDevicesRepository.create).toHaveBeenCalledWith('p1', expect.objectContaining({ name: 'New Node' }))
+      expect(httpDevicesRepository.create).toHaveBeenCalledWith('p1', expect.objectContaining({ name: deviceName }))
       expect(screen.getByText('Gateway Creado')).toBeDefined()
-      expect(screen.getByText('secret-key')).toBeDefined()
+      expect(screen.getByText(apiKey)).toBeDefined()
     })
   })
 
