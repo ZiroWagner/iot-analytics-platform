@@ -32,12 +32,12 @@ describe('OverviewPage', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
-    vi.mocked(useRouter).mockReturnValue(mockRouter as any)
+    vi.mocked(useRouter).mockReturnValue(mockRouter as unknown as ReturnType<typeof useRouter>)
     vi.mocked(useOverview).mockReturnValue({
       stats: mockStats,
       loading: false,
       unauthorized: false,
-    } as any)
+    } as unknown as ReturnType<typeof useOverview>)
   })
 
   it('renders stats cards correctly', () => {
@@ -64,7 +64,7 @@ describe('OverviewPage', () => {
       stats: { totalProjects: 0 },
       loading: false,
       unauthorized: false,
-    } as any)
+    } as unknown as ReturnType<typeof useOverview>)
 
     render(<OverviewPage />)
     expect(screen.getByText('Bienvenido a Vortex IoT')).toBeDefined()
@@ -78,7 +78,7 @@ describe('OverviewPage', () => {
       stats: null,
       loading: true,
       unauthorized: false,
-    } as any)
+    } as unknown as ReturnType<typeof useOverview>)
 
     render(<OverviewPage />)
     expect(document.querySelector('.animate-spin')).toBeDefined()
@@ -89,7 +89,7 @@ describe('OverviewPage', () => {
       stats: null,
       loading: false,
       unauthorized: true,
-    } as any)
+    } as unknown as ReturnType<typeof useOverview>)
 
     render(<OverviewPage />)
     expect(mockRouter.push).toHaveBeenCalledWith('/login')

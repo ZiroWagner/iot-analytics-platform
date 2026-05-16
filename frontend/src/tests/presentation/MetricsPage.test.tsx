@@ -2,7 +2,7 @@ import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { MetricsPage } from '@/features/observability/presentation/pages/MetricsPage'
 import { useSystemMetrics } from '@/features/observability/presentation/hooks/useSystemMetrics'
-import { useSocketStatus, useTelemetry } from '@/features/telemetry'
+import { useSocketStatus } from '@/features/telemetry'
 
 // Mock dependencies
 vi.mock('@/features/observability/presentation/hooks/useSystemMetrics', () => ({
@@ -28,7 +28,7 @@ describe('MetricsPage', () => {
       metrics: mockMetrics,
       loading: false,
       refresh: vi.fn(),
-    } as any)
+    } as unknown as ReturnType<typeof useSystemMetrics>)
     vi.mocked(useSocketStatus).mockReturnValue(true)
   })
 
@@ -46,7 +46,7 @@ describe('MetricsPage', () => {
       metrics: null,
       loading: true,
       refresh: vi.fn(),
-    } as any)
+    } as unknown as ReturnType<typeof useSystemMetrics>)
 
     render(<MetricsPage />)
     const values = screen.getAllByText('—')
@@ -69,7 +69,7 @@ describe('MetricsPage', () => {
       metrics: mockMetrics,
       loading: false,
       refresh,
-    } as any)
+    } as unknown as ReturnType<typeof useSystemMetrics>)
 
     render(<MetricsPage />)
     fireEvent.click(screen.getByText('Sincronizar'))

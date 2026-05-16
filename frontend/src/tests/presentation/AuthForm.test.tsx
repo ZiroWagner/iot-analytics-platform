@@ -1,9 +1,9 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import { AuthForm } from '@/components/auth/AuthForm'
 import { useRouter } from 'next/navigation'
 import { loginUseCase, registerUseCase } from '@/features/auth'
-import { z } from 'zod'
+
 
 // Mock dependencies
 vi.mock('next/navigation', () => ({
@@ -39,7 +39,7 @@ describe('AuthForm', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
-    vi.mocked(useRouter).mockReturnValue(mockRouter as any)
+    vi.mocked(useRouter).mockReturnValue(mockRouter as unknown as ReturnType<typeof useRouter>)
   })
 
   it('renders login form by default', () => {
@@ -60,7 +60,7 @@ describe('AuthForm', () => {
 
   it('submits login successfully', async () => {
     const user = userEvent.setup()
-    vi.mocked(loginUseCase).mockResolvedValue({} as any)
+    vi.mocked(loginUseCase).mockResolvedValue({ token: 'fake-token' })
     
     render(<AuthForm />)
     
@@ -82,7 +82,7 @@ describe('AuthForm', () => {
 
   it('submits registration successfully', async () => {
     const user = userEvent.setup()
-    vi.mocked(registerUseCase).mockResolvedValue({} as any)
+    vi.mocked(registerUseCase).mockResolvedValue({ token: 'fake-token' })
     
     render(<AuthForm />)
     await user.click(screen.getByText(/¿No tienes cuenta\? Regístrate/i))

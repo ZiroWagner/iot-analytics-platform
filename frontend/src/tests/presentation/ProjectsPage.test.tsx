@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import { ProjectsPage } from '@/features/projects/presentation/pages/ProjectsPage'
 import { useProjects } from '@/features/projects/presentation/hooks/useProjects'
 import { httpProjectsRepository } from '@/features/projects/infrastructure/projects.repository'
@@ -46,13 +46,13 @@ describe('ProjectsPage', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
-    vi.mocked(useRouter).mockReturnValue(mockRouter as any)
+    vi.mocked(useRouter).mockReturnValue(mockRouter as unknown as ReturnType<typeof useRouter>)
     vi.mocked(useProjects).mockReturnValue({
       projects: mockProjects,
       loading: false,
       unauthorized: false,
       refetch: vi.fn(),
-    } as any)
+    } as unknown as ReturnType<typeof useProjects>)
   })
 
   it('renders loading state', () => {
@@ -61,7 +61,7 @@ describe('ProjectsPage', () => {
       loading: true,
       unauthorized: false,
       refetch: vi.fn(),
-    } as any)
+    } as unknown as ReturnType<typeof useProjects>)
 
     const { container } = render(<ProjectsPage />)
     expect(container.querySelector('.animate-spin')).toBeDefined()
@@ -73,7 +73,7 @@ describe('ProjectsPage', () => {
       loading: false,
       unauthorized: false,
       refetch: vi.fn(),
-    } as any)
+    } as unknown as ReturnType<typeof useProjects>)
 
     render(<ProjectsPage />)
     expect(screen.getByText(/No tienes proyectos creados aún/i)).toBeDefined()
@@ -91,7 +91,7 @@ describe('ProjectsPage', () => {
       loading: false,
       unauthorized: true,
       refetch: vi.fn(),
-    } as any)
+    } as unknown as ReturnType<typeof useProjects>)
 
     render(<ProjectsPage />)
     expect(mockRouter.push).toHaveBeenCalledWith('/login')
@@ -99,7 +99,7 @@ describe('ProjectsPage', () => {
 
   it('opens dialog and creates project successfully', async () => {
     const user = userEvent.setup()
-    vi.mocked(httpProjectsRepository.create).mockResolvedValue({ id: 'new-p' } as any)
+    vi.mocked(httpProjectsRepository.create).mockResolvedValue({ id: 'new-p' } as unknown as never)
     
     render(<ProjectsPage />)
     

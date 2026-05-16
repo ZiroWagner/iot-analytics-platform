@@ -2,13 +2,13 @@ import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { ProjectDetailPage } from '@/features/devices/presentation/pages/ProjectDetailPage'
 import { useDevicesByProject } from '@/features/devices/presentation/hooks/useDevicesByProject'
-import { useTelemetry, useSocketStatus, useTelemetryStore } from '@/features/telemetry'
+import { useSocketStatus, useTelemetryStore } from '@/features/telemetry'
 import { useParams, useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { httpDevicesRepository } from '@/features/devices/infrastructure/devices.repository'
 import { httpSensorsRepository } from '@/features/sensors'
 
-import { z } from 'zod'
+
 
 // Mock dependencies
 vi.mock('next/navigation', () => ({
@@ -69,7 +69,7 @@ class MockResizeObserver {
   unobserve = vi.fn()
   disconnect = vi.fn()
 }
-global.ResizeObserver = MockResizeObserver as any
+global.ResizeObserver = MockResizeObserver as unknown as typeof ResizeObserver
 
 describe('ProjectDetailPage', () => {
   const mockRouter = { push: vi.fn() }
@@ -80,7 +80,7 @@ describe('ProjectDetailPage', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     vi.mocked(useParams).mockReturnValue({ id: 'p1' })
-    vi.mocked(useRouter).mockReturnValue(mockRouter as any)
+    vi.mocked(useRouter).mockReturnValue(mockRouter as unknown as ReturnType<typeof useRouter>)
     vi.mocked(useSocketStatus).mockReturnValue(true)
     vi.mocked(useTelemetryStore).mockReturnValue({})
     vi.mocked(useDevicesByProject).mockReturnValue({
@@ -88,7 +88,7 @@ describe('ProjectDetailPage', () => {
       loading: false,
       unauthorized: false,
       refetch: vi.fn(),
-    } as any)
+    } as unknown as ReturnType<typeof useDevicesByProject>)
   })
 
   it('renders loading state', () => {
@@ -97,7 +97,7 @@ describe('ProjectDetailPage', () => {
       loading: true,
       unauthorized: false,
       refetch: vi.fn(),
-    } as any)
+    } as unknown as ReturnType<typeof useDevicesByProject>)
 
     render(<ProjectDetailPage />)
     expect(screen.getByText(/Cargando.../i)).toBeDefined()
@@ -116,14 +116,14 @@ describe('ProjectDetailPage', () => {
       loading: false,
       unauthorized: true,
       refetch: vi.fn(),
-    } as any)
+    } as unknown as ReturnType<typeof useDevicesByProject>)
 
     render(<ProjectDetailPage />)
     expect(mockRouter.push).toHaveBeenCalledWith('/login')
   })
 
   it('opens register gateway dialog and submits form', async () => {
-    vi.mocked(httpDevicesRepository.create).mockResolvedValue({ id: 'new-d', api_key: 'secret-key' } as any)
+    vi.mocked(httpDevicesRepository.create).mockResolvedValue({ id: 'new-d', api_key: 'secret-key' } as unknown as never)
     
     render(<ProjectDetailPage />)
     
@@ -146,7 +146,7 @@ describe('ProjectDetailPage', () => {
   })
 
   it('opens new sensor dialog and submits form', async () => {
-    vi.mocked(httpSensorsRepository.create).mockResolvedValue({ id: 's1' } as any)
+    vi.mocked(httpSensorsRepository.create).mockResolvedValue({ id: 's1' } as unknown as never)
     
     render(<ProjectDetailPage />)
     const row = screen.getByText('Gateway 1')

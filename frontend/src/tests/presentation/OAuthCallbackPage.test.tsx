@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import { OAuthCallbackPage } from '@/features/auth/presentation/pages/OAuthCallbackPage'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { handleOAuthCallbackUseCase } from '@/features/auth/application'
@@ -19,13 +19,13 @@ describe('OAuthCallbackPage', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
-    vi.mocked(useRouter).mockReturnValue(mockRouter as any)
+    vi.mocked(useRouter).mockReturnValue(mockRouter as unknown as ReturnType<typeof useRouter>)
     vi.useFakeTimers()
   })
 
   it('redirects to dashboard if token is valid', async () => {
     const mockParams = new URLSearchParams('token=valid-token')
-    vi.mocked(useSearchParams).mockReturnValue(mockParams as any)
+    vi.mocked(useSearchParams).mockReturnValue(mockParams as unknown as ReturnType<typeof useSearchParams>)
     vi.mocked(handleOAuthCallbackUseCase).mockReturnValue(true)
 
     render(<OAuthCallbackPage />)
@@ -39,7 +39,7 @@ describe('OAuthCallbackPage', () => {
 
   it('redirects to login if token is missing or invalid', async () => {
     const mockParams = new URLSearchParams('')
-    vi.mocked(useSearchParams).mockReturnValue(mockParams as any)
+    vi.mocked(useSearchParams).mockReturnValue(mockParams as unknown as ReturnType<typeof useSearchParams>)
     vi.mocked(handleOAuthCallbackUseCase).mockReturnValue(false)
 
     render(<OAuthCallbackPage />)
@@ -49,7 +49,7 @@ describe('OAuthCallbackPage', () => {
 
   it('renders authenticating state', () => {
     const mockParams = new URLSearchParams('token=any')
-    vi.mocked(useSearchParams).mockReturnValue(mockParams as any)
+    vi.mocked(useSearchParams).mockReturnValue(mockParams as unknown as ReturnType<typeof useSearchParams>)
     
     render(<OAuthCallbackPage />)
     expect(screen.getByText('Autenticando...')).toBeDefined()
