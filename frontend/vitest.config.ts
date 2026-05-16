@@ -36,8 +36,6 @@ export default defineConfig({
         'src/tests/fixtures/**',
         'src/tests/mocks/**',
         'src/**/*.d.ts',
-        'src/app/**',
-        'src/components/ui/**',
       ],
     },
   },
