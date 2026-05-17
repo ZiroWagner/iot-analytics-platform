@@ -14,19 +14,24 @@ export default defineConfig({
   },
   test: {
     environment: 'jsdom',
+    typecheck: {
+      tsconfig: './tsconfig.test.json',
+    },
     globals: true,
-    setupFiles: ['./src/tests/setup/setup.ts'],
+    setupFiles: ['./tests/setup/setup.ts'],
     include: [
-      'src/tests/**/*.{test,spec}.{ts,tsx}',
+      'tests/**/*.{test,spec}.{ts,tsx}',
     ],
+    clearMocks: true,
+    restoreMocks: true,
+    mockReset: true,
     css: false,
-coverage: {
+    coverage: {
       provider: 'v8',
       reporter: ['text', 'lcov', 'json-summary'],
       include: ['src/**/*.{ts,tsx}'],
       exclude: [
-        'src/tests/**',
-        'src/**/*.test.{ts,tsx}',
+        'tests/**',
         'src/**/*.d.ts',
         'src/app/**',
         'src/components/ui/**',
