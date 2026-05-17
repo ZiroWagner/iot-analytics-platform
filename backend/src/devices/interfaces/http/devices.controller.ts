@@ -12,11 +12,11 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { CreateDeviceDto } from './dto/create-device.dto';
 import { UpdateDeviceDto } from './dto/update-device.dto';
-import { CreateDeviceUseCase } from '../../application/use-cases/create-device.use-case';
-import { GetDevicesByProjectUseCase } from '../../application/use-cases/get-devices-by-project.use-case';
-import { GetDeviceUseCase } from '../../application/use-cases/get-device.use-case';
-import { UpdateDeviceUseCase } from '../../application/use-cases/update-device.use-case';
-import { DeleteDeviceUseCase } from '../../application/use-cases/delete-device.use-case';
+import { CreateDeviceUseCase } from '@/devices/application/use-cases/create-device.use-case';
+import { GetDevicesByProjectUseCase } from '@/devices/application/use-cases/get-devices-by-project.use-case';
+import { GetDeviceUseCase } from '@/devices/application/use-cases/get-device.use-case';
+import { UpdateDeviceUseCase } from '@/devices/application/use-cases/update-device.use-case';
+import { DeleteDeviceUseCase } from '@/devices/application/use-cases/delete-device.use-case';
 import {
   ApiTags,
   ApiOperation,
@@ -42,7 +42,7 @@ export class DevicesController {
     private readonly getDeviceUseCase: GetDeviceUseCase,
     private readonly updateDeviceUseCase: UpdateDeviceUseCase,
     private readonly deleteDeviceUseCase: DeleteDeviceUseCase,
-  ) {}
+  ) { }
 
   @ApiOperation({ summary: 'Create a new device' })
   @ApiResponse({ status: 201, description: 'Device created successfully' })

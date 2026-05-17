@@ -1,20 +1,20 @@
 import { Module } from '@nestjs/common';
-import { RedisModule } from '../redis/redis.module';
-import { PrismaModule } from '../prisma/prisma.module';
+import { RedisModule } from '@/redis/redis.module';
+import { PrismaModule } from '@/prisma/prisma.module';
 
 // Controllers
-import { ObservabilityController } from './interfaces/http/observability.controller';
+import { ObservabilityController } from '@/observability/interfaces/http/observability.controller';
 
 // Use Cases
-import { GetSystemMetricsUseCase } from './application/use-cases/get-system-metrics.use-case';
-import { CheckOfflineDevicesUseCase } from './application/use-cases/check-offline-devices.use-case';
+import { GetSystemMetricsUseCase } from '@/observability/application/use-cases/get-system-metrics.use-case';
+import { CheckOfflineDevicesUseCase } from '@/observability/application/use-cases/check-offline-devices.use-case';
 
 // Repositories
-import { OBSERVABILITY_REPOSITORY_TOKEN } from './domain/repositories/observability.repository.interface';
-import { RedisObservabilityRepository } from './infrastructure/repositories/redis-observability.repository';
+import { OBSERVABILITY_REPOSITORY_TOKEN } from '@/observability/domain/repositories/observability.repository.interface';
+import { RedisObservabilityRepository } from '@/observability/infrastructure/repositories/redis-observability.repository';
 
 // Infrastructure schedulers
-import { OfflineDevicesScheduler } from './infrastructure/schedulers/offline-devices.scheduler';
+import { OfflineDevicesScheduler } from '@/observability/infrastructure/schedulers/offline-devices.scheduler';
 
 @Module({
   imports: [RedisModule, PrismaModule],
@@ -33,4 +33,4 @@ import { OfflineDevicesScheduler } from './infrastructure/schedulers/offline-dev
   ],
   exports: [GetSystemMetricsUseCase],
 })
-export class ObservabilityModule {}
+export class ObservabilityModule { }

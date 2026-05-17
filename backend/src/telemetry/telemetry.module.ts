@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { RedisModule } from '../redis/redis.module';
+import { RedisModule } from '@/redis/redis.module';
 
 // Gateway (interfaces/ws)
 import { TelemetryGateway } from './interfaces/ws/telemetry.gateway';
@@ -23,4 +23,4 @@ import {
   ],
   exports: [TelemetryGateway],
 })
-export class TelemetryModule {}
+export class TelemetryModule { }

@@ -11,12 +11,12 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { CreateProjectDto, UpdateProjectDto } from './dto/project.dto';
-import { CreateProjectUseCase } from '../../application/use-cases/create-project.use-case';
-import { GetProjectsUseCase } from '../../application/use-cases/get-projects.use-case';
-import { GetProjectUseCase } from '../../application/use-cases/get-project.use-case';
-import { UpdateProjectUseCase } from '../../application/use-cases/update-project.use-case';
-import { DeleteProjectUseCase } from '../../application/use-cases/delete-project.use-case';
-import { GetProjectOverviewUseCase } from '../../application/use-cases/get-project-overview.use-case';
+import { CreateProjectUseCase } from '@/projects/application/use-cases/create-project.use-case';
+import { GetProjectsUseCase } from '@/projects/application/use-cases/get-projects.use-case';
+import { GetProjectUseCase } from '@/projects/application/use-cases/get-project.use-case';
+import { UpdateProjectUseCase } from '@/projects/application/use-cases/update-project.use-case';
+import { DeleteProjectUseCase } from '@/projects/application/use-cases/delete-project.use-case';
+import { GetProjectOverviewUseCase } from '@/projects/application/use-cases/get-project-overview.use-case';
 import {
   ApiTags,
   ApiOperation,
@@ -43,7 +43,7 @@ export class ProjectsController {
     private readonly updateProjectUseCase: UpdateProjectUseCase,
     private readonly deleteProjectUseCase: DeleteProjectUseCase,
     private readonly getProjectOverviewUseCase: GetProjectOverviewUseCase,
-  ) {}
+  ) { }
 
   @ApiOperation({ summary: 'Create a new project' })
   @ApiResponse({ status: 201, description: 'Project created successfully' })

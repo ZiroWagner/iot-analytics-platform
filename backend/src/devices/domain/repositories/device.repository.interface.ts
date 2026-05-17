@@ -1,4 +1,4 @@
-import { Device } from '../entities/device.entity';
+import { Device } from '@/devices/domain/entities/device.entity';
 
 export const DEVICE_REPOSITORY_TOKEN = 'DEVICE_REPOSITORY_TOKEN';
 

@@ -1,4 +1,4 @@
-import { User } from '../entities/user.entity';
+import { User } from '@/auth/domain/entities/user.entity';
 
 export const USER_REPOSITORY_TOKEN = Symbol('UserRepositoryInterface');
 

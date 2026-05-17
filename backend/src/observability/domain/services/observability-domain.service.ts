@@ -1,4 +1,4 @@
-import { SystemMetrics } from '../entities/system-metrics.entity';
+import { SystemMetrics } from '@/observability/domain/entities/system-metrics.entity';
 
 export class ObservabilityDomainService {
   static buildSystemMetrics(props: {

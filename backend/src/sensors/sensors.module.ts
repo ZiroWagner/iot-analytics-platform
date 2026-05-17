@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { PrismaModule } from '../prisma/prisma.module';
+import { PrismaModule } from '@/prisma/prisma.module';
 
 // Controllers
 import { SensorsController } from './interfaces/http/sensors.controller';
@@ -35,4 +35,4 @@ import { PrismaSensorRepository } from './infrastructure/repositories/prisma-sen
   ],
   exports: [SENSOR_REPOSITORY_TOKEN],
 })
-export class SensorsModule {}
+export class SensorsModule { }

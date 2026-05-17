@@ -1,4 +1,4 @@
-import { Project } from '../entities/project.entity';
+import { Project } from '@/projects/domain/entities/project.entity';
 
 export const PROJECT_REPOSITORY_TOKEN = Symbol('ProjectRepositoryInterface');
 

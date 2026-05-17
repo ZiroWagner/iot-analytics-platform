@@ -13,12 +13,12 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { CreateSensorDto } from './dto/create-sensor.dto';
 import { UpdateSensorDto } from './dto/update-sensor.dto';
-import { CreateSensorUseCase } from '../../application/use-cases/create-sensor.use-case';
-import { GetSensorsByDeviceUseCase } from '../../application/use-cases/get-sensors-by-device.use-case';
-import { GetSensorUseCase } from '../../application/use-cases/get-sensor.use-case';
-import { UpdateSensorUseCase } from '../../application/use-cases/update-sensor.use-case';
-import { DeleteSensorUseCase } from '../../application/use-cases/delete-sensor.use-case';
-import { GetSensorDataPointsUseCase } from '../../application/use-cases/get-sensor-data-points.use-case';
+import { CreateSensorUseCase } from '@/sensors/application/use-cases/create-sensor.use-case';
+import { GetSensorsByDeviceUseCase } from '@/sensors/application/use-cases/get-sensors-by-device.use-case';
+import { GetSensorUseCase } from '@/sensors/application/use-cases/get-sensor.use-case';
+import { UpdateSensorUseCase } from '@/sensors/application/use-cases/update-sensor.use-case';
+import { DeleteSensorUseCase } from '@/sensors/application/use-cases/delete-sensor.use-case';
+import { GetSensorDataPointsUseCase } from '@/sensors/application/use-cases/get-sensor-data-points.use-case';
 import {
   ApiTags,
   ApiOperation,
@@ -46,7 +46,7 @@ export class SensorsController {
     private readonly updateSensorUseCase: UpdateSensorUseCase,
     private readonly deleteSensorUseCase: DeleteSensorUseCase,
     private readonly getSensorDataPointsUseCase: GetSensorDataPointsUseCase,
-  ) {}
+  ) { }
 
   @ApiOperation({ summary: 'Create a new sensor' })
   @ApiResponse({ status: 201, description: 'Sensor created successfully' })

@@ -1,8 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { PrismaService } from '../../../prisma/prisma.service';
-import { RedisService } from '../../../redis/redis.service';
-import { ObservabilityDomainService } from '../../domain/services/observability-domain.service';
-import type { ObservabilityRepositoryInterface } from '../../domain/repositories/observability.repository.interface';
+import { PrismaService } from '@/prisma/prisma.service';
+import { RedisService } from '@/redis/redis.service';
+import { ObservabilityDomainService } from '@/observability/domain/services/observability-domain.service';
+import type { ObservabilityRepositoryInterface } from '@/observability/domain/repositories/observability.repository.interface';
 
 const EPS_WINDOW_SECONDS = 3;
 const STREAM_NAME = 'telemetry:ingest';
@@ -16,7 +16,7 @@ export class RedisObservabilityRepository implements ObservabilityRepositoryInte
   constructor(
     private readonly redisService: RedisService,
     private readonly prisma: PrismaService,
-  ) {}
+  ) { }
 
   async getStreamLength(): Promise<number> {
     try {

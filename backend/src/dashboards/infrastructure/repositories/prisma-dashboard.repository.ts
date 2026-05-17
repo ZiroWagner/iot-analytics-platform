@@ -3,13 +3,13 @@ import {
   NotFoundException,
   ForbiddenException,
 } from '@nestjs/common';
-import { PrismaService } from '../../../prisma/prisma.service';
-import { DashboardRepositoryInterface } from '../../domain/repositories/dashboard.repository.interface';
-import { DashboardConfig } from '../../domain/entities/dashboard-config.entity';
+import { PrismaService } from '@/prisma/prisma.service';
+import { DashboardRepositoryInterface } from '@/dashboards/domain/repositories/dashboard.repository.interface';
+import { DashboardConfig } from '@/dashboards/domain/entities/dashboard-config.entity';
 
 @Injectable()
 export class PrismaDashboardRepository implements DashboardRepositoryInterface {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async getConfig(
     projectId: string,

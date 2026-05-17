@@ -10,10 +10,10 @@ import {
 } from '@nestjs/websockets';
 import { Logger, Inject, Injectable } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
-import { TelemetryDomainService } from '../../domain/services/telemetry-domain.service';
-import { TelemetryEvent } from '../../domain/entities/telemetry-event.entity';
-import { TELEMETRY_ADAPTER_TOKEN } from '../../infrastructure/adapters/redis-telemetry.adapter';
-import type { TelemetryAdapterInterface } from '../../infrastructure/adapters/redis-telemetry.adapter';
+import { TelemetryDomainService } from '@/telemetry/domain/services/telemetry-domain.service';
+import { TelemetryEvent } from '@/telemetry/domain/entities/telemetry-event.entity';
+import { TELEMETRY_ADAPTER_TOKEN } from '@/telemetry/infrastructure/adapters/redis-telemetry.adapter';
+import type { TelemetryAdapterInterface } from '@/telemetry/infrastructure/adapters/redis-telemetry.adapter';
 
 const FLUSH_INTERVAL_MS = 500;
 
@@ -26,8 +26,7 @@ const FLUSH_INTERVAL_MS = 500;
 })
 @Injectable()
 export class TelemetryGateway
-  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
-{
+  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
@@ -38,7 +37,7 @@ export class TelemetryGateway
   constructor(
     @Inject(TELEMETRY_ADAPTER_TOKEN)
     private readonly telemetryAdapter: TelemetryAdapterInterface,
-  ) {}
+  ) { }
 
   afterInit() {
     this.logger.log('TelemetryGateway initialized');

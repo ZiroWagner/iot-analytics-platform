@@ -1,7 +1,7 @@
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
-import { USER_REPOSITORY_TOKEN } from '../../domain/repositories/user.repository.interface';
-import type { UserRepositoryInterface } from '../../domain/repositories/user.repository.interface';
-import { User } from '../../domain/entities/user.entity';
+import { USER_REPOSITORY_TOKEN } from '@/auth/domain/repositories/user.repository.interface';
+import type { UserRepositoryInterface } from '@/auth/domain/repositories/user.repository.interface';
+import { User } from '@/auth/domain/entities/user.entity';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -9,7 +9,7 @@ export class ValidateUserUseCase {
   constructor(
     @Inject(USER_REPOSITORY_TOKEN)
     private readonly userRepository: UserRepositoryInterface,
-  ) {}
+  ) { }
 
   async execute(email: string, password: string): Promise<User> {
     const user = await this.userRepository.findByEmail(email);

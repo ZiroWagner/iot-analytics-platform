@@ -3,13 +3,13 @@ import {
   NotFoundException,
   ForbiddenException,
 } from '@nestjs/common';
-import { PrismaService } from '../../../prisma/prisma.service';
-import { SensorRepositoryInterface } from '../../domain/repositories/sensor.repository.interface';
-import { Sensor } from '../../domain/entities/sensor.entity';
+import { PrismaService } from '@/prisma/prisma.service';
+import { SensorRepositoryInterface } from '@/sensors/domain/repositories/sensor.repository.interface';
+import { Sensor } from '@/sensors/domain/entities/sensor.entity';
 
 @Injectable()
 export class PrismaSensorRepository implements SensorRepositoryInterface {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async create(data: {
     name: string;

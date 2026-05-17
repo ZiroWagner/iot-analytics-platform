@@ -11,9 +11,9 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { RegisterDto } from './dto/auth.dto';
-import { RegisterUserUseCase } from '../../application/use-cases/register-user.use-case';
-import { GenerateTokenUseCase } from '../../application/use-cases/generate-token.use-case';
+import { RegisterDto } from '@/auth/interfaces/http/dto/auth.dto';
+import { RegisterUserUseCase } from '@/auth/application/use-cases/register-user.use-case';
+import { GenerateTokenUseCase } from '@/auth/application/use-cases/generate-token.use-case';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
 import { ConfigService } from '@nestjs/config';
@@ -25,7 +25,7 @@ export class AuthController {
     private readonly registerUserUseCase: RegisterUserUseCase,
     private readonly generateTokenUseCase: GenerateTokenUseCase,
     private readonly configService: ConfigService,
-  ) {}
+  ) { }
 
   @ApiOperation({ summary: 'Registrar nuevo usuario' })
   @ApiResponse({ status: 201, description: 'Usuario creado exitosamente' })

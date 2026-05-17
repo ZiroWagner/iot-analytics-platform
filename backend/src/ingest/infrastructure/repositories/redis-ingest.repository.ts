@@ -1,9 +1,9 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { PrismaService } from '../../../prisma/prisma.service';
-import { RedisService } from '../../../redis/redis.service';
-import { SensorReading } from '../../domain/entities/sensor-reading.entity';
-import { IngestDomainService } from '../../domain/services/ingest-domain.service';
-import type { IngestRepositoryInterface } from '../../domain/repositories/ingest.repository.interface';
+import { PrismaService } from '@/prisma/prisma.service';
+import { RedisService } from '@/redis/redis.service';
+import { SensorReading } from '@/ingest/domain/entities/sensor-reading.entity';
+import { IngestDomainService } from '@/ingest/domain/services/ingest-domain.service';
+import type { IngestRepositoryInterface } from '@/ingest/domain/repositories/ingest.repository.interface';
 
 const DEVICE_STATUS_TTL = 15;
 const STREAM_MAX_LENGTH = 100000;
@@ -15,7 +15,7 @@ export class RedisIngestRepository implements IngestRepositoryInterface {
   constructor(
     private readonly prisma: PrismaService,
     private readonly redisService: RedisService,
-  ) {}
+  ) { }
 
   async resolveDeviceId(apiKey: string): Promise<string> {
     const cacheKey = `device:apikey:${apiKey}`;

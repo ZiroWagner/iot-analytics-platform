@@ -4,16 +4,16 @@ import {
   NotFoundException,
   ForbiddenException,
 } from '@nestjs/common';
-import { Project } from '../../domain/entities/project.entity';
-import { PROJECT_REPOSITORY_TOKEN } from '../../domain/repositories/project.repository.interface';
-import type { ProjectRepositoryInterface } from '../../domain/repositories/project.repository.interface';
+import { Project } from '@/projects/domain/entities/project.entity';
+import { PROJECT_REPOSITORY_TOKEN } from '@/projects/domain/repositories/project.repository.interface';
+import type { ProjectRepositoryInterface } from '@/projects/domain/repositories/project.repository.interface';
 
 @Injectable()
 export class UpdateProjectUseCase {
   constructor(
     @Inject(PROJECT_REPOSITORY_TOKEN)
     private readonly projectRepository: ProjectRepositoryInterface,
-  ) {}
+  ) { }
 
   async execute(
     userId: string,

@@ -1,10 +1,10 @@
 import { Controller, Get, Param, Query, Req, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { GetAvailableMetricsUseCase } from '../../application/use-cases/get-available-metrics.use-case';
-import { GetTimeseriesUseCase } from '../../application/use-cases/get-timeseries.use-case';
-import { GetMultiTimeseriesUseCase } from '../../application/use-cases/get-multi-timeseries.use-case';
-import { GetStatsUseCase } from '../../application/use-cases/get-stats.use-case';
-import { SeriesRequest } from '../../domain/entities/analytics.entities';
+import { GetAvailableMetricsUseCase } from '@/analytics/application/use-cases/get-available-metrics.use-case';
+import { GetTimeseriesUseCase } from '@/analytics/application/use-cases/get-timeseries.use-case';
+import { GetMultiTimeseriesUseCase } from '@/analytics/application/use-cases/get-multi-timeseries.use-case';
+import { GetStatsUseCase } from '@/analytics/application/use-cases/get-stats.use-case';
+import { SeriesRequest } from '@/analytics/domain/entities/analytics.entities';
 import {
   ApiTags,
   ApiOperation,
@@ -29,7 +29,7 @@ export class AnalyticsController {
     private readonly getTimeseriesUseCase: GetTimeseriesUseCase,
     private readonly getMultiTimeseriesUseCase: GetMultiTimeseriesUseCase,
     private readonly getStatsUseCase: GetStatsUseCase,
-  ) {}
+  ) { }
 
   @ApiOperation({ summary: 'Get available metrics for a project' })
   @ApiResponse({ status: 200, description: 'List of available metrics' })

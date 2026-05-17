@@ -3,14 +3,14 @@ import {
   NotFoundException,
   ForbiddenException,
 } from '@nestjs/common';
-import { PrismaService } from '../../../prisma/prisma.service';
-import { DeviceRepositoryInterface } from '../../domain/repositories/device.repository.interface';
-import { Device } from '../../domain/entities/device.entity';
+import { PrismaService } from '@/prisma/prisma.service';
+import { DeviceRepositoryInterface } from '@/devices/domain/repositories/device.repository.interface';
+import { Device } from '@/devices/domain/entities/device.entity';
 import * as crypto from 'crypto';
 
 @Injectable()
 export class PrismaDeviceRepository implements DeviceRepositoryInterface {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async create(data: {
     name: string;

@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { PrismaModule } from '../prisma/prisma.module';
+import { PrismaModule } from '@/prisma/prisma.module';
 
 // Controllers
 import { AnalyticsController } from './interfaces/http/analytics.controller';
@@ -30,4 +30,4 @@ import { PrismaAnalyticsRepository } from './infrastructure/repositories/prisma-
     GetStatsUseCase,
   ],
 })
-export class AnalyticsModule {}
+export class AnalyticsModule { }

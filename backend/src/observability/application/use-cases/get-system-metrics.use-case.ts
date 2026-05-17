@@ -1,15 +1,15 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { OBSERVABILITY_REPOSITORY_TOKEN } from '../../domain/repositories/observability.repository.interface';
-import type { ObservabilityRepositoryInterface } from '../../domain/repositories/observability.repository.interface';
-import { ObservabilityDomainService } from '../../domain/services/observability-domain.service';
-import { SystemMetrics } from '../../domain/entities/system-metrics.entity';
+import { OBSERVABILITY_REPOSITORY_TOKEN } from '@/observability/domain/repositories/observability.repository.interface';
+import type { ObservabilityRepositoryInterface } from '@/observability/domain/repositories/observability.repository.interface';
+import { ObservabilityDomainService } from '@/observability/domain/services/observability-domain.service';
+import { SystemMetrics } from '@/observability/domain/entities/system-metrics.entity';
 
 @Injectable()
 export class GetSystemMetricsUseCase {
   constructor(
     @Inject(OBSERVABILITY_REPOSITORY_TOKEN)
     private readonly observabilityRepository: ObservabilityRepositoryInterface,
-  ) {}
+  ) { }
 
   async execute(userId?: string): Promise<SystemMetrics | null> {
     try {

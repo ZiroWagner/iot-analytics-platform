@@ -1,4 +1,4 @@
-import { SensorReading } from '../entities/sensor-reading.entity';
+import { SensorReading } from '@/ingest/domain/entities/sensor-reading.entity';
 
 export const INGEST_REPOSITORY_TOKEN = Symbol('IngestRepositoryInterface');
 

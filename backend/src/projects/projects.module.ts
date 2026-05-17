@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { PrismaModule } from '../prisma/prisma.module';
+import { PrismaModule } from '@/prisma/prisma.module';
 
 // Controllers
 import { ProjectsController } from './interfaces/http/projects.controller';
@@ -35,4 +35,4 @@ import { PrismaProjectRepository } from './infrastructure/repositories/prisma-pr
   ],
   exports: [PROJECT_REPOSITORY_TOKEN],
 })
-export class ProjectsModule {}
+export class ProjectsModule { }

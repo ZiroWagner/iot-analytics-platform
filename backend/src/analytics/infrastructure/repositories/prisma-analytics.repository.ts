@@ -3,18 +3,18 @@ import {
   NotFoundException,
   ForbiddenException,
 } from '@nestjs/common';
-import { PrismaService } from '../../../prisma/prisma.service';
-import { AnalyticsRepositoryInterface } from '../../domain/repositories/analytics.repository.interface';
+import { PrismaService } from '@/prisma/prisma.service';
+import { AnalyticsRepositoryInterface } from '@/analytics/domain/repositories/analytics.repository.interface';
 import {
   SensorMetric,
   TimeseriesPoint,
   SeriesRequest,
   MetricStats,
-} from '../../domain/entities/analytics.entities';
+} from '@/analytics/domain/entities/analytics.entities';
 
 @Injectable()
 export class PrismaAnalyticsRepository implements AnalyticsRepositoryInterface {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async getAvailableMetrics(
     userId: string,

@@ -1,4 +1,4 @@
-import { Sensor } from '../entities/sensor.entity';
+import { Sensor } from '@/sensors/domain/entities/sensor.entity';
 
 export const SENSOR_REPOSITORY_TOKEN = 'SENSOR_REPOSITORY_TOKEN';
 

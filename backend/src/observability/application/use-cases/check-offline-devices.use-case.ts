@@ -1,6 +1,6 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { OBSERVABILITY_REPOSITORY_TOKEN } from '../../domain/repositories/observability.repository.interface';
-import type { ObservabilityRepositoryInterface } from '../../domain/repositories/observability.repository.interface';
+import { OBSERVABILITY_REPOSITORY_TOKEN } from '@/observability/domain/repositories/observability.repository.interface';
+import type { ObservabilityRepositoryInterface } from '@/observability/domain/repositories/observability.repository.interface';
 
 const DEVICE_ONLINE_TTL_MS = 15_000;
 
@@ -11,7 +11,7 @@ export class CheckOfflineDevicesUseCase {
   constructor(
     @Inject(OBSERVABILITY_REPOSITORY_TOKEN)
     private readonly observabilityRepository: ObservabilityRepositoryInterface,
-  ) {}
+  ) { }
 
   async execute(): Promise<void> {
     try {

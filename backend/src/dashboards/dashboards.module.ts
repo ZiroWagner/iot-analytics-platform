@@ -1,16 +1,16 @@
 import { Module } from '@nestjs/common';
-import { PrismaModule } from '../prisma/prisma.module';
+import { PrismaModule } from '@/prisma/prisma.module';
 
 // Controllers
-import { DashboardsController } from './interfaces/http/dashboards.controller';
+import { DashboardsController } from '@/dashboards/interfaces/http/dashboards.controller';
 
 // Use Cases
-import { GetDashboardConfigUseCase } from './application/use-cases/get-dashboard-config.use-case';
-import { SaveDashboardConfigUseCase } from './application/use-cases/save-dashboard-config.use-case';
+import { GetDashboardConfigUseCase } from '@/dashboards/application/use-cases/get-dashboard-config.use-case';
+import { SaveDashboardConfigUseCase } from '@/dashboards/application/use-cases/save-dashboard-config.use-case';
 
 // Repositories
-import { DASHBOARD_REPOSITORY_TOKEN } from './domain/repositories/dashboard.repository.interface';
-import { PrismaDashboardRepository } from './infrastructure/repositories/prisma-dashboard.repository';
+import { DASHBOARD_REPOSITORY_TOKEN } from '@/dashboards/domain/repositories/dashboard.repository.interface';
+import { PrismaDashboardRepository } from '@/dashboards/infrastructure/repositories/prisma-dashboard.repository';
 
 @Module({
   imports: [PrismaModule],
@@ -26,4 +26,4 @@ import { PrismaDashboardRepository } from './infrastructure/repositories/prisma-
     SaveDashboardConfigUseCase,
   ],
 })
-export class DashboardsModule {}
+export class DashboardsModule { }

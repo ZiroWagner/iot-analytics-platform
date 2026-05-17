@@ -1,5 +1,5 @@
-import { TelemetryEvent } from '../entities/telemetry-event.entity';
-import { DeviceSnapshot } from '../entities/device-snapshot.entity';
+import { TelemetryEvent } from '@/telemetry/domain/entities/telemetry-event.entity';
+import { DeviceSnapshot } from '@/telemetry/domain/entities/device-snapshot.entity';
 
 export class TelemetryDomainService {
   static parsePubSubMessage(message: string): TelemetryEvent | null {

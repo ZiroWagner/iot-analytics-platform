@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { RedisService } from '../../../redis/redis.service';
+import { RedisService } from '@/redis/redis.service';
 
 export const TELEMETRY_ADAPTER_TOKEN = Symbol('TelemetryAdapterInterface');
 
@@ -15,7 +15,7 @@ export class RedisTelemetryAdapter implements TelemetryAdapterInterface {
   private readonly logger = new Logger(RedisTelemetryAdapter.name);
   private subscriber: any;
 
-  constructor(private readonly redisService: RedisService) {}
+  constructor(private readonly redisService: RedisService) { }
 
   subscribe(channel: string, callback: (message: string) => void): void {
     this.subscriber = this.redisService.client.duplicate();

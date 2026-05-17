@@ -4,11 +4,11 @@ import {
   OnModuleInit,
   OnModuleDestroy,
 } from '@nestjs/common';
-import { PrismaService } from '../../../prisma/prisma.service';
-import { RedisService } from '../../../redis/redis.service';
-import { IngestDomainService } from '../../domain/services/ingest-domain.service';
-import { ParsedStreamMessage } from '../../domain/entities/parsed-stream-message.entity';
-import { DataPointInsert } from '../../domain/entities/data-point-insert.entity';
+import { PrismaService } from '@/prisma/prisma.service';
+import { RedisService } from '@/redis/redis.service';
+import { IngestDomainService } from '@/ingest/domain/services/ingest-domain.service';
+import { ParsedStreamMessage } from '@/ingest/domain/entities/parsed-stream-message.entity';
+import { DataPointInsert } from '@/ingest/domain/entities/data-point-insert.entity';
 
 const BLOCK_TIMEOUT_MS = 2000;
 const BATCH_SIZE = 100;
@@ -25,7 +25,7 @@ export class StreamIngestProcessor implements OnModuleInit, OnModuleDestroy {
   constructor(
     private readonly prisma: PrismaService,
     private readonly redisService: RedisService,
-  ) {}
+  ) { }
 
   async onModuleInit() {
     this.isRunning = true;

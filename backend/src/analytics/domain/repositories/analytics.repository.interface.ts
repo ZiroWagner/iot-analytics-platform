@@ -3,7 +3,7 @@ import {
   TimeseriesPoint,
   SeriesRequest,
   MetricStats,
-} from '../entities/analytics.entities';
+} from '@/analytics/domain/entities/analytics.entities';
 
 export const ANALYTICS_REPOSITORY_TOKEN = 'ANALYTICS_REPOSITORY_TOKEN';
 

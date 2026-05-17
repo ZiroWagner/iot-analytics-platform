@@ -1,8 +1,8 @@
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-github2';
 import { Injectable } from '@nestjs/common';
-import { ValidateOAuthUseCase } from '../../application/use-cases/validate-oauth.use-case';
-import { OAuthProfile } from '../../domain/entities/oauth-profile.entity';
+import { ValidateOAuthUseCase } from '@/auth/application/use-cases/validate-oauth.use-case';
+import { OAuthProfile } from '@/auth/domain/entities/oauth-profile.entity';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()

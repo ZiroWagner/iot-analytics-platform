@@ -1,19 +1,19 @@
 import { Module } from '@nestjs/common';
-import { PrismaModule } from '../prisma/prisma.module';
-import { RedisModule } from '../redis/redis.module';
+import { PrismaModule } from '@/prisma/prisma.module';
+import { RedisModule } from '@/redis/redis.module';
 
 // Controllers
-import { IngestController } from './interfaces/http/ingest.controller';
+import { IngestController } from '@/ingest/interfaces/http/ingest.controller';
 
 // Use Cases
-import { ProcessIngestUseCase } from './application/use-cases/process-ingest.use-case';
+import { ProcessIngestUseCase } from '@/ingest/application/use-cases/process-ingest.use-case';
 
 // Repositories
-import { INGEST_REPOSITORY_TOKEN } from './domain/repositories/ingest.repository.interface';
-import { RedisIngestRepository } from './infrastructure/repositories/redis-ingest.repository';
+import { INGEST_REPOSITORY_TOKEN } from '@/ingest/domain/repositories/ingest.repository.interface';
+import { RedisIngestRepository } from '@/ingest/infrastructure/repositories/redis-ingest.repository';
 
 // Infrastructure processors
-import { StreamIngestProcessor } from './infrastructure/processors/stream-ingest.processor';
+import { StreamIngestProcessor } from '@/ingest/infrastructure/processors/stream-ingest.processor';
 
 @Module({
   imports: [PrismaModule, RedisModule],
@@ -30,4 +30,4 @@ import { StreamIngestProcessor } from './infrastructure/processors/stream-ingest
     StreamIngestProcessor,
   ],
 })
-export class IngestModule {}
+export class IngestModule { }

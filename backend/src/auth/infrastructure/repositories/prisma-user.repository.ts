@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../../../prisma/prisma.service';
-import { User } from '../../domain/entities/user.entity';
+import { PrismaService } from '@/prisma/prisma.service';
+import { User } from '@/auth/domain/entities/user.entity';
 import * as bcrypt from 'bcrypt';
-import type { UserRepositoryInterface } from '../../domain/repositories/user.repository.interface';
+import type { UserRepositoryInterface } from '@/auth/domain/repositories/user.repository.interface';
 
 const BCRYPT_SALT_ROUNDS = 10;
 
 @Injectable()
 export class PrismaUserRepository implements UserRepositoryInterface {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async findByEmail(email: string): Promise<User | null> {
     const user = await this.prisma.user.findUnique({ where: { email } });

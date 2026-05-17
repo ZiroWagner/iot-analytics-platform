@@ -1,17 +1,17 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { ANALYTICS_REPOSITORY_TOKEN } from '../../domain/repositories/analytics.repository.interface';
-import type { AnalyticsRepositoryInterface } from '../../domain/repositories/analytics.repository.interface';
+import { ANALYTICS_REPOSITORY_TOKEN } from '@/analytics/domain/repositories/analytics.repository.interface';
+import type { AnalyticsRepositoryInterface } from '@/analytics/domain/repositories/analytics.repository.interface';
 import type {
   TimeseriesPoint,
   SeriesRequest,
-} from '../../domain/entities/analytics.entities';
+} from '@/analytics/domain/entities/analytics.entities';
 
 @Injectable()
 export class GetMultiTimeseriesUseCase {
   constructor(
     @Inject(ANALYTICS_REPOSITORY_TOKEN)
     private readonly analyticsRepository: AnalyticsRepositoryInterface,
-  ) {}
+  ) { }
 
   async execute(
     userId: string,

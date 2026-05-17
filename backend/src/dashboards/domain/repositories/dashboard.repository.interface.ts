@@ -1,4 +1,4 @@
-import { DashboardConfig } from '../entities/dashboard-config.entity';
+import { DashboardConfig } from '@/dashboards/domain/entities/dashboard-config.entity';
 
 export const DASHBOARD_REPOSITORY_TOKEN = 'DASHBOARD_REPOSITORY_TOKEN';
 

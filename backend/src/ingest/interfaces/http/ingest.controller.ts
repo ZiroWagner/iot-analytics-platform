@@ -7,13 +7,13 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
-import { ProcessIngestUseCase } from '../../application/use-cases/process-ingest.use-case';
+import { ProcessIngestUseCase } from '@/ingest/application/use-cases/process-ingest.use-case';
 import { IngestBodyDto } from './dto/ingest.dto';
 
 @ApiTags('Ingest')
 @Controller('ingest')
 export class IngestController {
-  constructor(private readonly processIngestUseCase: ProcessIngestUseCase) {}
+  constructor(private readonly processIngestUseCase: ProcessIngestUseCase) { }
 
   @ApiOperation({ summary: 'Ingest IoT sensor data (device-triggered)' })
   @ApiResponse({ status: 202, description: 'Data accepted for processing' })

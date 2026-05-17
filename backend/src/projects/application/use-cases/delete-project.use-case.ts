@@ -4,15 +4,15 @@ import {
   NotFoundException,
   ForbiddenException,
 } from '@nestjs/common';
-import { PROJECT_REPOSITORY_TOKEN } from '../../domain/repositories/project.repository.interface';
-import type { ProjectRepositoryInterface } from '../../domain/repositories/project.repository.interface';
+import { PROJECT_REPOSITORY_TOKEN } from '@/projects/domain/repositories/project.repository.interface';
+import type { ProjectRepositoryInterface } from '@/projects/domain/repositories/project.repository.interface';
 
 @Injectable()
 export class DeleteProjectUseCase {
   constructor(
     @Inject(PROJECT_REPOSITORY_TOKEN)
     private readonly projectRepository: ProjectRepositoryInterface,
-  ) {}
+  ) { }
 
   async execute(userId: string, projectId: string): Promise<void> {
     const project = await this.projectRepository.findById(projectId);

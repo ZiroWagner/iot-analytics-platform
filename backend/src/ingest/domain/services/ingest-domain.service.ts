@@ -1,6 +1,6 @@
-import { SensorReading } from '../entities/sensor-reading.entity';
-import { ParsedStreamMessage } from '../entities/parsed-stream-message.entity';
-import { DataPointInsert } from '../entities/data-point-insert.entity';
+import { SensorReading } from '@/ingest/domain/entities/sensor-reading.entity';
+import { ParsedStreamMessage } from '@/ingest/domain/entities/parsed-stream-message.entity';
+import { DataPointInsert } from '@/ingest/domain/entities/data-point-insert.entity';
 
 interface PayloadSensorInput {
   sensorId: string;
