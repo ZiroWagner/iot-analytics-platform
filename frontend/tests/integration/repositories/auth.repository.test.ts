@@ -2,7 +2,7 @@ import { faker } from '@faker-js/faker'
 import { http, HttpResponse } from 'msw'
 import { describe, expect, it } from 'vitest'
 import { API_URL } from '@/shared/infrastructure/http'
-import { server } from '@/tests/mocks/server'
+import { server } from '../../mocks/server'
 import { httpAuthRepository } from '@/features/auth/infrastructure/auth.repository'
 
 describe('httpAuthRepository', () => {
