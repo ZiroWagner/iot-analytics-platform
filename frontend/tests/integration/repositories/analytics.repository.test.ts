@@ -87,4 +87,13 @@ describe('httpAnalyticsRepository', () => {
     )
     expect(result).toEqual(mockStats)
   })
+
+  it('handles empty query params gracefully', async () => {
+    vi.mocked(apiClient).mockResolvedValueOnce([])
+
+    const result = await httpAnalyticsRepository.multiTimeseries('project-1', {})
+
+    expect(apiClient).toHaveBeenCalledWith('/analytics/project-1/multi-timeseries?')
+    expect(result).toEqual([])
+  })
 })
