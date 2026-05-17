@@ -165,8 +165,8 @@ pipeline {
         stage('Health Checks') {
             steps {
                 sleep time: 15, unit: 'SECONDS'
-                sh "curl -f http://stg_backend:3000/api/v1/health"
-                sh "curl -f http://stg_frontend:3000/api/health"
+                sh "curl -f http://localhost:3001/api/v1/health"
+                sh "curl -f http://localhost:3002/api/health"
             }
         }
     }
