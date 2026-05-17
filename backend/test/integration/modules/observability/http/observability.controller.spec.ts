@@ -20,7 +20,7 @@ describe('ObservabilityController', () => {
   it('should call useCase with userId from request', async () => {
     const mockUser = { sub: 'u1', email: 'test@example.com' };
     const result = await controller.getMetrics({ user: mockUser });
-    
+
     expect(useCase.execute).toHaveBeenCalledWith('u1');
     expect(result).toEqual({ streamSize: 10 });
   });

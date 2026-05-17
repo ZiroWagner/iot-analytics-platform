@@ -21,7 +21,9 @@ describe('CheckOfflineDevicesUseCase', () => {
       ],
     }).compile();
 
-    useCase = module.get<CheckOfflineDevicesUseCase>(CheckOfflineDevicesUseCase);
+    useCase = module.get<CheckOfflineDevicesUseCase>(
+      CheckOfflineDevicesUseCase,
+    );
   });
 
   it('should do nothing if no active devices', async () => {
@@ -34,8 +36,18 @@ describe('CheckOfflineDevicesUseCase', () => {
     const now = Date.now();
     repository.scanActiveDeviceIds.mockResolvedValue(['d1', 'd2']);
     repository.getDeviceStates.mockResolvedValue([
-      { deviceId: 'd1', status: 'online', lastSeenAt: new Date(now - 30000).toISOString(), projectId: 'p1' }, // Stale
-      { deviceId: 'd2', status: 'online', lastSeenAt: new Date(now - 1000).toISOString(), projectId: 'p1' }, // Fresh
+      {
+        deviceId: 'd1',
+        status: 'online',
+        lastSeenAt: new Date(now - 30000).toISOString(),
+        projectId: 'p1',
+      }, // Stale
+      {
+        deviceId: 'd2',
+        status: 'online',
+        lastSeenAt: new Date(now - 1000).toISOString(),
+        projectId: 'p1',
+      }, // Fresh
     ]);
 
     await useCase.execute();
@@ -58,7 +70,7 @@ describe('CheckOfflineDevicesUseCase', () => {
   it('should catch and log errors', async () => {
     repository.scanActiveDeviceIds.mockRejectedValue(new Error('scan failed'));
     const loggerSpy = jest.spyOn((useCase as any).logger, 'error');
-    
+
     await useCase.execute();
     expect(loggerSpy).toHaveBeenCalled();
   });

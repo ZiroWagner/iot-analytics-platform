@@ -73,7 +73,7 @@ describe('RedisObservabilityRepository Integration', () => {
   describe('getConsumerLag', () => {
     it('should return lag from GROUPS info', async () => {
       redisClient.xinfo.mockResolvedValue([
-        ['name', 'ingest-group', 'lag', '5']
+        ['name', 'ingest-group', 'lag', '5'],
       ]);
       const result = await repository.getConsumerLag();
       expect(result).toBe(5);
@@ -88,7 +88,10 @@ describe('RedisObservabilityRepository Integration', () => {
 
   describe('countOnlineDevices', () => {
     it('should scan and filter online devices', async () => {
-      redisClient.scan.mockResolvedValueOnce(['0', ['device:state:d1', 'device:state:d2']]);
+      redisClient.scan.mockResolvedValueOnce([
+        '0',
+        ['device:state:d1', 'device:state:d2'],
+      ]);
       const now = new Date().toISOString();
       redisClient.pipeline.mockReturnValue({
         hmget: jest.fn(),
@@ -130,7 +133,7 @@ describe('RedisObservabilityRepository Integration', () => {
       redisClient.scan
         .mockResolvedValueOnce(['10', ['device:state:d1']])
         .mockResolvedValueOnce(['0', ['device:state:d2']]);
-      
+
       const result = await repository.scanActiveDeviceIds();
       expect(result).toEqual(['d1', 'd2']);
       expect(redisClient.scan).toHaveBeenCalledTimes(2);
@@ -167,7 +170,7 @@ describe('RedisObservabilityRepository Integration', () => {
       await repository.markDeviceOffline('d1');
       expect(redisClient.hset).toHaveBeenCalledWith(
         'device:state:d1',
-        expect.objectContaining({ status: 'offline' })
+        expect.objectContaining({ status: 'offline' }),
       );
     });
   });
@@ -177,25 +180,41 @@ describe('RedisObservabilityRepository Integration', () => {
       await repository.broadcastOfflineEvent('d1', 'p1');
       expect(redisClient.publish).toHaveBeenCalledWith(
         'telemetry:broadcast',
-        expect.stringContaining('d1')
+        expect.stringContaining('d1'),
       );
     });
   });
 
   describe('isStateOnline edge cases', () => {
     it('should return false if status not online', () => {
-      const result = (repository as any).isStateOnline({ status: 'offline', lastSeenAt: new Date().toISOString() }, Date.now());
+      const result = (repository as any).isStateOnline(
+        { status: 'offline', lastSeenAt: new Date().toISOString() },
+        Date.now(),
+      );
       expect(result).toBe(false);
     });
 
     it('should return false if lastSeenAt missing or invalid', () => {
-      expect((repository as any).isStateOnline({ status: 'online', lastSeenAt: null }, Date.now())).toBe(false);
-      expect((repository as any).isStateOnline({ status: 'online', lastSeenAt: 'invalid' }, Date.now())).toBe(false);
+      expect(
+        (repository as any).isStateOnline(
+          { status: 'online', lastSeenAt: null },
+          Date.now(),
+        ),
+      ).toBe(false);
+      expect(
+        (repository as any).isStateOnline(
+          { status: 'online', lastSeenAt: 'invalid' },
+          Date.now(),
+        ),
+      ).toBe(false);
     });
 
     it('should return false if TTL expired', () => {
       const oldDate = new Date(Date.now() - 60000).toISOString();
-      const result = (repository as any).isStateOnline({ status: 'online', lastSeenAt: oldDate }, Date.now());
+      const result = (repository as any).isStateOnline(
+        { status: 'online', lastSeenAt: oldDate },
+        Date.now(),
+      );
       expect(result).toBe(false);
     });
   });

@@ -54,20 +54,23 @@ describe('HttpExceptionFilter', () => {
   });
 
   it('should log error for 500 status', () => {
-    const exception = new HttpException('Server crash', HttpStatus.INTERNAL_SERVER_ERROR);
+    const exception = new HttpException(
+      'Server crash',
+      HttpStatus.INTERNAL_SERVER_ERROR,
+    );
     const loggerSpy = jest.spyOn((filter as any).logger, 'error');
-    
+
     filter.catch(exception, mockArgumentsHost);
-    
+
     expect(loggerSpy).toHaveBeenCalled();
   });
 
   it('should log warn for 400 status', () => {
     const exception = new HttpException('Bad input', HttpStatus.BAD_REQUEST);
     const loggerSpy = jest.spyOn((filter as any).logger, 'warn');
-    
+
     filter.catch(exception, mockArgumentsHost);
-    
+
     expect(loggerSpy).toHaveBeenCalled();
   });
 });

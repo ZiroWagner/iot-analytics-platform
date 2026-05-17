@@ -113,12 +113,16 @@ describe('StreamIngestProcessor', () => {
 
   describe('lifecycle', () => {
     it('should start and stop correctly', async () => {
-      jest.spyOn(processor as any, 'ensureConsumerGroup').mockResolvedValue(undefined);
-      jest.spyOn(processor as any, 'processLoop').mockImplementation(async () => {});
-      
+      jest
+        .spyOn(processor as any, 'ensureConsumerGroup')
+        .mockResolvedValue(undefined);
+      jest
+        .spyOn(processor as any, 'processLoop')
+        .mockImplementation(async () => {});
+
       await processor.onModuleInit();
       expect((processor as any).isRunning).toBe(true);
-      
+
       processor.onModuleDestroy();
       expect((processor as any).isRunning).toBe(false);
     });
@@ -126,13 +130,32 @@ describe('StreamIngestProcessor', () => {
 
   describe('processBatch errors', () => {
     it('should log error if database insert fails', async () => {
-      const messages: any = [['1-0', ['deviceId', 'd1', 'timestamp', '2026-05-16T10:00:00Z', 'sensors', '[{"sensorId":"s1","payload":{"v":1}}]']]];
-      prismaService.sensor.findMany.mockResolvedValue([{ id: 's1', name: 's1', deviceId: 'd1' }]);
-      prismaService.dataPoint.createMany.mockRejectedValue(new Error('DB Fail'));
+      const messages: any = [
+        [
+          '1-0',
+          [
+            'deviceId',
+            'd1',
+            'timestamp',
+            '2026-05-16T10:00:00Z',
+            'sensors',
+            '[{"sensorId":"s1","payload":{"v":1}}]',
+          ],
+        ],
+      ];
+      prismaService.sensor.findMany.mockResolvedValue([
+        { id: 's1', name: 's1', deviceId: 'd1' },
+      ]);
+      prismaService.dataPoint.createMany.mockRejectedValue(
+        new Error('DB Fail'),
+      );
       const loggerSpy = jest.spyOn((processor as any).logger, 'error');
 
       await (processor as any).processBatch(messages);
-      expect(loggerSpy).toHaveBeenCalledWith(expect.stringContaining('Failed to bulk insert'), expect.anything());
+      expect(loggerSpy).toHaveBeenCalledWith(
+        expect.stringContaining('Failed to bulk insert'),
+        expect.anything(),
+      );
     });
   });
 
@@ -143,7 +166,10 @@ describe('StreamIngestProcessor', () => {
       const loggerSpy = jest.spyOn((processor as any).logger, 'warn');
 
       await (processor as any).updateDeviceTimestamps(parsed);
-      expect(loggerSpy).toHaveBeenCalledWith(expect.stringContaining('Failed to update lastSeenAt'), expect.anything());
+      expect(loggerSpy).toHaveBeenCalledWith(
+        expect.stringContaining('Failed to update lastSeenAt'),
+        expect.anything(),
+      );
     });
   });
 
@@ -152,14 +178,19 @@ describe('StreamIngestProcessor', () => {
       (processor as any).isRunning = true;
       redisClient.xreadgroup.mockRejectedValueOnce(new Error('Redis Down'));
       const loggerSpy = jest.spyOn((processor as any).logger, 'error');
-      const delaySpy = jest.spyOn(processor as any, 'delay').mockResolvedValue(undefined);
+      const delaySpy = jest
+        .spyOn(processor as any, 'delay')
+        .mockResolvedValue(undefined);
 
       // We manually trigger one iteration
       const loopPromise = (processor as any).processLoop();
       (processor as any).isRunning = false; // Stop loop after first iteration
       await loopPromise;
 
-      expect(loggerSpy).toHaveBeenCalledWith(expect.stringContaining('Error in stream processing loop'), expect.anything());
+      expect(loggerSpy).toHaveBeenCalledWith(
+        expect.stringContaining('Error in stream processing loop'),
+        expect.anything(),
+      );
       expect(delaySpy).toHaveBeenCalled();
     });
   });

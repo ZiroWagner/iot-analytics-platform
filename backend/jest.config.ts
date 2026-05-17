@@ -16,6 +16,7 @@ const config: Config.InitialOptions = {
   testTimeout: 30000,
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
+    '^@test/(.*)$': '<rootDir>/test/$1',
   },
   projects: [
     {
@@ -26,6 +27,7 @@ const config: Config.InitialOptions = {
       setupFilesAfterEnv: ['<rootDir>/test/setup/unit.ts'],
       moduleNameMapper: {
         '^@/(.*)$': '<rootDir>/src/$1',
+        '^@test/(.*)$': '<rootDir>/test/$1',
       },
     },
     {
@@ -36,6 +38,7 @@ const config: Config.InitialOptions = {
       setupFilesAfterEnv: ['<rootDir>/test/setup/integration.ts'],
       moduleNameMapper: {
         '^@/(.*)$': '<rootDir>/src/$1',
+        '^@test/(.*)$': '<rootDir>/test/$1',
       },
     },
     {
@@ -46,6 +49,7 @@ const config: Config.InitialOptions = {
       setupFilesAfterEnv: ['<rootDir>/test/setup/e2e.ts'],
       moduleNameMapper: {
         '^@/(.*)$': '<rootDir>/src/$1',
+        '^@test/(.*)$': '<rootDir>/test/$1',
       },
     },
   ],

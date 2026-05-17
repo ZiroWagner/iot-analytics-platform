@@ -101,7 +101,10 @@ describe('PrismaUserRepository Integration', () => {
 
     it('should link to existing user if email matches but account is new', async () => {
       prismaMock.account.findUnique.mockResolvedValue(null);
-      prismaMock.user.findUnique.mockResolvedValue({ id: 'u1', email: 'existing@o.com' });
+      prismaMock.user.findUnique.mockResolvedValue({
+        id: 'u1',
+        email: 'existing@o.com',
+      });
       prismaMock.account.create.mockResolvedValue({});
 
       const result = await repository.findOrCreateOAuthUser({
@@ -122,7 +125,7 @@ describe('PrismaUserRepository Integration', () => {
     it('should handle OAuth without email', async () => {
       prismaMock.account.findUnique.mockResolvedValue(null);
       prismaMock.user.create.mockResolvedValue({ id: 'u3', email: '' });
-      
+
       const result = await repository.findOrCreateOAuthUser({
         provider: 'github',
         providerAccountId: 'gh2',
@@ -134,9 +137,11 @@ describe('PrismaUserRepository Integration', () => {
       });
 
       expect(result.id).toBe('u3');
-      expect(prismaMock.user.create).toHaveBeenCalledWith(expect.objectContaining({
-        data: expect.objectContaining({ email: '' })
-      }));
+      expect(prismaMock.user.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({ email: '' }),
+        }),
+      );
     });
   });
 });
