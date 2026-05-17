@@ -6,7 +6,7 @@ import { GetSensorsByDeviceUseCase } from '@/sensors/application/use-cases/get-s
 import { GetSensorDataPointsUseCase } from '@/sensors/application/use-cases/get-sensor-data-points.use-case';
 import { UpdateSensorUseCase } from '@/sensors/application/use-cases/update-sensor.use-case';
 import { SENSOR_REPOSITORY_TOKEN } from '@/sensors/domain/repositories/sensor.repository.interface';
-import { SensorBuilder } from '../../../../../builders/sensor.builder';
+import { SensorBuilder } from '@test/builders/sensor.builder';
 
 describe('Sensor Use Cases', () => {
   let repository: any;

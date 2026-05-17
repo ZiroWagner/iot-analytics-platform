@@ -4,7 +4,7 @@ import { ValidateUserUseCase } from '@/auth/application/use-cases/validate-user.
 import { GenerateTokenUseCase } from '@/auth/application/use-cases/generate-token.use-case';
 import { USER_REPOSITORY_TOKEN } from '@/auth/domain/repositories/user.repository.interface';
 import { JwtService } from '@nestjs/jwt';
-import { UserBuilder } from '../../../../../builders/user.builder';
+import { UserBuilder } from '@test/builders/user.builder';
 import { ConflictException, UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 

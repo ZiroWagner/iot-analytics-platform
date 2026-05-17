@@ -5,7 +5,7 @@ import { GetDeviceUseCase } from '@/devices/application/use-cases/get-device.use
 import { GetDevicesByProjectUseCase } from '@/devices/application/use-cases/get-devices-by-project.use-case';
 import { UpdateDeviceUseCase } from '@/devices/application/use-cases/update-device.use-case';
 import { DEVICE_REPOSITORY_TOKEN } from '@/devices/domain/repositories/device.repository.interface';
-import { DeviceBuilder } from '../../../../../builders/device.builder';
+import { DeviceBuilder } from '@test/builders/device.builder';
 
 describe('Device Use Cases', () => {
   let repository: any;
