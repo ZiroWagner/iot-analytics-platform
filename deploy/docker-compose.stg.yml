@@ -11,7 +11,7 @@ services:
       - DATABASE_URL=${DATABASE_URL:?DATABASE_URL de Supabase es requerida}
       - JWT_SECRET=${JWT_SECRET:?JWT_SECRET es requerido}
       - JWT_EXPIRES_IN=${JWT_EXPIRES_IN:-7d}
-      - FRONTEND_URL=${FRONTEND_URL:-http://frontend:3000}
+      - FRONTEND_URL=${FRONTEND_URL:?FRONTEND_URL es requerido}
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID:?GOOGLE_CLIENT_ID es requerido}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET:?GOOGLE_CLIENT_SECRET es requerido}
       - GOOGLE_CALLBACK_URL=${GOOGLE_CALLBACK_URL:?GOOGLE_CALLBACK_URL es requerido}
@@ -39,7 +39,7 @@ services:
     image: iot-frontend:latest
     container_name: stg_frontend
     environment:
-      - NEXT_PUBLIC_API_URL=http://backend:3000
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:?NEXT_PUBLIC_API_URL es requerido}
     ports:
       - "3002:3000"
     networks:
