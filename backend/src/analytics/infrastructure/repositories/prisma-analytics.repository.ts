@@ -116,14 +116,7 @@ export class PrismaAnalyticsRepository implements AnalyticsRepositoryInterface {
     const allPoints = new Map<number, Record<string, unknown>>();
 
     for (const req of seriesRequests) {
-      await this.collectSeriesPoints(
-        projectId,
-        req,
-        allPoints,
-        from,
-        to,
-        limit,
-      );
+      await this.collectSeriesPoints(projectId, req, allPoints, from, to, limit);
     }
 
     return this.sortTimeseriesMap(allPoints);
@@ -158,10 +151,7 @@ export class PrismaAnalyticsRepository implements AnalyticsRepositoryInterface {
 
     for (const dp of dataPoints) {
       const payloadObj = dp.payload as Record<string, unknown>;
-      const value =
-        typeof payloadObj[req.metric] === 'number'
-          ? payloadObj[req.metric]
-          : null;
+      const value = typeof payloadObj[req.metric] === 'number' ? payloadObj[req.metric] : null;
       this.mergeDataPointIntoMap(allPoints, dp, seriesKey, value);
     }
   }
@@ -181,7 +171,10 @@ export class PrismaAnalyticsRepository implements AnalyticsRepositoryInterface {
   }
 
   /** Returns a Prisma date range filter or `null` if no bounds are set. */
-  private buildTimeFilter(from?: Date, to?: Date): Record<string, Date> | null {
+  private buildTimeFilter(
+    from?: Date,
+    to?: Date,
+  ): Record<string, Date> | null {
     if (!from && !to) return null;
     const filter: Record<string, Date> = {};
     if (from) filter.gte = from;
@@ -196,7 +189,7 @@ export class PrismaAnalyticsRepository implements AnalyticsRepositoryInterface {
     seriesKey: string,
     value: unknown,
   ): void {
-    const ts = dp.timestamp.getTime();
+    const ts = (dp.timestamp as Date).getTime();
     const existing = map.get(ts);
     if (existing) {
       existing[seriesKey] = value;

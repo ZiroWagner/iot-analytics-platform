@@ -50,7 +50,7 @@ describe('httpAnalyticsRepository', () => {
   it('saves dashboard config', async () => {
     vi.mocked(apiClient).mockResolvedValueOnce(undefined)
 
-    const layoutConfig = [{ id: '1', type: 'line' }]
+    const layoutConfig = [{ id: '1', type: 'line' }] as unknown as import('@/features/analytics/domain/types').ChartWidgetConfig[]
     await httpAnalyticsRepository.saveDashboardConfig('project-1', layoutConfig)
 
     expect(apiClient).toHaveBeenCalledWith(

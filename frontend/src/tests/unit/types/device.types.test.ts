@@ -43,8 +43,8 @@ describe('devices domain types', () => {
       name: 'Gateway 1',
       type: 'ESP32',
       sensors: [
-        { id: 'sensor-1', name: 'Temp', deviceId: 'device-1', metadata: {} },
-        { id: 'sensor-2', name: 'Humidity', deviceId: 'device-1', metadata: {} },
+        { id: 'sensor-1', name: 'Temp', metadata: {}, createdAt: '2026-01-01T00:00:00Z' },
+        { id: 'sensor-2', name: 'Humidity', metadata: {}, createdAt: '2026-01-01T00:00:00Z' },
       ],
       createdAt: '2026-01-01T00:00:00Z',
     }
