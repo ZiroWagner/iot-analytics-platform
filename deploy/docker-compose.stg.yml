@@ -7,7 +7,7 @@ services:
     container_name: stg_backend
     environment:
       - NODE_ENV=production
-      - PORT=3001
+      - PORT=3000
       - DATABASE_URL=${DATABASE_URL:?DATABASE_URL de Supabase es requerida}
       - JWT_SECRET=${JWT_SECRET:?JWT_SECRET es requerido}
       - JWT_EXPIRES_IN=${JWT_EXPIRES_IN:-7d}
