@@ -126,8 +126,12 @@ pipeline {
             parallel {
                 stage('Build Frontend') {
                     steps {
-                        dir('frontend') {
-                            sh "docker build -t ${FRONTEND_IMAGE} -t iot-frontend:latest ."
+                        withCredentials([
+                            string(credentialsId: 'NEXT_PUBLIC_API_URL', variable: 'NEXT_PUBLIC_API_URL')
+                        ]) {
+                            dir('frontend') {
+                                sh "docker build --build-arg NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL} -t ${FRONTEND_IMAGE} -t iot-frontend:latest ."
+                            }
                         }
                     }
                 }
