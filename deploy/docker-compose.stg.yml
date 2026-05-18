@@ -6,11 +6,11 @@ services:
     image: iot-backend:latest
     container_name: stg_backend
     environment:
-      - NODE_ENV=${NODE_ENV:?NODE_ENV es requerido}
+      - NODE_ENV=production
       - PORT=${PORT:?PORT es requerido}
       - DATABASE_URL=${DATABASE_URL:?DATABASE_URL de Supabase es requerida}
       - JWT_SECRET=${JWT_SECRET:?JWT_SECRET es requerido}
-      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN:?JWT_EXPIRES_IN es requerido}
+      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN:-7d}
       - FRONTEND_URL=${FRONTEND_URL:?FRONTEND_URL es requerido}
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID:?GOOGLE_CLIENT_ID es requerido}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET:?GOOGLE_CLIENT_SECRET es requerido}

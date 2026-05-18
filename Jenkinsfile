@@ -144,7 +144,6 @@ pipeline {
         stage('Deploy Local (Staging)') {
             steps {
                 withCredentials([
-                        string(credentialsId: 'NODE_ENV', variable: 'NODE_ENV'),
                         string(credentialsId: 'PORT', variable: 'PORT'),
                         string(credentialsId: 'DATABASE_URL', variable: 'DATABASE_URL'),
                         string(credentialsId: 'JWT_SECRET', variable: 'JWT_SECRET'),
