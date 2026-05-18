@@ -144,7 +144,6 @@ pipeline {
         stage('Deploy Local (Staging)') {
             steps {
                 withCredentials([
-                        string(credentialsId: 'PORT', variable: 'PORT'),
                         string(credentialsId: 'DATABASE_URL', variable: 'DATABASE_URL'),
                         string(credentialsId: 'JWT_SECRET', variable: 'JWT_SECRET'),
                         string(credentialsId: 'JWT_EXPIRES_IN', variable: 'JWT_EXPIRES_IN'),
@@ -155,9 +154,7 @@ pipeline {
                         string(credentialsId: 'GITHUB_CLIENT_SECRET', variable: 'GITHUB_CLIENT_SECRET'),
                         string(credentialsId: 'GITHUB_CALLBACK_URL', variable: 'GITHUB_CALLBACK_URL'),
                         string(credentialsId: 'FRONTEND_URL', variable: 'FRONTEND_URL'),
-                        string(credentialsId: 'NEXT_PUBLIC_API_URL', variable: 'NEXT_PUBLIC_API_URL'),
-                        string(credentialsId: 'REDIS_HOST', variable: 'REDIS_HOST'),
-                        string(credentialsId: 'REDIS_PORT', variable: 'REDIS_PORT')
+                        string(credentialsId: 'NEXT_PUBLIC_API_URL', variable: 'NEXT_PUBLIC_API_URL')
                 ]) {
                     sh '''
                         docker compose -f deploy/docker-compose.stg.yml up -d --force-recreate

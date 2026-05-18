@@ -7,7 +7,7 @@ services:
     container_name: stg_backend
     environment:
       - NODE_ENV=production
-      - PORT=${PORT:?PORT es requerido}
+      - PORT=3001
       - DATABASE_URL=${DATABASE_URL:?DATABASE_URL de Supabase es requerida}
       - JWT_SECRET=${JWT_SECRET:?JWT_SECRET es requerido}
       - JWT_EXPIRES_IN=${JWT_EXPIRES_IN:-7d}
@@ -18,8 +18,8 @@ services:
       - GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID:?GITHUB_CLIENT_ID es requerido}
       - GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET:?GITHUB_CLIENT_SECRET es requerido}
       - GITHUB_CALLBACK_URL=${GITHUB_CALLBACK_URL:?GITHUB_CALLBACK_URL es requerido}
-      - REDIS_HOST=${REDIS_HOST:?REDIS_HOST es requerido}
-      - REDIS_PORT=${REDIS_PORT:?REDIS_PORT es requerido}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
     ports:
       - "3001:3000"
     networks:
