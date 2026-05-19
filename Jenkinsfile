@@ -156,7 +156,7 @@ pipeline {
                         string(credentialsId: 'GITHUB_CLIENT_SECRET', variable: 'GITHUB_CLIENT_SECRET'),
                         string(credentialsId: 'GITHUB_CALLBACK_URL', variable: 'GITHUB_CALLBACK_URL'),
                         string(credentialsId: 'FRONTEND_URL', variable: 'FRONTEND_URL'),
-                        string(credentialsId: 'NEXT_PUBLIC_API_URL', variable: 'NEXT_PUBLIC_API_URL')
+                        string(credentialsId: 'NEXT_PUBLIC_API_URL', variable: 'NEXT_PUBLIC_API_URL'),
                         string(credentialsId: 'REDIS_HOST', variable: 'REDIS_HOST'),
                         string(credentialsId: 'REDIS_PORT', variable: 'REDIS_PORT')
                 ]) {
