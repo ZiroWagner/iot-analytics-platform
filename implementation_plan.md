@@ -524,15 +524,3 @@ Para ejecutar este plan, seguiremos estas fases de manera ordenada:
 8. Enviar payload de prueba a `/api/v1/ingest` con una API key válida.
 9. Verificar Redis Stream, persistencia en Supabase y métricas de observabilidad.
 10. Si falla el despliegue, conservar volúmenes y revisar logs antes de eliminar recursos; hacer limpieza destructiva solo como último recurso.
-
----
-
-## User Review Required
-
-> [!IMPORTANT]
-> **Aprobación del Plan:** Por favor, revisa esta arquitectura. Si estás de acuerdo, procederé a **crear automáticamente todos los archivos propuestos en tu disco duro**, organizando las carpetas `/infra`, `/deploy`, actualizando los Dockerfiles y el Jenkinsfile en la raíz. 
-
-> [!WARNING]
-> Ten a la mano tu `AUTHTOKEN` de Ngrok, un token de acceso personal (PAT) de GitHub, y acceso a la configuración web de Jenkins que se levantará en `localhost:8080`.
-
-¿Deseas que proceda con la creación de los archivos y la reestructuración de los directorios según el plan descrito?
