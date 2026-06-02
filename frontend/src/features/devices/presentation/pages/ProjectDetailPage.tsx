@@ -56,7 +56,6 @@ import {
   Pencil,
   Trash2,
   MoreVertical,
-  Key,
 } from "lucide-react"
 import {
   useTelemetry,
@@ -185,7 +184,6 @@ export function ProjectDetailPage() {
       toast.success("Gateway registrado. Copia la API Key para el Hardware.")
       refetchDevices()
       deviceForm.reset()
-      setIsDeviceDialogOpen(false)
     } catch (error) {
       const message = error instanceof Error ? error.message : "Error al registrar el Gateway"
       toast.error(message)
@@ -363,15 +361,6 @@ export function ProjectDetailPage() {
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
                   <DropdownMenuLabel>Acciones del Gateway</DropdownMenuLabel>
-                  <DropdownMenuItem
-                    onClick={() => {
-                      if (device.apiKey) copyToClipboard(device.apiKey)
-                      else toast.error("No hay API Key disponible para este Gateway")
-                    }}
-                  >
-                    <Key className="h-4 w-4 mr-2" />
-                    Copiar API Key
-                  </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => {
                       setEditingDevice(device)
