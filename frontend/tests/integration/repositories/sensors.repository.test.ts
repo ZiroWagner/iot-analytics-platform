@@ -7,6 +7,8 @@ vi.mock('@/shared/infrastructure/http', () => ({
     SENSORS: {
       CREATE: '/sensors',
       DATA: (id: string) => `/sensors/${id}/data`,
+      UPDATE: (id: string) => `/sensors/${id}`,
+      DELETE: (id: string) => `/sensors/${id}`,
     },
   },
 }))
@@ -47,5 +49,30 @@ describe('httpSensorsRepository', () => {
       body: JSON.stringify(payload),
     })
     expect(result).toEqual(mockSensor)
+  })
+
+  it('updates a sensor with PATCH', async () => {
+    const mockSensor = { id: 'sensor-1', name: 'Updated Sensor', deviceId: 'device-1', metadata: {} }
+    vi.mocked(apiClient).mockResolvedValue(mockSensor)
+
+    const payload = { name: 'Updated Sensor', metadata: { tags: ['temp'] } }
+    const result = await httpSensorsRepository.update('sensor-1', payload)
+
+    expect(apiClient).toHaveBeenCalledWith('/sensors/sensor-1', {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    })
+    expect(result).toEqual(mockSensor)
+  })
+
+  it('deletes a sensor with DELETE', async () => {
+    vi.mocked(apiClient).mockResolvedValue(undefined)
+
+    await httpSensorsRepository.delete('sensor-1')
+
+    expect(apiClient).toHaveBeenCalledWith(
+      '/sensors/sensor-1',
+      expect.objectContaining({ method: 'DELETE' }),
+    )
   })
 })

@@ -8,6 +8,8 @@ vi.mock('@/shared/infrastructure/http', () => ({
       LIST: '/projects',
       CREATE: '/projects',
       OVERVIEW: '/projects/overview',
+      UPDATE: (id: string) => `/projects/${id}`,
+      DELETE: (id: string) => `/projects/${id}`,
     },
   },
 }))
@@ -70,5 +72,36 @@ describe('httpProjectsRepository', () => {
       }),
     )
     expect(result).toEqual(mockProject)
+  })
+
+  it('updates a project with PATCH', async () => {
+    const mockProject = {
+      id: 'project-1',
+      name: 'Updated Project',
+      createdAt: '2026-01-01T00:00:00Z',
+    }
+    vi.mocked(apiClient).mockResolvedValueOnce(mockProject)
+
+    const result = await httpProjectsRepository.update('project-1', { name: 'Updated Project' })
+
+    expect(apiClient).toHaveBeenCalledWith(
+      '/projects/project-1',
+      expect.objectContaining({
+        method: 'PATCH',
+        body: JSON.stringify({ name: 'Updated Project' }),
+      }),
+    )
+    expect(result).toEqual(mockProject)
+  })
+
+  it('deletes a project with DELETE', async () => {
+    vi.mocked(apiClient).mockResolvedValueOnce(undefined)
+
+    await httpProjectsRepository.delete('project-1')
+
+    expect(apiClient).toHaveBeenCalledWith(
+      '/projects/project-1',
+      expect.objectContaining({ method: 'DELETE' }),
+    )
   })
 })

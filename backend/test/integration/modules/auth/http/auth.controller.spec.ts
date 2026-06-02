@@ -84,4 +84,78 @@ describe('AuthController', () => {
       );
     });
   });
+
+  describe('getProfile', () => {
+    it('should return user profile when user exists', async () => {
+      const mockUserEntity = {
+        id: 'u1',
+        email: 'test@example.com',
+        name: 'Test',
+        image: 'http://avatar.com/img.png',
+        hasPassword: () => true,
+      };
+      userRepository.findById.mockResolvedValue(mockUserEntity);
+
+      const result = await controller.getProfile({ user: { sub: 'u1', email: 'test@example.com' } });
+
+      expect(userRepository.findById).toHaveBeenCalledWith('u1');
+      expect(result).toEqual({
+        id: 'u1',
+        email: 'test@example.com',
+        name: 'Test',
+        image: 'http://avatar.com/img.png',
+        hasPassword: true,
+      });
+    });
+
+    it('should return hasPassword false for OAuth users', async () => {
+      const mockUserEntity = {
+        id: 'u2',
+        email: 'oauth@example.com',
+        name: 'OAuth User',
+        image: null,
+        hasPassword: () => false,
+      };
+      userRepository.findById.mockResolvedValue(mockUserEntity);
+
+      const result = await controller.getProfile({ user: { sub: 'u2', email: 'oauth@example.com' } });
+
+      expect(result.hasPassword).toBe(false);
+    });
+
+    it('should throw NotFoundException when user is not found', async () => {
+      userRepository.findById.mockResolvedValue(null);
+
+      await expect(
+        controller.getProfile({ user: { sub: 'nonexistent', email: 'test@example.com' } }),
+      ).rejects.toThrow();
+    });
+  });
+
+  describe('updateProfile', () => {
+    it('should update profile and return new token', async () => {
+      const updatedUser = { id: 'u1', email: 'test@example.com', name: 'Updated Name' };
+      updateProfileUseCase.execute.mockResolvedValue(updatedUser);
+
+      const result = await controller.updateProfile(
+        { user: { sub: 'u1', email: 'test@example.com' } },
+        { name: 'Updated Name' },
+      );
+
+      expect(updateProfileUseCase.execute).toHaveBeenCalledWith('u1', { name: 'Updated Name' });
+      expect(generateTokenUseCase.execute).toHaveBeenCalledWith(updatedUser);
+      expect(result).toEqual({ access_token: 'tk123' });
+    });
+  });
+
+  describe('deleteProfile', () => {
+    it('should delete user and return success', async () => {
+      deleteUserUseCase.execute.mockResolvedValue(undefined);
+
+      const result = await controller.deleteProfile({ user: { sub: 'u1', email: 'test@example.com' } });
+
+      expect(deleteUserUseCase.execute).toHaveBeenCalledWith('u1');
+      expect(result).toEqual({ success: true });
+    });
+  });
 });

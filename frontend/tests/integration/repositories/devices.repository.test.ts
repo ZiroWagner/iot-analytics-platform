@@ -7,6 +7,8 @@ vi.mock('@/shared/infrastructure/http', () => ({
     DEVICES: {
       LIST_BY_PROJECT: (id: string) => `/projects/${id}/devices`,
       CREATE: '/devices',
+      UPDATE: (id: string) => `/devices/${id}`,
+      DELETE: (id: string) => `/devices/${id}`,
     },
   },
 }))
@@ -45,5 +47,29 @@ describe('httpDevicesRepository', () => {
       body: JSON.stringify({ name: 'New Device', type: 'ESP32', projectId: 'project-1' }),
     })
     expect(result).toEqual(mockDevice)
+  })
+
+  it('updates a device with PATCH', async () => {
+    const mockDevice = { id: 'device-1', name: 'Updated Device', projectId: 'project-1', status: 'online', sensors: [] }
+    vi.mocked(apiClient).mockResolvedValue(mockDevice)
+
+    const result = await httpDevicesRepository.update('device-1', { name: 'Updated Device', type: 'ESP32' })
+
+    expect(apiClient).toHaveBeenCalledWith('/devices/device-1', {
+      method: 'PATCH',
+      body: JSON.stringify({ name: 'Updated Device', type: 'ESP32' }),
+    })
+    expect(result).toEqual(mockDevice)
+  })
+
+  it('deletes a device with DELETE', async () => {
+    vi.mocked(apiClient).mockResolvedValue(undefined)
+
+    await httpDevicesRepository.delete('device-1')
+
+    expect(apiClient).toHaveBeenCalledWith(
+      '/devices/device-1',
+      expect.objectContaining({ method: 'DELETE' }),
+    )
   })
 })

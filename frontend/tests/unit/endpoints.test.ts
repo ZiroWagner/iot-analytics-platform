@@ -9,6 +9,7 @@ describe('API_ENDPOINTS', () => {
       expect(API_ENDPOINTS.AUTH.GOOGLE).toBe('/auth/google')
       expect(API_ENDPOINTS.AUTH.GITHUB).toBe('/auth/github')
       expect(API_ENDPOINTS.AUTH.CALLBACK).toBe('/auth/callback')
+      expect(API_ENDPOINTS.AUTH.PROFILE).toBe('/auth/profile')
     })
   })
 

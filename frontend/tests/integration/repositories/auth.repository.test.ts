@@ -44,4 +44,49 @@ describe('httpAuthRepository', () => {
       access_token: token,
     })
   })
+
+  it('fetches the user profile', async () => {
+    const profile = {
+      id: faker.string.uuid(),
+      email: faker.internet.email(),
+      name: faker.person.fullName(),
+      image: faker.image.avatar(),
+      hasPassword: true,
+    }
+
+    server.use(
+      http.get(`${API_URL}/auth/profile`, () =>
+        HttpResponse.json(profile),
+      ),
+    )
+
+    await expect(httpAuthRepository.getProfile()).resolves.toEqual(profile)
+  })
+
+  it('sends profile update to the auth endpoint', async () => {
+    const data = { name: faker.person.fullName() }
+    const token = faker.string.alphanumeric(24)
+
+    server.use(
+      http.patch(`${API_URL}/auth/profile`, async ({ request }) => {
+        await expect(request.json()).resolves.toEqual(data)
+        return HttpResponse.json({ access_token: token })
+      }),
+    )
+
+    await expect(httpAuthRepository.updateProfile(data)).resolves.toEqual({
+      access_token: token,
+    })
+  })
+
+  it('sends delete profile request to the auth endpoint', async () => {
+    server.use(
+      http.delete(`${API_URL}/auth/profile`, () =>
+        HttpResponse.json(null, { status: 200 }),
+      ),
+    )
+
+    const result = await httpAuthRepository.deleteProfile()
+    expect(result).toBeNull()
+  })
 })
