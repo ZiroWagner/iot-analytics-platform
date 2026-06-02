@@ -101,7 +101,7 @@ export default function SettingsPage() {
       tokenStorage.set(res.access_token)
       toast.success("Contraseña actualizada correctamente")
       passwordForm.reset()
-    } catch (err: any) {
+    } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Error al actualizar la contraseña"
       toast.error(msg || "La contraseña actual es incorrecta")
     } finally {

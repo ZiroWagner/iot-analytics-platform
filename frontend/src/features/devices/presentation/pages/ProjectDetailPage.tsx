@@ -341,11 +341,12 @@ export function ProjectDetailPage() {
               >
                 <Trash2 className="h-4 w-4" />
               </Button>
-              <Dialog
-                open={activeDeviceIdForSensor === device.id}
-                onOpenChange={(open) => !open && setActiveDeviceIdForSensor(null)}
-              >
-                <DialogTrigger
+            </div>
+            <Dialog
+              open={activeDeviceIdForSensor === device.id}
+              onOpenChange={(open) => !open && setActiveDeviceIdForSensor(null)}
+            >
+              <DialogTrigger
                   render={
                     <Button
                       variant="ghost"

@@ -38,9 +38,9 @@ export function DeleteConfirmDialog({
           </DialogTitle>
           <DialogDescription className="pt-2 text-foreground/90">
             ¿Estás seguro de que deseas eliminar <strong>{title}</strong>?
-            <p className="mt-2 text-xs text-muted-foreground">
+            <span className="mt-2 block text-xs text-muted-foreground">
               {description}
-            </p>
+            </span>
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="gap-2 sm:gap-0 pt-4">
