@@ -115,7 +115,7 @@ function SeriesStep({
 
         <Select value={selGateway} onValueChange={(v) => { setSelGateway(v ?? ''); setSelSensor(''); setSelMetric('') }}>
           <SelectTrigger className="h-8 text-xs bg-background/60">
-            <SelectValue placeholder="Gateway (Device)" />
+            {selGateway ? (uniqueGateways.find(g => g.id === selGateway)?.name ?? "Gateway (Device)") : "Gateway (Device)"}
           </SelectTrigger>
           <SelectContent>
             {uniqueGateways.map(g => (
@@ -127,7 +127,7 @@ function SeriesStep({
         {selGateway && (
           <Select value={selSensor} onValueChange={(v) => { setSelSensor(v ?? ''); setSelMetric('') }}>
             <SelectTrigger className="h-8 text-xs bg-background/60">
-              <SelectValue placeholder="Sensor" />
+              {selSensor ? (filteredSensors.find(s => s.sensorId === selSensor)?.sensorName ?? "Sensor") : "Sensor"}
             </SelectTrigger>
             <SelectContent>
               {filteredSensors.map(m => (
@@ -140,7 +140,7 @@ function SeriesStep({
         {selSensor && (
           <Select value={selMetric} onValueChange={(v) => setSelMetric(v ?? '')}>
             <SelectTrigger className="h-8 text-xs bg-background/60">
-              <SelectValue placeholder="Métrica" />
+              {selMetric || "Métrica"}
             </SelectTrigger>
             <SelectContent>
               {selectedSensorObj?.availableMetrics.map(m => (
