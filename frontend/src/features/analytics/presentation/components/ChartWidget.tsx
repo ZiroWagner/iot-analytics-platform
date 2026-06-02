@@ -145,7 +145,7 @@ export function ChartWidget({ projectId, config, globalTimeRange, globalCustomDa
 
   // Merge historical data with realtime WebSocket points
   const { data: data, isRealtime } = useRealtimeSeries(
-    config.series.map(s => ({ sensorId: s.sensorId, metric: s.metric })),
+    config.series.map(s => ({ sensorId: s.sensorId, sensorName: s.sensorName, metric: s.metric })),
     historicalData,
   )
 

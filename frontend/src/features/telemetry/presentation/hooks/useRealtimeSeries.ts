@@ -17,6 +17,7 @@ import type { TimeseriesPoint } from '@/features/analytics/domain/types'
  */
 interface SeriesSubscription {
   sensorId: string
+  sensorName: string
   metric: string
 }
 
@@ -28,33 +29,23 @@ export function useRealtimeSeries(
   const [lastUpdate, setLastUpdate] = useState<number | null>(null)
   const prevPointsRef = useRef(0)
 
-  // Build a set of keys for fast matching
-  const seriesKeys = useMemo(() => {
-    const keys = new Set<string>()
-    for (const s of seriesConfig) {
-      keys.add(`${s.sensorId}:${s.metric}`)
-    }
-    return keys
-  }, [seriesConfig])
-
-  // Map series config to the dataKey format used by the chart
+  // Build lookup: "sensorId:metric" -> "sensorName:metric" (chart dataKey)
   const dataKeyMap = useMemo(() => {
     const map = new Map<string, string>()
     for (const s of seriesConfig) {
-      // Find the dataKey used by the chart for this sensor:metric
-      const found = historicalData.find((p) => {
-        const key = sensorNameFromPoint(p, s.sensorId, s.metric)
-        return key !== undefined && p[key] !== undefined
-      })
-      if (found) {
-        const dataKey = sensorNameFromPoint(found, s.sensorId, s.metric)
-        if (dataKey) {
-          map.set(`${s.sensorId}:${s.metric}`, dataKey)
-        }
-      }
+      map.set(`${s.sensorId}:${s.metric}`, `${s.sensorName}:${s.metric}`)
     }
     return map
-  }, [seriesConfig, historicalData])
+  }, [seriesConfig])
+
+  // Build set of chart dataKeys for fast matching
+  const chartDataKeys = useMemo(() => {
+    const keys = new Set<string>()
+    for (const s of seriesConfig) {
+      keys.add(`${s.sensorName}:${s.metric}`)
+    }
+    return keys
+  }, [seriesConfig])
 
   // Merge historical + realtime into a single array
   const mergedData = useMemo(() => {
@@ -87,7 +78,8 @@ export function useRealtimeSeries(
     // Add realtime points, merging into existing timestamps or creating new ones
     for (const rp of realtimePoints) {
       const lookupKey = `${rp.sensorId}:${rp.metric}`
-      if (!seriesKeys.has(lookupKey)) continue
+      const dataKey = dataKeyMap.get(lookupKey)
+      if (!dataKey || !chartDataKeys.has(dataKey)) continue
 
       const ts = new Date(rp.timestamp).getTime()
       let entry = timeMap.get(ts)
@@ -100,8 +92,7 @@ export function useRealtimeSeries(
         timeMap.set(ts, entry)
       }
 
-      // Find the matching dataKey for this sensor:metric
-      const dataKey = dataKeyMap.get(lookupKey) || `${rp.metric}`
+      // Use the mapped dataKey for this sensor:metric
       entry[dataKey] = rp.value
     }
 
@@ -131,7 +122,7 @@ export function useRealtimeSeries(
       }
       return result
     })
-  }, [historicalData, realtimePoints, seriesKeys, dataKeyMap, seriesConfig])
+  }, [historicalData, realtimePoints, chartDataKeys, dataKeyMap, seriesConfig])
 
   // Track when realtime points change
   useEffect(() => {
@@ -149,21 +140,4 @@ export function useRealtimeSeries(
   }
 }
 
-/**
- * Helper to find which key in a historical point corresponds to a sensor:metric.
- * Historical points use "sensorName:metric" as keys, but we only have sensorId.
- * This scans the point's keys to find one ending with the metric name.
- */
-function sensorNameFromPoint(
-  point: Record<string, unknown>,
-  sensorId: string,
-  metric: string,
-): string | undefined {
-  for (const key of Object.keys(point)) {
-    if (key === 'timestamp' || key === 'timeLabel') continue
-    if (key.endsWith(`:${metric}`)) {
-      return key
-    }
-  }
-  return undefined
-}
+
