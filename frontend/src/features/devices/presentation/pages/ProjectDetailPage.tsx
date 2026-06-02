@@ -56,6 +56,7 @@ import {
   Pencil,
   Trash2,
   MoreVertical,
+  Key,
 } from "lucide-react"
 import {
   useTelemetry,
@@ -180,10 +181,11 @@ export function ProjectDetailPage() {
   async function onSubmitDevice(values: CreateDeviceInput) {
     try {
       const created = await httpDevicesRepository.create(projectId, values)
-      setNewApiKey(created.api_key || null)
+      setNewApiKey(created.apiKey || null)
       toast.success("Gateway registrado. Copia la API Key para el Hardware.")
       refetchDevices()
       deviceForm.reset()
+      setIsDeviceDialogOpen(false)
     } catch (error) {
       const message = error instanceof Error ? error.message : "Error al registrar el Gateway"
       toast.error(message)
@@ -279,6 +281,14 @@ export function ProjectDetailPage() {
     setNewApiKey(null)
   }
 
+  function onDeviceDialogOpenChange(open: boolean) {
+    setIsDeviceDialogOpen(open)
+    if (!open) {
+      setNewApiKey(null)
+      deviceForm.reset()
+    }
+  }
+
   let devicesTableContent: React.ReactNode = devices.map((device) => {
     const active = isDeviceActive(device.id, device.lastSeenAt, realtimeDevices)
     const expanded = expandedDeviceIds.has(device.id)
@@ -353,6 +363,15 @@ export function ProjectDetailPage() {
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
                   <DropdownMenuLabel>Acciones del Gateway</DropdownMenuLabel>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      if (device.apiKey) copyToClipboard(device.apiKey)
+                      else toast.error("No hay API Key disponible para este Gateway")
+                    }}
+                  >
+                    <Key className="h-4 w-4 mr-2" />
+                    Copiar API Key
+                  </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => {
                       setEditingDevice(device)
@@ -526,7 +545,7 @@ export function ProjectDetailPage() {
               </div>
             </div>
 
-            <Dialog open={isDeviceDialogOpen} onOpenChange={setIsDeviceDialogOpen}>
+            <Dialog open={isDeviceDialogOpen} onOpenChange={onDeviceDialogOpenChange}>
               <DialogTrigger
                 render={
                   <Button className="bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-500/20">

@@ -4,8 +4,8 @@ export interface Device {
   id: string
   name: string
   type: string
-  mac_address?: string
-  api_key?: string
+  macAddress?: string
+  apiKey?: string
   sensors: Sensor[]
   createdAt: string
   lastSeenAt?: string
