@@ -97,7 +97,9 @@ export function ProjectDetailPage() {
   const [newApiKey, setNewApiKey] = useState<string | null>(null)
   const [inspectingSensor, setInspectingSensor] = useState<Sensor | null>(null)
   const [expandedDeviceIds, setExpandedDeviceIds] = useState<Set<string>>(new Set())
-  const [activeDeviceIdForSensor, setActiveDeviceIdForSensor] = useState<string | null>(null)
+
+  const [isAddSensorDialogOpen, setIsAddSensorDialogOpen] = useState(false)
+  const [addSensorDeviceId, setAddSensorDeviceId] = useState<string | null>(null)
 
   const [editingDevice, setEditingDevice] = useState<Device | null>(null)
   const [isEditDeviceDialogOpen, setIsEditDeviceDialogOpen] = useState(false)
@@ -182,17 +184,18 @@ export function ProjectDetailPage() {
   }
 
   async function onSubmitSensor(values: CreateSensorFormInput) {
-    if (!activeDeviceIdForSensor) return
+    if (!addSensorDeviceId) return
     try {
       await httpSensorsRepository.create({
         name: values.name,
-        deviceId: activeDeviceIdForSensor,
+        deviceId: addSensorDeviceId,
         metadata: parseSensorMetadata(values.metadata),
       })
 
       toast.success("Sensor lógico registrado al Gateway.")
-      setExpandedDeviceIds((prev) => new Set(prev).add(activeDeviceIdForSensor))
-      setActiveDeviceIdForSensor(null)
+      setExpandedDeviceIds((prev) => new Set(prev).add(addSensorDeviceId))
+      setAddSensorDeviceId(null)
+      setIsAddSensorDialogOpen(false)
       sensorForm.reset()
       refetchDevices()
     } catch (error) {
@@ -380,11 +383,12 @@ export function ProjectDetailPage() {
                     </DropdownMenuItem>
                   </React.Fragment>
                 ))}
-                {device.sensors.length > 0 && <DropdownMenuSeparator />}
+                <DropdownMenuSeparator />
                 <DropdownMenuItem
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    setActiveDeviceIdForSensor(device.id)
+                  onSelect={(e) => {
+                    e.preventDefault()
+                    setAddSensorDeviceId(device.id)
+                    setIsAddSensorDialogOpen(true)
                   }}
                   className="text-primary font-medium"
                 >
@@ -394,24 +398,15 @@ export function ProjectDetailPage() {
               </DropdownMenuContent>
             </DropdownMenu>
             <Dialog
-              open={activeDeviceIdForSensor === device.id}
-              onOpenChange={(open) => !open && setActiveDeviceIdForSensor(null)}
+              open={isAddSensorDialogOpen && addSensorDeviceId === device.id}
+              onOpenChange={(open) => {
+                if (!open) {
+                  setIsAddSensorDialogOpen(false)
+                  setAddSensorDeviceId(null)
+                  sensorForm.reset()
+                }
+              }}
             >
-              <DialogTrigger
-                  render={
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-primary hover:bg-primary/10 hover:text-primary"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        setActiveDeviceIdForSensor(device.id)
-                      }}
-                    >
-                      <Plus className="h-4 w-4 mr-1" /> Nuevo Sensor
-                    </Button>
-                  }
-                />
               <DialogContent className="sm:max-w-[400px]">
                 <DialogHeader>
                   <DialogTitle>Anexar Sensor al Gateway</DialogTitle>
@@ -458,6 +453,17 @@ export function ProjectDetailPage() {
                       )}
                     />
                     <div className="flex justify-end gap-3 pt-4">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        onClick={() => {
+                          setIsAddSensorDialogOpen(false)
+                          setAddSensorDeviceId(null)
+                          sensorForm.reset()
+                        }}
+                      >
+                        Cancelar
+                      </Button>
                       <Button type="submit">Agregar Sensor</Button>
                     </div>
                   </form>
