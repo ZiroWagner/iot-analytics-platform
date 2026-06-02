@@ -1,6 +1,6 @@
 import { useTelemetryStore, type RealtimeSensorPoint } from '@/features/telemetry/presentation/store'
 import { describe, expect, it, beforeEach } from 'vitest'
-import type { DeviceMap, InitialDeviceSnapshotMap, TelemetryEvent } from '@/features/telemetry/domain/types'
+import type { TelemetryEvent } from '@/features/telemetry/domain/types'
 
 describe('TelemetryStore', () => {
   beforeEach(() => {
@@ -30,7 +30,7 @@ describe('TelemetryStore', () => {
     const snapshot = {
       [deviceId]: { status: 'online', lastSeenAt: 'today' }
     }
-    useTelemetryStore.getState().setInitialState('p1', snapshot as unknown as InitialDeviceSnapshotMap)
+    useTelemetryStore.getState().setInitialState('p1', snapshot)
 
     expect(useTelemetryStore.getState().devices[deviceId]).toBeDefined()
     expect(useTelemetryStore.getState().devices[deviceId].status).toBe('online')
@@ -40,19 +40,19 @@ describe('TelemetryStore', () => {
     const events = [
       { type: 'device_data', deviceId: 'd1', timestamp: 't1', sensors: [{ sensorId: 's1', payload: 10 }] }
     ]
-    useTelemetryStore.getState().applyBatch(events as unknown as TelemetryEvent[])
+    useTelemetryStore.getState().applyBatch(events)
 
     expect(useTelemetryStore.getState().devices['d1'].sensors?.['s1']).toBe(10)
   })
 
   it('should mark a device offline', () => {
-    useTelemetryStore.setState({ devices: { 'd1': { status: 'online' } } as unknown as DeviceMap })
+    useTelemetryStore.setState({ devices: { 'd1': { status: 'online' } } })
     useTelemetryStore.getState().markOffline('d1')
     expect(useTelemetryStore.getState().devices['d1'].status).toBe('offline')
   })
 
   it('should clear devices', () => {
-    useTelemetryStore.setState({ devices: { 'd1': {} } as unknown as DeviceMap })
+    useTelemetryStore.setState({ devices: { 'd1': {} } })
     useTelemetryStore.getState().clearDevices()
     expect(useTelemetryStore.getState().devices).toEqual({})
   })
@@ -77,7 +77,7 @@ describe('TelemetryStore', () => {
           ],
         },
       ]
-      useTelemetryStore.getState().applyBatch(events as unknown as TelemetryEvent[])
+      useTelemetryStore.getState().applyBatch(events)
 
       const points = useTelemetryStore.getState().realtimePoints
       expect(points).toHaveLength(3)
@@ -106,7 +106,7 @@ describe('TelemetryStore', () => {
           ],
         },
       ]
-      useTelemetryStore.getState().applyBatch(events as unknown as TelemetryEvent[])
+      useTelemetryStore.getState().applyBatch(events)
 
       const points = useTelemetryStore.getState().realtimePoints
       expect(points).toHaveLength(1)
@@ -114,11 +114,11 @@ describe('TelemetryStore', () => {
     })
 
     it('should skip non-device_data events', () => {
-      const events = [
+      const events: TelemetryEvent[] = [
         { type: 'device_offline', deviceId: 'd1', projectId: 'p1', timestamp: 't1', sensors: [] },
         { type: 'device_data', deviceId: 'd2', projectId: 'p1', timestamp: 't2', sensors: [{ sensorId: 's1', payload: { v: 1 } }] },
       ]
-      useTelemetryStore.getState().applyBatch(events as unknown as TelemetryEvent[])
+      useTelemetryStore.getState().applyBatch(events)
 
       const points = useTelemetryStore.getState().realtimePoints
       expect(points).toHaveLength(1)
@@ -149,13 +149,13 @@ describe('TelemetryStore', () => {
           sensors: [{ sensorId: 's2', payload: { v: 500 } }],
         },
       ]
-      useTelemetryStore.getState().applyBatch(events as unknown as TelemetryEvent[])
+      useTelemetryStore.getState().applyBatch(events)
 
       const points = useTelemetryStore.getState().realtimePoints
       expect(points).toHaveLength(500)
       // Should keep the most recent 500 values (dropping value 0)
       expect(points[0].value).toBe(1)
-      expect(points[points.length - 1].value).toBe(500)
+      expect(points.at(-1)!.value).toBe(500)
     })
 
     it('should addRealtimePoints to an empty array', () => {
@@ -204,7 +204,7 @@ describe('TelemetryStore', () => {
       expect(points).toHaveLength(500)
       // First point should have been trimmed away
       expect(points[0].value).toBe(1)
-      expect(points[points.length - 1].value).toBe(999)
+      expect(points.at(-1)!.value).toBe(999)
     })
 
     it('should clearRealtimePoints', () => {
