@@ -172,6 +172,11 @@ export function ProjectDetailPage() {
     [devices, realtimeDevices],
   )
 
+  const addSensorDevice = useMemo(
+    () => devices.find(d => d.id === addSensorDeviceId),
+    [devices, addSensorDeviceId],
+  )
+
   async function onSubmitDevice(values: CreateDeviceInput) {
     try {
       const created = await httpDevicesRepository.create(projectId, values)
@@ -371,79 +376,6 @@ export function ProjectDetailPage() {
                 </DropdownMenuGroup>
               </DropdownMenuContent>
             </DropdownMenu>
-            <Dialog
-              open={isAddSensorDialogOpen && addSensorDeviceId === device.id}
-              onOpenChange={(open) => {
-                if (!open) {
-                  setIsAddSensorDialogOpen(false)
-                  setAddSensorDeviceId(null)
-                  sensorForm.reset()
-                }
-              }}
-            >
-              <DialogContent className="sm:max-w-[400px]">
-                <DialogHeader>
-                  <DialogTitle>Anexar Sensor al Gateway</DialogTitle>
-                  <DialogDescription>
-                    Agrega una fuente de datos lógica a <b>{device.name}</b>.
-                  </DialogDescription>
-                </DialogHeader>
-                <Form {...sensorForm}>
-                  <form
-                    onSubmit={sensorForm.handleSubmit(onSubmitSensor)}
-                    className="space-y-4 pt-4"
-                  >
-                    <FormField
-                      control={sensorForm.control}
-                      name="name"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>ID/Nombre del Sensor</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="Ej. sensor_temp_01"
-                              {...field}
-                              className="bg-surface-container-lowest"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={sensorForm.control}
-                      name="metadata"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Etiquetas</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="outdoor, dht22"
-                              {...field}
-                              className="bg-surface-container-lowest"
-                            />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-                    <div className="flex justify-end gap-3 pt-4">
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        onClick={() => {
-                          setIsAddSensorDialogOpen(false)
-                          setAddSensorDeviceId(null)
-                          sensorForm.reset()
-                        }}
-                      >
-                        Cancelar
-                      </Button>
-                      <Button type="submit">Agregar Sensor</Button>
-                    </div>
-                  </form>
-                </Form>
-              </DialogContent>
-            </Dialog>
           </TableCell>
         </TableRow>
         {expanded && (
@@ -839,6 +771,81 @@ export function ProjectDetailPage() {
         onConfirm={onDeleteDeviceConfirm}
         loading={deletingDeviceLoading}
       />
+
+      {/* ADD SENSOR DIALOG */}
+      <Dialog
+        open={isAddSensorDialogOpen && !!addSensorDeviceId}
+        onOpenChange={(open) => {
+          if (!open) {
+            setIsAddSensorDialogOpen(false)
+            setAddSensorDeviceId(null)
+            sensorForm.reset()
+          }
+        }}
+      >
+        <DialogContent className="sm:max-w-[400px] border-border bg-background shadow-2xl">
+          <DialogHeader>
+            <DialogTitle>Anexar Sensor al Gateway</DialogTitle>
+            <DialogDescription>
+              Agrega una fuente de datos lógica a <b>{addSensorDevice?.name}</b>.
+            </DialogDescription>
+          </DialogHeader>
+          <Form {...sensorForm}>
+            <form
+              onSubmit={sensorForm.handleSubmit(onSubmitSensor)}
+              className="space-y-4 pt-4"
+            >
+              <FormField
+                control={sensorForm.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>ID/Nombre del Sensor</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Ej. sensor_temp_01"
+                        {...field}
+                        className="bg-surface-container-lowest"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={sensorForm.control}
+                name="metadata"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Etiquetas</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="outdoor, dht22"
+                        {...field}
+                        className="bg-surface-container-lowest"
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <div className="flex justify-end gap-3 pt-4">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => {
+                    setIsAddSensorDialogOpen(false)
+                    setAddSensorDeviceId(null)
+                    sensorForm.reset()
+                  }}
+                >
+                  Cancelar
+                </Button>
+                <Button type="submit">Agregar Sensor</Button>
+              </div>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
 
       {/* EDIT SENSOR DIALOG */}
       <Dialog open={isEditSensorDialogOpen} onOpenChange={setIsEditSensorDialogOpen}>
