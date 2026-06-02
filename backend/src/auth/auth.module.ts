@@ -12,6 +12,8 @@ import { RegisterUserUseCase } from '@/auth/application/use-cases/register-user.
 import { ValidateUserUseCase } from '@/auth/application/use-cases/validate-user.use-case';
 import { ValidateOAuthUseCase } from '@/auth/application/use-cases/validate-oauth.use-case';
 import { GenerateTokenUseCase } from '@/auth/application/use-cases/generate-token.use-case';
+import { UpdateProfileUseCase } from '@/auth/application/use-cases/update-profile.use-case';
+import { DeleteUserUseCase } from '@/auth/application/use-cases/delete-user.use-case';
 
 // Repositories
 import { USER_REPOSITORY_TOKEN } from '@/auth/domain/repositories/user.repository.interface';
@@ -48,6 +50,8 @@ import { LocalStrategy } from '@/auth/infrastructure/strategies/local.strategy';
     ValidateUserUseCase,
     ValidateOAuthUseCase,
     GenerateTokenUseCase,
+    UpdateProfileUseCase,
+    DeleteUserUseCase,
     // Infrastructure adapters
     GoogleStrategy,
     GithubStrategy,

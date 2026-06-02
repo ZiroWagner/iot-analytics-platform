@@ -44,6 +44,8 @@ import {
   ChevronRight,
   Radio,
   LayoutDashboard,
+  Pencil,
+  Trash2,
 } from "lucide-react"
 import {
   useTelemetry,
@@ -54,6 +56,7 @@ import {
   SensorDataModal,
   createSensorFormSchema,
   parseSensorMetadata,
+  formatSensorMetadata,
   httpSensorsRepository,
   type CreateSensorFormInput,
   type Sensor,
@@ -62,6 +65,8 @@ import { createDeviceSchema, type CreateDeviceInput } from "../../domain/schemas
 import { isDeviceActive, countActiveDevicesFromList } from "../../domain/rules"
 import { httpDevicesRepository } from "../../infrastructure/devices.repository"
 import { useDevicesByProject } from "../hooks/useDevicesByProject"
+import { DeleteConfirmDialog } from "@/components/DeleteConfirmDialog"
+import type { Device } from "../../domain/types"
 
 export function ProjectDetailPage() {
   const params = useParams()
@@ -86,7 +91,24 @@ export function ProjectDetailPage() {
   const [expandedDeviceIds, setExpandedDeviceIds] = useState<Set<string>>(new Set())
   const [activeDeviceIdForSensor, setActiveDeviceIdForSensor] = useState<string | null>(null)
 
+  const [editingDevice, setEditingDevice] = useState<Device | null>(null)
+  const [isEditDeviceDialogOpen, setIsEditDeviceDialogOpen] = useState(false)
+  const [deletingDevice, setDeletingDevice] = useState<Device | null>(null)
+  const [isDeleteDeviceOpen, setIsDeleteDeviceOpen] = useState(false)
+  const [deletingDeviceLoading, setDeletingDeviceLoading] = useState(false)
+
+  const [editingSensor, setEditingSensor] = useState<Sensor | null>(null)
+  const [isEditSensorDialogOpen, setIsEditSensorDialogOpen] = useState(false)
+  const [deletingSensor, setDeletingSensor] = useState<Sensor | null>(null)
+  const [isDeleteSensorOpen, setIsDeleteSensorOpen] = useState(false)
+  const [deletingSensorLoading, setDeletingSensorLoading] = useState(false)
+
   const deviceForm = useForm<CreateDeviceInput>({
+    resolver: zodResolver(createDeviceSchema),
+    defaultValues: { name: "", type: "ESP32", mac_address: "" },
+  })
+
+  const editDeviceForm = useForm<CreateDeviceInput>({
     resolver: zodResolver(createDeviceSchema),
     defaultValues: { name: "", type: "ESP32", mac_address: "" },
   })
@@ -96,9 +118,33 @@ export function ProjectDetailPage() {
     defaultValues: { name: "", metadata: "" },
   })
 
+  const editSensorForm = useForm<CreateSensorFormInput>({
+    resolver: zodResolver(createSensorFormSchema),
+    defaultValues: { name: "", metadata: "" },
+  })
+
   useEffect(() => {
     if (unauthorized) router.push("/login")
   }, [unauthorized, router])
+
+  useEffect(() => {
+    if (editingDevice) {
+      editDeviceForm.reset({
+        name: editingDevice.name,
+        type: editingDevice.type,
+        mac_address: editingDevice.mac_address || "",
+      })
+    }
+  }, [editingDevice, editDeviceForm])
+
+  useEffect(() => {
+    if (editingSensor) {
+      editSensorForm.reset({
+        name: editingSensor.name,
+        metadata: formatSensorMetadata(editingSensor.metadata),
+      })
+    }
+  }, [editingSensor, editSensorForm])
 
   const toggleRow = (deviceId: string) => {
     setExpandedDeviceIds((prev) => {
@@ -144,6 +190,67 @@ export function ProjectDetailPage() {
     } catch (error) {
       const message = error instanceof Error ? error.message : "Error al registrar el Sensor"
       toast.error(message)
+    }
+  }
+
+  async function onEditDevice(values: CreateDeviceInput) {
+    if (!editingDevice) return
+    try {
+      await httpDevicesRepository.update(editingDevice.id, values)
+      toast.success("Gateway actualizado exitosamente")
+      setIsEditDeviceDialogOpen(false)
+      setEditingDevice(null)
+      refetchDevices()
+    } catch {
+      toast.error("Hubo un problema al actualizar el Gateway")
+    }
+  }
+
+  async function onDeleteDeviceConfirm() {
+    if (!deletingDevice) return
+    try {
+      setDeletingDeviceLoading(true)
+      await httpDevicesRepository.delete(deletingDevice.id)
+      toast.success("Gateway eliminado permanentemente")
+      setIsDeleteDeviceOpen(false)
+      setDeletingDevice(null)
+      refetchDevices()
+    } catch {
+      toast.error("Hubo un problema al eliminar el Gateway")
+    } finally {
+      setDeletingDeviceLoading(false)
+    }
+  }
+
+  async function onEditSensor(values: CreateSensorFormInput) {
+    if (!editingSensor) return
+    try {
+      await httpSensorsRepository.update(editingSensor.id, {
+        name: values.name,
+        metadata: parseSensorMetadata(values.metadata),
+      })
+      toast.success("Sensor actualizado exitosamente")
+      setIsEditSensorDialogOpen(false)
+      setEditingSensor(null)
+      refetchDevices()
+    } catch {
+      toast.error("Hubo un problema al actualizar el Sensor")
+    }
+  }
+
+  async function onDeleteSensorConfirm() {
+    if (!deletingSensor) return
+    try {
+      setDeletingSensorLoading(true)
+      await httpSensorsRepository.delete(deletingSensor.id)
+      toast.success("Sensor eliminado permanentemente")
+      setIsDeleteSensorOpen(false)
+      setDeletingSensor(null)
+      refetchDevices()
+    } catch {
+      toast.error("Hubo un problema al eliminar el Sensor")
+    } finally {
+      setDeletingSensorLoading(false)
     }
   }
 
@@ -207,25 +314,52 @@ export function ProjectDetailPage() {
             )}
           </TableCell>
           <TableCell className="text-right">
-            <Dialog
-              open={activeDeviceIdForSensor === device.id}
-              onOpenChange={(open) => !open && setActiveDeviceIdForSensor(null)}
-            >
-              <DialogTrigger
-                render={
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-primary hover:bg-primary/10 hover:text-primary"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      setActiveDeviceIdForSensor(device.id)
-                    }}
-                  >
-                    <Plus className="h-4 w-4 mr-1" /> Nuevo Sensor
-                  </Button>
-                }
-              />
+            <div className="flex items-center justify-end gap-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setEditingDevice(device)
+                  setIsEditDeviceDialogOpen(true)
+                }}
+                title="Editar Gateway"
+              >
+                <Pencil className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setDeletingDevice(device)
+                  setIsDeleteDeviceOpen(true)
+                }}
+                title="Eliminar Gateway"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+              <Dialog
+                open={activeDeviceIdForSensor === device.id}
+                onOpenChange={(open) => !open && setActiveDeviceIdForSensor(null)}
+              >
+                <DialogTrigger
+                  render={
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-primary hover:bg-primary/10 hover:text-primary"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setActiveDeviceIdForSensor(device.id)
+                      }}
+                    >
+                      <Plus className="h-4 w-4 mr-1" /> Nuevo Sensor
+                    </Button>
+                  }
+                />
               <DialogContent className="sm:max-w-[400px]">
                 <DialogHeader>
                   <DialogTitle>Anexar Sensor al Gateway</DialogTitle>
@@ -296,10 +430,12 @@ export function ProjectDetailPage() {
                     {device.sensors.map((sensor) => (
                       <div
                         key={sensor.id}
-                        onClick={() => setInspectingSensor(sensor)}
-                        className="flex items-center justify-between p-3 rounded-md bg-background border border-border/50 hover:border-emerald-500/50 cursor-pointer transition-colors group"
+                        className="relative flex items-center justify-between p-3 rounded-md bg-background border border-border/50 hover:border-emerald-500/50 cursor-pointer transition-colors group"
                       >
-                        <div>
+                        <div
+                          className="flex-1"
+                          onClick={() => setInspectingSensor(sensor)}
+                        >
                           <p
                             className={`font-medium text-sm transition-colors ${active ? "text-foreground group-hover:text-emerald-500" : "text-muted-foreground"}`}
                           >
@@ -309,9 +445,39 @@ export function ProjectDetailPage() {
                             ID: {sensor.id}
                           </p>
                         </div>
-                        <Activity
-                          className={`h-4 w-4 ${active ? "text-emerald-500/50 group-hover:text-emerald-500 group-hover:animate-pulse" : "text-muted-foreground/30"}`}
-                        />
+                        <div className="flex items-center gap-1">
+                          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7 text-muted-foreground hover:text-foreground"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                setEditingSensor(sensor)
+                                setIsEditSensorDialogOpen(true)
+                              }}
+                              title="Editar sensor"
+                            >
+                              <Pencil className="h-3.5 w-3.5" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7 text-muted-foreground hover:text-destructive"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                setDeletingSensor(sensor)
+                                setIsDeleteSensorOpen(true)
+                              }}
+                              title="Eliminar sensor"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
+                          </div>
+                          <Activity
+                            className={`h-4 w-4 ${active ? "text-emerald-500/50 group-hover:text-emerald-500 group-hover:animate-pulse" : "text-muted-foreground/30"}`}
+                          />
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -546,6 +712,176 @@ export function ProjectDetailPage() {
           onClose={() => setInspectingSensor(null)}
         />
       )}
+
+      {/* EDIT DEVICE DIALOG */}
+      <Dialog open={isEditDeviceDialogOpen} onOpenChange={setIsEditDeviceDialogOpen}>
+        <DialogContent className="sm:max-w-[500px] border-border bg-background shadow-2xl">
+          <DialogHeader>
+            <DialogTitle>Editar Gateway</DialogTitle>
+            <DialogDescription>
+              Modifica los detalles del dispositivo gateway.
+            </DialogDescription>
+          </DialogHeader>
+          <Form {...editDeviceForm}>
+            <form
+              onSubmit={editDeviceForm.handleSubmit(onEditDevice)}
+              className="space-y-4 pt-4"
+            >
+              <FormField
+                control={editDeviceForm.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nombre del Gateway</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Ej. Nodo-Central-Piso1"
+                        {...field}
+                        className="bg-surface-container-lowest"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={editDeviceForm.control}
+                  name="type"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Modelo/Placa</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="ESP32, RPi4"
+                          {...field}
+                          className="bg-surface-container-lowest"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={editDeviceForm.control}
+                  name="mac_address"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>MAC (Opcional)</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="00:1A:..."
+                          {...field}
+                          className="font-mono bg-surface-container-lowest uppercase"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <div className="flex justify-end gap-3 pt-4">
+                <Button
+                  variant="ghost"
+                  type="button"
+                  onClick={() => {
+                    setIsEditDeviceDialogOpen(false)
+                    setEditingDevice(null)
+                  }}
+                >
+                  Cancelar
+                </Button>
+                <Button type="submit">Guardar Cambios</Button>
+              </div>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+
+      {/* DELETE DEVICE CONFIRMATION */}
+      <DeleteConfirmDialog
+        open={isDeleteDeviceOpen}
+        onOpenChange={setIsDeleteDeviceOpen}
+        title={deletingDevice?.name || "este gateway"}
+        description="Al eliminar este gateway, se eliminarán en cascada de forma permanente todos sus sensores registrados y el histórico completo de eventos de telemetría asociados."
+        onConfirm={onDeleteDeviceConfirm}
+        loading={deletingDeviceLoading}
+      />
+
+      {/* EDIT SENSOR DIALOG */}
+      <Dialog open={isEditSensorDialogOpen} onOpenChange={setIsEditSensorDialogOpen}>
+        <DialogContent className="sm:max-w-[400px] border-border bg-background shadow-2xl">
+          <DialogHeader>
+            <DialogTitle>Editar Sensor</DialogTitle>
+            <DialogDescription>
+              Modifica los detalles del sensor lógico.
+            </DialogDescription>
+          </DialogHeader>
+          <Form {...editSensorForm}>
+            <form
+              onSubmit={editSensorForm.handleSubmit(onEditSensor)}
+              className="space-y-4 pt-4"
+            >
+              <FormField
+                control={editSensorForm.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>ID/Nombre del Sensor</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Ej. sensor_temp_01"
+                        {...field}
+                        className="bg-surface-container-lowest"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={editSensorForm.control}
+                name="metadata"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Etiquetas</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="outdoor, dht22"
+                        {...field}
+                        className="bg-surface-container-lowest"
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <div className="flex justify-end gap-3 pt-4">
+                <Button
+                  variant="ghost"
+                  type="button"
+                  onClick={() => {
+                    setIsEditSensorDialogOpen(false)
+                    setEditingSensor(null)
+                  }}
+                >
+                  Cancelar
+                </Button>
+                <Button type="submit">Guardar Cambios</Button>
+              </div>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+
+      {/* DELETE SENSOR CONFIRMATION */}
+      <DeleteConfirmDialog
+        open={isDeleteSensorOpen}
+        onOpenChange={setIsDeleteSensorOpen}
+        title={deletingSensor?.name || "este sensor"}
+        description="Al eliminar este sensor, se borrará permanentemente su configuración y todo el histórico de datos de telemetría asociados."
+        onConfirm={onDeleteSensorConfirm}
+        loading={deletingSensorLoading}
+      />
     </div>
   )
 }

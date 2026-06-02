@@ -19,7 +19,6 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog"
 import {
   Form,
@@ -30,7 +29,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { Plus, ArrowRight } from "lucide-react"
+import { Plus, ArrowRight, Pencil, Trash2 } from "lucide-react"
 import {
   createProjectSchema,
   type CreateProjectInput,
@@ -38,13 +37,27 @@ import {
 import { countActiveDevices } from "../../domain/rules"
 import { httpProjectsRepository } from "../../infrastructure/projects.repository"
 import { useProjects } from "../hooks/useProjects"
+import { DeleteConfirmDialog } from "@/components/DeleteConfirmDialog"
+import type { Project } from "../../domain/types"
 
 export function ProjectsPage() {
   const router = useRouter()
   const { projects, loading, unauthorized, refetch } = useProjects()
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  
+  // Edit & Delete state
+  const [editingProject, setEditingProject] = useState<Project | null>(null)
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+  const [deletingProject, setDeletingProject] = useState<Project | null>(null)
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false)
+  const [deleting, setDeleting] = useState(false)
 
   const form = useForm<CreateProjectInput>({
+    resolver: zodResolver(createProjectSchema),
+    defaultValues: { name: "" },
+  })
+
+  const editForm = useForm<CreateProjectInput>({
     resolver: zodResolver(createProjectSchema),
     defaultValues: { name: "" },
   })
@@ -52,6 +65,12 @@ export function ProjectsPage() {
   useEffect(() => {
     if (unauthorized) router.push("/login")
   }, [unauthorized, router])
+
+  useEffect(() => {
+    if (editingProject) {
+      editForm.reset({ name: editingProject.name })
+    }
+  }, [editingProject, editForm])
 
   async function onSubmit(values: CreateProjectInput) {
     try {
@@ -65,6 +84,35 @@ export function ProjectsPage() {
     }
   }
 
+  async function onEditSubmit(values: CreateProjectInput) {
+    if (!editingProject) return
+    try {
+      await httpProjectsRepository.update(editingProject.id, values)
+      toast.success("Proyecto actualizado exitosamente")
+      setIsEditDialogOpen(false)
+      setEditingProject(null)
+      refetch()
+    } catch {
+      toast.error("Hubo un problema al actualizar el proyecto")
+    }
+  }
+
+  async function onDeleteConfirm() {
+    if (!deletingProject) return
+    try {
+      setDeleting(true)
+      await httpProjectsRepository.delete(deletingProject.id)
+      toast.success("Proyecto eliminado permanentemente")
+      setIsDeleteOpen(false)
+      setDeletingProject(null)
+      refetch()
+    } catch {
+      toast.error("Hubo un problema al eliminar el proyecto")
+    } finally {
+      setDeleting(false)
+    }
+  }
+
   let projectsContent = (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
       {projects.map((project) => {
@@ -72,16 +120,46 @@ export function ProjectsPage() {
         return (
           <Card
             key={project.id}
-            className="group hover:border-primary/50 transition-all duration-300 bg-surface-container-low border-border/50"
+            className="group hover:border-primary/50 transition-all duration-300 bg-surface-container-low border-border/50 relative overflow-hidden"
           >
-            <CardHeader>
+            <CardHeader className="pb-3">
               <CardTitle className="text-xl flex items-center justify-between">
-                {project.name}
+                <span className="truncate pr-2" title={project.name}>
+                  {project.name}
+                </span>
+                <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setEditingProject(project)
+                      setIsEditDialogOpen(true)
+                    }}
+                    title="Editar proyecto"
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setDeletingProject(project)
+                      setIsDeleteOpen(true)
+                    }}
+                    title="Eliminar proyecto"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pb-4">
               <div className="flex items-baseline gap-2">
-                <span className="text-4xl font-bold text-primary">
+                <span className="text-4xl font-bold text-primary font-mono tabular-nums">
                   {active}
                   <span className="text-xl text-muted-foreground ml-1">
                     / {project._count?.devices || 0}
@@ -89,17 +167,17 @@ export function ProjectsPage() {
                 </span>
                 <span className="text-sm text-muted-foreground">Devices Activos</span>
               </div>
-              <p className="text-xs text-muted-foreground mt-4">
+              <p className="text-[10px] text-muted-foreground mt-4 font-mono">
                 Creado el {new Date(project.createdAt).toLocaleDateString()}
               </p>
             </CardContent>
-            <CardFooter className="pt-4 border-t border-border/50">
+            <CardFooter className="pt-3 border-t border-border/50">
               <Button
                 variant="ghost"
-                className="w-full justify-between hover:bg-primary/10 hover:text-primary group-hover:translate-x-1 transition-transform"
+                className="w-full justify-between hover:bg-primary/10 hover:text-primary group-hover:translate-x-0.5 transition-all text-xs h-9"
                 onClick={() => router.push(`/dashboard/projects/${project.id}`)}
               >
-                Gestionar Sensores
+                Gestionar Proyecto
                 <ArrowRight className="h-4 w-4" />
               </Button>
             </CardFooter>
@@ -137,14 +215,13 @@ export function ProjectsPage() {
         </div>
 
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger
-            render={
-              <Button className="bg-primary/90 hover:bg-primary text-primary-foreground shadow-lg shadow-primary/20">
-                <Plus className="mr-2 h-4 w-4" />
-                Nuevo Proyecto
-              </Button>
-            }
-          />
+          <Button
+            onClick={() => setIsDialogOpen(true)}
+            className="bg-primary/90 hover:bg-primary text-primary-foreground shadow-lg shadow-primary/20"
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Nuevo Proyecto
+          </Button>
           <DialogContent className="sm:max-w-[425px] border-border bg-background shadow-2xl">
             <DialogHeader>
               <DialogTitle>Crear Nuevo Proyecto</DialogTitle>
@@ -191,6 +268,65 @@ export function ProjectsPage() {
       </div>
 
       {projectsContent}
+
+      {/* EDIT PROJECT DIALOG */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="sm:max-w-[425px] border-border bg-background shadow-2xl">
+          <DialogHeader>
+            <DialogTitle>Editar Proyecto</DialogTitle>
+            <DialogDescription>
+              Modifica los detalles del contenedor lógico.
+            </DialogDescription>
+          </DialogHeader>
+          <Form {...editForm}>
+            <form
+              onSubmit={editForm.handleSubmit(onEditSubmit)}
+              className="space-y-4 pt-4"
+            >
+              <FormField
+                control={editForm.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nombre del Proyecto</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Ej. Sector Logístico"
+                        {...field}
+                        className="bg-surface-container-lowest"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="flex justify-end gap-3 pt-4">
+                <Button
+                  variant="ghost"
+                  type="button"
+                  onClick={() => {
+                    setIsEditDialogOpen(false)
+                    setEditingProject(null)
+                  }}
+                >
+                  Cancelar
+                </Button>
+                <Button type="submit">Guardar Cambios</Button>
+              </div>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+
+      {/* DELETE PROJECT CONFIRMATION */}
+      <DeleteConfirmDialog
+        open={isDeleteOpen}
+        onOpenChange={setIsDeleteOpen}
+        title={deletingProject?.name || "este proyecto"}
+        description="Al eliminar este proyecto, se eliminarán en cascada de forma permanente todos los dispositivos Gateways registrados a este, junto con sus sensores y el histórico completo de eventos de telemetría."
+        onConfirm={onDeleteConfirm}
+        loading={deleting}
+      />
     </div>
   )
 }

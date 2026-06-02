@@ -3,12 +3,18 @@ import { AuthController } from '@/auth/interfaces/http/auth.controller';
 import { RegisterUserUseCase } from '@/auth/application/use-cases/register-user.use-case';
 import { GenerateTokenUseCase } from '@/auth/application/use-cases/generate-token.use-case';
 import { ConfigService } from '@nestjs/config';
+import { UpdateProfileUseCase } from '@/auth/application/use-cases/update-profile.use-case';
+import { DeleteUserUseCase } from '@/auth/application/use-cases/delete-user.use-case';
+import { USER_REPOSITORY_TOKEN } from '@/auth/domain/repositories/user.repository.interface';
 
 describe('AuthController', () => {
   let controller: AuthController;
   let registerUseCase: any;
   let generateTokenUseCase: any;
   let configService: any;
+  let updateProfileUseCase: any;
+  let deleteUserUseCase: any;
+  let userRepository: any;
 
   beforeEach(async () => {
     registerUseCase = { execute: jest.fn() };
@@ -16,6 +22,9 @@ describe('AuthController', () => {
       execute: jest.fn().mockReturnValue({ access_token: 'tk123' }),
     };
     configService = { get: jest.fn().mockReturnValue('http://frontend.com') };
+    updateProfileUseCase = { execute: jest.fn() };
+    deleteUserUseCase = { execute: jest.fn() };
+    userRepository = { findById: jest.fn() };
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AuthController],
@@ -23,6 +32,9 @@ describe('AuthController', () => {
         { provide: RegisterUserUseCase, useValue: registerUseCase },
         { provide: GenerateTokenUseCase, useValue: generateTokenUseCase },
         { provide: ConfigService, useValue: configService },
+        { provide: UpdateProfileUseCase, useValue: updateProfileUseCase },
+        { provide: DeleteUserUseCase, useValue: deleteUserUseCase },
+        { provide: USER_REPOSITORY_TOKEN, useValue: userRepository },
       ],
     }).compile();
 

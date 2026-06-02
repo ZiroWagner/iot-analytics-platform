@@ -3,4 +3,4 @@ export {
   createSensorFormSchema,
   type CreateSensorFormInput,
 } from './schemas'
-export { parseSensorMetadata } from './metadata'
+export { parseSensorMetadata, formatSensorMetadata } from './metadata'

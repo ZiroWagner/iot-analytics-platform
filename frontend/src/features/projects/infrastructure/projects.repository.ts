@@ -7,6 +7,8 @@ export interface ProjectsRepository {
   list(): Promise<Project[]>
   overview(): Promise<OverviewStats>
   create(input: CreateProjectInput): Promise<Project>
+  update(id: string, input: CreateProjectInput): Promise<Project>
+  delete(id: string): Promise<void>
 }
 
 export const httpProjectsRepository: ProjectsRepository = {
@@ -21,4 +23,17 @@ export const httpProjectsRepository: ProjectsRepository = {
       body: JSON.stringify(body),
     })
   },
+
+  update: (id, input) => {
+    const body = createProjectSchema.parse(input)
+    return apiClient<Project>(API_ENDPOINTS.PROJECTS.UPDATE(id), {
+      method: 'PATCH',
+      body: JSON.stringify(body),
+    })
+  },
+
+  delete: (id) =>
+    apiClient<void>(API_ENDPOINTS.PROJECTS.DELETE(id), {
+      method: 'DELETE',
+    }),
 }

@@ -91,6 +91,33 @@ export class PrismaUserRepository implements UserRepositoryInterface {
     return this.mapToDomain(user);
   }
 
+  async findById(id: string): Promise<User | null> {
+    const user = await this.prisma.user.findUnique({ where: { id } });
+    return user ? this.mapToDomain(user) : null;
+  }
+
+  async update(
+    id: string,
+    data: { name?: string; password?: string },
+  ): Promise<User> {
+    const updateData: any = {};
+    if (data.name !== undefined) {
+      updateData.name = data.name;
+    }
+    if (data.password !== undefined) {
+      updateData.password = await bcrypt.hash(data.password, BCRYPT_SALT_ROUNDS);
+    }
+    const user = await this.prisma.user.update({
+      where: { id },
+      data: updateData,
+    });
+    return this.mapToDomain(user);
+  }
+
+  async delete(id: string): Promise<void> {
+    await this.prisma.user.delete({ where: { id } });
+  }
+
   private mapToDomain(prismaModel: any): User {
     return User.create({
       id: prismaModel.id,

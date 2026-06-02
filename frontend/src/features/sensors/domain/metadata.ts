@@ -14,3 +14,8 @@ export function parseSensorMetadata(raw: string | undefined): Record<string, unk
   if (tags.length === 0) return {}
   return { tags }
 }
+
+export function formatSensorMetadata(metadata: any): string {
+  if (!metadata || !Array.isArray(metadata.tags)) return ''
+  return metadata.tags.join(', ')
+}

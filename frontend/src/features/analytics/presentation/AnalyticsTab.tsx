@@ -4,9 +4,11 @@ import React, { useEffect, useState, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Plus, BarChart3, Sparkles } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { toast } from "sonner"
 import { ChartWidget } from "./components/ChartWidget"
 import { ChartConfigDialog } from "./components/ChartConfigDialog"
 import { TimeRangeSelector } from "./components/TimeRangeSelector"
+import { DeleteConfirmDialog } from "@/components/DeleteConfirmDialog"
 import type {
   AvailableMetric,
   ChartWidgetConfig,
@@ -35,6 +37,9 @@ export function AnalyticsTab({ projectId }: { projectId: string }) {
 
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingWidget, setEditingWidget] = useState<ChartWidgetConfig | undefined>()
+  const [deletingWidgetId, setDeletingWidgetId] = useState<string | null>(null)
+  const [isDeleteWidgetOpen, setIsDeleteWidgetOpen] = useState(false)
+  const [deletingWidgetLoading, setDeletingWidgetLoading] = useState(false)
 
   const fetchMetrics = useCallback(async () => {
     try {
@@ -105,9 +110,25 @@ export function AnalyticsTab({ projectId }: { projectId: string }) {
   }
 
   const handleRemoveWidget = (id: string) => {
-    const updated = widgets.filter((w) => w.id !== id)
-    setWidgets(updated)
-    persistConfig(updated)
+    setDeletingWidgetId(id)
+    setIsDeleteWidgetOpen(true)
+  }
+
+  const handleConfirmDeleteWidget = async () => {
+    if (!deletingWidgetId) return
+    try {
+      setDeletingWidgetLoading(true)
+      const updated = widgets.filter((w) => w.id !== deletingWidgetId)
+      setWidgets(updated)
+      await persistConfig(updated)
+      toast.success("Widget eliminado permanentemente")
+      setIsDeleteWidgetOpen(false)
+      setDeletingWidgetId(null)
+    } catch {
+      toast.error("Hubo un problema al eliminar el widget")
+    } finally {
+      setDeletingWidgetLoading(false)
+    }
   }
 
   const handleEditWidget = (widget: ChartWidgetConfig) => {
@@ -206,6 +227,15 @@ export function AnalyticsTab({ projectId }: { projectId: string }) {
         metrics={metrics}
         existingConfig={editingWidget}
         onSave={handleSaveWidget}
+      />
+
+      <DeleteConfirmDialog
+        open={isDeleteWidgetOpen}
+        onOpenChange={setIsDeleteWidgetOpen}
+        title="este widget"
+        description="El widget será eliminado del dashboard. Esta acción no se puede deshacer."
+        onConfirm={handleConfirmDeleteWidget}
+        loading={deletingWidgetLoading}
       />
     </div>
   )

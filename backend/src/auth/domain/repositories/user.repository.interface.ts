@@ -22,4 +22,7 @@ export interface UserRepositoryInterface {
     accessToken: string | null;
     refreshToken: string | null;
   }): Promise<User>;
+  findById(id: string): Promise<User | null>;
+  update(id: string, data: { name?: string; password?: string }): Promise<User>;
+  delete(id: string): Promise<void>;
 }

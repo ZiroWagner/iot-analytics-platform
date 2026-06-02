@@ -9,6 +9,7 @@ export const API_ENDPOINTS = {
     GOOGLE: '/auth/google',
     GITHUB: '/auth/github',
     CALLBACK: '/auth/callback',
+    PROFILE: '/auth/profile',
   },
 
   PROJECTS: {
