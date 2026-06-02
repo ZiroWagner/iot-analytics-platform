@@ -10,7 +10,7 @@ import {
 } from "recharts"
 import {
   X, Settings2, Grid3X3, TrendingUp,
-  BarChart3, LineChart as LineChartIcon, AreaChart as AreaChartIcon
+  BarChart3, LineChart as LineChartIcon, AreaChart as AreaChartIcon, Zap
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { getAreaFillColor } from "../../domain/chart-colors"
@@ -20,6 +20,7 @@ import type {
 } from "../../domain/types"
 import { TIME_RANGE_MS } from "../../domain/types"
 import { httpAnalyticsRepository } from "../../infrastructure/analytics.repository"
+import { useRealtimeSeries, useSocketStatus } from "@/features/telemetry"
 
 
 interface ChartWidgetProps {
@@ -72,11 +73,13 @@ function CustomTooltip({ active, payload, label, series }: CustomTooltipProps) {
 }
 
 export function ChartWidget({ projectId, config, globalTimeRange, globalCustomDate, onRemove, onEdit }: ChartWidgetProps) {
-  const [data, setData] = useState<TimeseriesPoint[]>([])
+  const [historicalData, setHistoricalData] = useState<TimeseriesPoint[]>([])
   const [stats, setStats] = useState<MetricStats[]>([])
   const [loading, setLoading] = useState(true)
   const [showGrid, setShowGrid] = useState(config.showGrid)
   const [showRefLines, setShowRefLines] = useState(config.showReferenceLines)
+
+  const wsConnected = useSocketStatus()
 
   const effectiveTimeRange = config.timeRange === '15m' ? globalTimeRange : config.timeRange
 
@@ -98,7 +101,8 @@ export function ChartWidget({ projectId, config, globalTimeRange, globalCustomDa
     }
   }, [effectiveTimeRange, config.customFrom, config.customTo, globalCustomDate])
 
-  const fetchData = useCallback(async () => {
+  // Fetch historical data once (initial load)
+  const fetchHistoricalData = useCallback(async () => {
     if (config.series.length === 0) return
 
     try {
@@ -111,14 +115,15 @@ export function ChartWidget({ projectId, config, globalTimeRange, globalCustomDa
       if (timeParams.to) params.to = timeParams.to
 
       const result = await httpAnalyticsRepository.multiTimeseries(projectId, params)
-      setData(result)
+      setHistoricalData(result)
     } catch {
-      // Retry on next interval
+      // Retry on next fallback
     } finally {
       setLoading(false)
     }
   }, [projectId, config.series, getTimeParams])
 
+  // Fetch stats (only when needed)
   const fetchStats = useCallback(async () => {
     if (!showRefLines || config.series.length === 0) return
 
@@ -138,17 +143,26 @@ export function ChartWidget({ projectId, config, globalTimeRange, globalCustomDa
     }
   }, [projectId, config.series, showRefLines, getTimeParams])
 
+  // Merge historical data with realtime WebSocket points
+  const { data: data, isRealtime } = useRealtimeSeries(
+    config.series.map(s => ({ sensorId: s.sensorId, metric: s.metric })),
+    historicalData,
+  )
+
+  // Initial load: fetch historical data and stats
   useEffect(() => {
     const timeout = setTimeout(() => {
-      fetchData()
+      fetchHistoricalData()
       fetchStats()
     }, 0)
-    const interval = setInterval(fetchData, config.refreshInterval)
-    return () => {
-      clearTimeout(timeout)
-      clearInterval(interval)
-    }
-  }, [fetchData, fetchStats, config.refreshInterval])
+    return () => clearTimeout(timeout)
+  }, [fetchHistoricalData, fetchStats])
+
+  // Fallback: resync historical data every 30s to catch up if WS missed events
+  useEffect(() => {
+    const interval = setInterval(fetchHistoricalData, 30000)
+    return () => clearInterval(interval)
+  }, [fetchHistoricalData])
 
   const hasMultipleYAxes = useMemo(() => {
     const axes = new Set(config.series.map(s => s.yAxisId))
@@ -278,7 +292,7 @@ export function ChartWidget({ projectId, config, globalTimeRange, globalCustomDa
     </div>
   )
 
-  if (loading && data.length === 0) {
+  if (loading && historicalData.length === 0) {
     chartContent = (
       <div className="h-full w-full flex items-center justify-center">
         <div className="flex flex-col items-center gap-2">
@@ -287,7 +301,7 @@ export function ChartWidget({ projectId, config, globalTimeRange, globalCustomDa
         </div>
       </div>
     )
-  } else if (data.length === 0) {
+  } else if (data.length === 0 && historicalData.length === 0) {
     chartContent = (
       <div className="h-full w-full flex items-center justify-center text-muted-foreground text-xs">
         Sin datos para el rango seleccionado.
@@ -312,6 +326,12 @@ export function ChartWidget({ projectId, config, globalTimeRange, globalCustomDa
               ))}
             </div>
             <h3 className="text-sm font-semibold truncate">{config.title}</h3>
+            {isRealtime && wsConnected && (
+              <span className="flex items-center gap-1 text-[10px] text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded-full" title="Real-time updates via WebSocket">
+                <Zap className="h-2.5 w-2.5" />
+                Live
+              </span>
+            )}
           </div>
 
           <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">

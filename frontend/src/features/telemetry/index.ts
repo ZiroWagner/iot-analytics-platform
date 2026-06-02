@@ -1,2 +1,2 @@
 export * from './domain'
-export { useTelemetry, useSocketStatus, useTelemetryStore } from './presentation'
+export { useTelemetry, useSocketStatus, useTelemetryStore, useRealtimeSeries } from './presentation'

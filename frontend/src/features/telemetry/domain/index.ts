@@ -1,10 +1,10 @@
 export type {
-  DeviceMap,
   DeviceState,
+  TelemetrySensorReading,
+  TelemetryEvent,
   InitialDeviceSnapshot,
   InitialDeviceSnapshotMap,
-  TelemetryEvent,
-  TelemetrySensorReading,
+  DeviceMap,
 } from './types'
 export {
   EVENT_DEVICE_DATA,
@@ -14,3 +14,4 @@ export {
   buildDeviceMapFromInitialState,
   markDeviceOffline,
 } from './reducers'
+export type { RealtimeSensorPoint } from '../presentation/store'
