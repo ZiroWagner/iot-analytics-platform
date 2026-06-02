@@ -15,7 +15,7 @@ const PROJECT = 'p1'
 function dataEvent(
   deviceId: string,
   timestamp: string,
-  sensors: Array<{ sensor_id: string; payload: Record<string, unknown> }> = [],
+  sensors: Array<{ sensorId: string; payload: Record<string, unknown> }> = [],
 ): TelemetryEvent {
   return {
     type: EVENT_DEVICE_DATA,
@@ -44,7 +44,7 @@ describe('applyEventToDevices', () => {
     const next = applyEventToDevices(
       {},
       dataEvent('d1', '2026-01-01T00:00:00Z', [
-        { sensor_id: 's1', payload: { v: 1 } },
+        { sensorId: 's1', payload: { v: 1 } },
       ]),
     )
     expect(next.d1).toEqual({
@@ -67,7 +67,7 @@ describe('applyEventToDevices', () => {
     const next = applyEventToDevices(
       initial,
       dataEvent('d1', '2026-01-01T00:00:01Z', [
-        { sensor_id: 's2', payload: { v: 99 } },
+        { sensorId: 's2', payload: { v: 99 } },
       ]),
     )
     expect(next.d1.sensors).toEqual({ s1: { v: 1 }, s2: { v: 99 } })
@@ -122,7 +122,7 @@ describe('applyEventToDevices', () => {
 describe('applyEventsToDevices', () => {
   it('folds a batch of mixed events in order', () => {
     const events: TelemetryEvent[] = [
-      dataEvent('d1', 't0', [{ sensor_id: 's', payload: { v: 1 } }]),
+      dataEvent('d1', 't0', [{ sensorId: 's', payload: { v: 1 } }]),
       dataEvent('d2', 't1'),
       { type: EVENT_DEVICE_OFFLINE, deviceId: 'd1', projectId: PROJECT, timestamp: 't2' },
     ]

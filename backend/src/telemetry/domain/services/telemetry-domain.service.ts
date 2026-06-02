@@ -41,6 +41,7 @@ export class TelemetryDomainService {
       events: events.map((e) => ({
         type: e.type,
         deviceId: e.deviceId,
+        projectId: e.projectId,
         timestamp: e.timestamp,
         sensors: e.sensors,
       })),

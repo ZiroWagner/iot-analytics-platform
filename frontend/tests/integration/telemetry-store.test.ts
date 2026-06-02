@@ -62,7 +62,7 @@ describe('useTelemetryStore', () => {
           deviceId: 'device-1',
           projectId: 'project-1',
           timestamp: '2026-01-01T00:01:00Z',
-          sensors: [{ sensor_id: 's1', payload: { temp: 22 } }],
+          sensors: [{ sensorId: 's1', payload: { temp: 22 } }],
         },
       ])
 

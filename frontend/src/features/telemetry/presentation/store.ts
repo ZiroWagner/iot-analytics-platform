@@ -97,7 +97,7 @@ export const useTelemetryStore = create<TelemetryStore>((set) => ({
   markOffline: (deviceId) =>
     set((state) => ({ devices: markDeviceOffline(state.devices, deviceId) })),
 
-  clearDevices: () => set({ devices: {} }),
+  clearDevices: () => set({ devices: {}, realtimePoints: [] }),
 
   setSystemMetrics: (metrics) => set({ systemMetrics: metrics }),
 

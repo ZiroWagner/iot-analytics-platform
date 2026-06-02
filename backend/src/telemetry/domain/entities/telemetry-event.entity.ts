@@ -15,7 +15,7 @@ export class TelemetryEvent {
     deviceId: string;
     projectId?: string;
     timestamp: string;
-    sensors?: Array<{ sensor_id: string; payload: Record<string, unknown> }>;
+    sensors?: Array<{ sensorId: string; payload: Record<string, unknown> }>;
   }): TelemetryEvent {
     return new TelemetryEvent(
       plain.type as 'device_data' | 'device_offline',
@@ -23,7 +23,7 @@ export class TelemetryEvent {
       plain.projectId || null, // ✅ Now handles offline events with projectId
       plain.timestamp,
       (plain.sensors || []).map((s) => ({
-        sensorId: s.sensor_id,
+        sensorId: s.sensorId,
         payload: s.payload,
       })),
     );

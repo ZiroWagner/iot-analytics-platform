@@ -33,6 +33,7 @@ export function useTelemetry(projectId: string | null): void {
   const setInitialState = useTelemetryStore((s) => s.setInitialState)
   const applyBatch = useTelemetryStore((s) => s.applyBatch)
   const clearDevices = useTelemetryStore((s) => s.clearDevices)
+  const clearRealtimePoints = useTelemetryStore((s) => s.clearRealtimePoints)
 
   useEffect(() => {
     const socket = getSocket()
@@ -56,7 +57,10 @@ export function useTelemetry(projectId: string | null): void {
       applyBatch(data.events)
     }
 
-    if (projectId) clearDevices()
+    if (projectId) {
+      clearDevices()
+      clearRealtimePoints()
+    }
 
     socket.on('connect', onConnect)
     socket.on('disconnect', onDisconnect)
@@ -75,7 +79,7 @@ export function useTelemetry(projectId: string | null): void {
       socket.off('initial_state', onInitialState)
       socket.off('telemetry_batch', onTelemetryBatch)
     }
-  }, [projectId, setConnected, setInitialState, applyBatch, clearDevices])
+  }, [projectId, setConnected, setInitialState, applyBatch, clearDevices, clearRealtimePoints])
 }
 
 /** Returns the current WebSocket connection status from the store. */

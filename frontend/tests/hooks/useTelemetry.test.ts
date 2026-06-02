@@ -42,6 +42,7 @@ describe('useTelemetry hook', () => {
       setInitialState: vi.fn(),
       applyBatch: vi.fn(),
       clearDevices: vi.fn(),
+      clearRealtimePoints: vi.fn(),
       connected: false,
     }
     

@@ -37,7 +37,7 @@ describe('TelemetryStore', () => {
 
   it('should apply a batch of events', () => {
     const events = [
-      { type: 'device_data', deviceId: 'd1', timestamp: 't1', sensors: [{ sensor_id: 's1', payload: 10 }] }
+      { type: 'device_data', deviceId: 'd1', timestamp: 't1', sensors: [{ sensorId: 's1', payload: 10 }] }
     ]
     useTelemetryStore.getState().applyBatch(events as unknown as TelemetryEvent[])
     

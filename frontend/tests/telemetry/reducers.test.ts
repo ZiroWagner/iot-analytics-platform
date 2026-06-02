@@ -41,7 +41,7 @@ describe('Telemetry Reducers', () => {
       type: EVENT_DEVICE_DATA,
       deviceId,
       timestamp,
-      sensors: [{ sensor_id: 's1', payload: 42 }]
+      sensors: [{ sensorId: 's1', payload: 42 }]
     }
     
     const next = applyEventToDevices(state as unknown as DeviceMap, event as unknown as TelemetryEvent)
@@ -59,7 +59,7 @@ describe('Telemetry Reducers', () => {
       type: EVENT_DEVICE_DATA,
       deviceId: 'd1',
       timestamp: 'now',
-      sensors: [{ sensor_id: 's2', payload: 20 }]
+      sensors: [{ sensorId: 's2', payload: 20 }]
     }
     
     const next = applyEventToDevices(state as unknown as DeviceMap, event as unknown as TelemetryEvent)
@@ -89,8 +89,8 @@ describe('Telemetry Reducers', () => {
 
   it('applyEventsToDevices should process a batch', () => {
     const events = [
-      { type: EVENT_DEVICE_DATA, deviceId: 'd1', timestamp: 't1', sensors: [{ sensor_id: 's1', payload: 1 }] },
-      { type: EVENT_DEVICE_DATA, deviceId: 'd1', timestamp: 't2', sensors: [{ sensor_id: 's1', payload: 2 }] }
+      { type: EVENT_DEVICE_DATA, deviceId: 'd1', timestamp: 't1', sensors: [{ sensorId: 's1', payload: 1 }] },
+      { type: EVENT_DEVICE_DATA, deviceId: 'd1', timestamp: 't2', sensors: [{ sensorId: 's1', payload: 2 }] }
     ]
     const next = applyEventsToDevices({} as DeviceMap, events as unknown as TelemetryEvent[])
     expect(next['d1'].sensors?.['s1']).toBe(2)

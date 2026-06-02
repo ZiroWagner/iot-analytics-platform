@@ -33,7 +33,7 @@ export function useRealtimeSeries(
   const dataKeyMap = useMemo(() => {
     const map = new Map<string, string>()
     for (const s of seriesConfig) {
-      map.set(`${s.sensorId}:${s.metric}`, `${s.sensorName}:${s.metric}`)
+      map.set(`${s.sensorName}:${s.metric}`, `${s.sensorName}:${s.metric}`)
     }
     return map
   }, [seriesConfig])

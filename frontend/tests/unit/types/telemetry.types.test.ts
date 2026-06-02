@@ -29,10 +29,10 @@ describe('telemetry domain types', () => {
 
   it('TelemetrySensorReading has required fields', () => {
     const reading: TelemetrySensorReading = {
-      sensor_id: 'temp-sensor',
+      sensorId: 'temp-sensor',
       payload: { temperature: 25.0, humidity: 60 },
     }
-    expect(reading.sensor_id).toBe('temp-sensor')
+    expect(reading.sensorId).toBe('temp-sensor')
   })
 
   it('TelemetryEvent can represent device data', () => {
@@ -41,7 +41,7 @@ describe('telemetry domain types', () => {
       deviceId: 'device-1',
       projectId: 'project-1',
       timestamp: '2026-01-01T00:00:00Z',
-      sensors: [{ sensor_id: 'temp', payload: { temperature: 22 } }],
+      sensors: [{ sensorId: 'temp', payload: { temperature: 22 } }],
     }
     expect(event.type).toBe('DEVICE_DATA')
   })
