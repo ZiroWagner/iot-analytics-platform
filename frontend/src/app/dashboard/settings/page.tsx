@@ -193,7 +193,7 @@ export default function SettingsPage() {
                       </FormItem>
                     )}
                   />
-                  <div className="space-y-2">
+                  <div className="space-y-2 mb-2">
                     <Label htmlFor="email">Correo Electrónico</Label>
                     <Input id="email" type="email" value={profile?.email || ""} className="bg-surface-container-lowest" readOnly disabled />
                     <p className="text-xs text-muted-foreground">Tu correo electrónico no se puede cambiar desde esta interfaz.</p>
@@ -240,8 +240,8 @@ export default function SettingsPage() {
             <CardHeader>
               <CardTitle>Seguridad de la Cuenta</CardTitle>
               <CardDescription>
-                {profile?.hasPassword 
-                  ? "Actualiza tu contraseña para mantener tu cuenta protegida." 
+                {profile?.hasPassword
+                  ? "Actualiza tu contraseña para mantener tu cuenta protegida."
                   : "Tu cuenta está autenticada mediante un proveedor externo (OAuth)."}
               </CardDescription>
             </CardHeader>

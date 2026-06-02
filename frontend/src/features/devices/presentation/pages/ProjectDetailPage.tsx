@@ -117,12 +117,12 @@ export function ProjectDetailPage() {
 
   const deviceForm = useForm<CreateDeviceInput>({
     resolver: zodResolver(createDeviceSchema),
-    defaultValues: { name: "", type: "ESP32", mac_address: "" },
+    defaultValues: { name: "", type: "ESP32", macAddress: "" },
   })
 
   const editDeviceForm = useForm<CreateDeviceInput>({
     resolver: zodResolver(createDeviceSchema),
-    defaultValues: { name: "", type: "ESP32", mac_address: "" },
+    defaultValues: { name: "", type: "ESP32", macAddress: "" },
   })
 
   const sensorForm = useForm<CreateSensorFormInput>({
@@ -144,7 +144,7 @@ export function ProjectDetailPage() {
       editDeviceForm.reset({
         name: editingDevice.name,
         type: editingDevice.type,
-        mac_address: editingDevice.mac_address || "",
+        macAddress: editingDevice.macAddress || "",
       })
     }
   }, [editingDevice, editDeviceForm])
@@ -302,7 +302,7 @@ export function ProjectDetailPage() {
             {device.name}
           </TableCell>
           <TableCell className="text-xs text-muted-foreground">
-            {device.type} {device.mac_address && `(${device.mac_address})`}
+            {device.type} {device.macAddress && `(${device.macAddress})`}
           </TableCell>
           <TableCell>
             <Badge variant="secondary" className="bg-primary/10 text-primary">
@@ -341,8 +341,7 @@ export function ProjectDetailPage() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-52">
                 <DropdownMenuItem
-                  onSelect={(e) => {
-                    e.preventDefault()
+                  onClick={() => {
                     setAddSensorDeviceId(device.id)
                     setIsAddSensorDialogOpen(true)
                   }}
@@ -614,7 +613,7 @@ export function ProjectDetailPage() {
                           />
                           <FormField
                             control={deviceForm.control}
-                            name="mac_address"
+                            name="macAddress"
                             render={({ field }) => (
                               <FormItem>
                                 <FormLabel>MAC (Opcional)</FormLabel>
@@ -728,7 +727,7 @@ export function ProjectDetailPage() {
                 />
                 <FormField
                   control={editDeviceForm.control}
-                  name="mac_address"
+                  name="macAddress"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>MAC (Opcional)</FormLabel>

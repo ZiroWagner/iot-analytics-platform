@@ -9,13 +9,13 @@ describe('createDeviceSchema', () => {
     })
   })
 
-  it('accepts device with optional mac_address', () => {
+  it('accepts device with optional macAddress', () => {
     const result = createDeviceSchema.parse({
       name: 'Gateway 1',
       type: 'ESP32',
-      mac_address: '00:1B:44:11:3A:B7',
+      macAddress: '00:1B:44:11:3A:B7',
     })
-    expect(result.mac_address).toBe('00:1B:44:11:3A:B7')
+    expect(result.macAddress).toBe('00:1B:44:11:3A:B7')
   })
 
   it('rejects names shorter than 2 chars', () => {
@@ -30,12 +30,12 @@ describe('createDeviceSchema', () => {
     )
   })
 
-  it('allows empty mac_address (optional)', () => {
+  it('allows empty macAddress (optional)', () => {
     const result = createDeviceSchema.parse({
       name: 'Gateway 1',
       type: 'ESP32',
-      mac_address: '',
+      macAddress: '',
     })
-    expect(result.mac_address).toBe('')
+    expect(result.macAddress).toBe('')
   })
 })
