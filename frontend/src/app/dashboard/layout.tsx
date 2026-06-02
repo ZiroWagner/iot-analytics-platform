@@ -116,8 +116,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   </DropdownMenuLabel>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link href="/dashboard/settings" className="cursor-pointer">Perfil</Link>
+                <DropdownMenuItem
+                  onClick={() => router.push("/dashboard/settings")}
+                  className="cursor-pointer"
+                >
+                  Perfil
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout} className="text-red-500 cursor-pointer">

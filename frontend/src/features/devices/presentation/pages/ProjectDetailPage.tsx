@@ -18,6 +18,7 @@ import { Badge } from "@/components/ui/badge"
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -335,50 +336,57 @@ export function ProjectDetailPage() {
                 <ChevronDown className="h-3 w-3" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel>Acciones del Gateway</DropdownMenuLabel>
-                <DropdownMenuItem
-                  onClick={() => {
-                    setEditingDevice(device)
-                    setIsEditDeviceDialogOpen(true)
-                  }}
-                >
-                  <Pencil className="h-4 w-4 mr-2" />
-                  Editar Gateway
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  className="text-destructive"
-                  onClick={() => {
-                    setDeletingDevice(device)
-                    setIsDeleteDeviceOpen(true)
-                  }}
-                >
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  Eliminar Gateway
-                </DropdownMenuItem>
+                <DropdownMenuGroup>
+                  <DropdownMenuLabel>Acciones del Gateway</DropdownMenuLabel>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      setEditingDevice(device)
+                      setIsEditDeviceDialogOpen(true)
+                    }}
+                  >
+                    <Pencil className="h-4 w-4 mr-2" />
+                    Editar Gateway
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="text-destructive"
+                    onClick={() => {
+                      setDeletingDevice(device)
+                      setIsDeleteDeviceOpen(true)
+                    }}
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Eliminar Gateway
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
                 {device.sensors.length > 0 && <DropdownMenuSeparator />}
-                {device.sensors.map((sensor) => (
-                  <React.Fragment key={sensor.id}>
-                    <DropdownMenuItem
-                      onClick={() => {
-                        setEditingSensor(sensor)
-                        setIsEditSensorDialogOpen(true)
-                      }}
-                    >
-                      <Pencil className="h-3.5 w-3.5 mr-2" />
-                      Editar {sensor.name}
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      className="text-destructive"
-                      onClick={() => {
-                        setDeletingSensor(sensor)
-                        setIsDeleteSensorOpen(true)
-                      }}
-                    >
-                      <Trash2 className="h-3.5 w-3.5 mr-2" />
-                      Eliminar {sensor.name}
-                    </DropdownMenuItem>
-                  </React.Fragment>
-                ))}
+                {device.sensors.length > 0 && (
+                  <DropdownMenuGroup>
+                    <DropdownMenuLabel>Sensores conectados</DropdownMenuLabel>
+                    {device.sensors.map((sensor) => (
+                      <React.Fragment key={sensor.id}>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setEditingSensor(sensor)
+                            setIsEditSensorDialogOpen(true)
+                          }}
+                        >
+                          <Pencil className="h-3.5 w-3.5 mr-2" />
+                          Editar {sensor.name}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          className="text-destructive"
+                          onClick={() => {
+                            setDeletingSensor(sensor)
+                            setIsDeleteSensorOpen(true)
+                          }}
+                        >
+                          <Trash2 className="h-3.5 w-3.5 mr-2" />
+                          Eliminar {sensor.name}
+                        </DropdownMenuItem>
+                      </React.Fragment>
+                    ))}
+                  </DropdownMenuGroup>
+                )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onSelect={(e) => {
