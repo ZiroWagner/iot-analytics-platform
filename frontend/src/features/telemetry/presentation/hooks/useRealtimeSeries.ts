@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useTelemetryStore } from '../presentation/store'
+import { useTelemetryStore } from '../store'
 import type { TimeseriesPoint } from '@/features/analytics/domain/types'
 
 /**
@@ -41,18 +41,15 @@ export function useRealtimeSeries(
   const dataKeyMap = useMemo(() => {
     const map = new Map<string, string>()
     for (const s of seriesConfig) {
-      // The chart uses "sensorName:metric" as dataKey
-      // We need to find the sensorName from historical data
-      const samplePoint = historicalData.find(
-        (p) => p[sensorNameFromPoint(p, s.sensorId, s.metric)] !== undefined,
-      )
-      if (samplePoint) {
-        for (const key of Object.keys(samplePoint)) {
-          if (key !== 'timestamp' && key !== 'timeLabel') {
-            // We can't derive sensorName from the point directly, use the key as-is
-            map.set(`${s.sensorId}:${s.metric}`, key)
-            break
-          }
+      // Find the dataKey used by the chart for this sensor:metric
+      const found = historicalData.find((p) => {
+        const key = sensorNameFromPoint(p, s.sensorId, s.metric)
+        return key !== undefined && p[key] !== undefined
+      })
+      if (found) {
+        const dataKey = sensorNameFromPoint(found, s.sensorId, s.metric)
+        if (dataKey) {
+          map.set(`${s.sensorId}:${s.metric}`, dataKey)
         }
       }
     }
@@ -70,9 +67,7 @@ export function useRealtimeSeries(
     for (const point of historicalData) {
       const ts = typeof point.timestamp === 'string'
         ? new Date(point.timestamp).getTime()
-        : point.timestamp instanceof Date
-          ? point.timestamp.getTime()
-          : 0
+        : new Date(point.timestamp as string | number | Date).getTime()
 
       const entry: Record<string, unknown> = {
         timestamp: point.timestamp,
@@ -111,17 +106,31 @@ export function useRealtimeSeries(
     }
 
     // Convert map to sorted array
-    return Array.from(timeMap.values())
-      .map((entry) => ({
-        timestamp: entry.timestamp as string | Date,
-        timeLabel: entry.timeLabel as string,
-        ...entry,
-      }))
+    const sorted = Array.from(timeMap.values())
       .sort((a, b) => {
-        const ta = typeof a.timestamp === 'string' ? new Date(a.timestamp).getTime() : a.timestamp instanceof Date ? a.timestamp.getTime() : 0
-        const tb = typeof b.timestamp === 'string' ? new Date(b.timestamp).getTime() : b.timestamp instanceof Date ? b.timestamp.getTime() : 0
-        return ta - tb
+        const getTime = (t: unknown) => {
+          if (typeof t === 'string') return new Date(t).getTime()
+          if (t && typeof t === 'object' && 'getTime' in t) return (t as { getTime: () => number }).getTime()
+          return 0
+        }
+        return getTime(a.timestamp) - getTime(b.timestamp)
       })
+
+    // Normalize to TimeseriesPoint format
+    return sorted.map((entry) => {
+      const ts = entry.timestamp
+      const normalizedTimestamp = typeof ts === 'string' ? ts : ts instanceof Date ? ts.toISOString() : String(ts)
+      const result: TimeseriesPoint = {
+        timestamp: normalizedTimestamp,
+        timeLabel: entry.timeLabel as string,
+      }
+      for (const key of Object.keys(entry)) {
+        if (key !== 'timestamp' && key !== 'timeLabel') {
+          ;(result as Record<string, unknown>)[key] = entry[key]
+        }
+      }
+      return result
+    })
   }, [historicalData, realtimePoints, seriesKeys, dataKeyMap, seriesConfig])
 
   // Track when realtime points change
