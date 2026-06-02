@@ -68,6 +68,7 @@ export default function SettingsPage() {
       setProfile(data)
       profileForm.setValue("name", data.name || "")
     } catch (err) {
+      console.error("Error al cargar perfil:", err)
       toast.error("No se pudo cargar el perfil de usuario")
       router.push("/login")
     } finally {
@@ -87,6 +88,7 @@ export default function SettingsPage() {
       toast.success("Perfil actualizado correctamente")
       await loadProfile()
     } catch (err) {
+      console.error("Error al actualizar perfil:", err)
       toast.error("Error al actualizar el perfil")
     } finally {
       setSavingProfile(false)
@@ -119,6 +121,7 @@ export default function SettingsPage() {
       toast.success("Cuenta eliminada permanentemente")
       router.push("/login")
     } catch (err) {
+      console.error("Error al eliminar cuenta:", err)
       toast.error("Error al eliminar la cuenta")
       setDeleting(false)
       setIsDeleteOpen(false)
