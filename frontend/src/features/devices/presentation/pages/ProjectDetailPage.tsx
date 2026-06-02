@@ -55,6 +55,7 @@ import {
   LayoutDashboard,
   Pencil,
   Trash2,
+  MoreVertical,
 } from "lucide-react"
 import {
   useTelemetry,
@@ -328,14 +329,24 @@ export function ProjectDetailPage() {
           <TableCell className="text-right">
             <DropdownMenu>
               <DropdownMenuTrigger
-                className="inline-flex items-center gap-1 h-8 px-2 text-xs rounded-md text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+                className="inline-flex items-center justify-center h-8 w-8 rounded-md text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
                 onClick={(e) => e.stopPropagation()}
               >
-                <Radio className="h-4 w-4" />
-                Sensores ({device.sensors.length})
-                <ChevronDown className="h-3 w-3" />
+                <MoreVertical className="h-4 w-4" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuContent align="end" className="w-52">
+                <DropdownMenuItem
+                  onSelect={(e) => {
+                    e.preventDefault()
+                    setAddSensorDeviceId(device.id)
+                    setIsAddSensorDialogOpen(true)
+                  }}
+                  className="text-primary font-medium"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Agregar nuevo sensor
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
                 <DropdownMenuGroup>
                   <DropdownMenuLabel>Acciones del Gateway</DropdownMenuLabel>
                   <DropdownMenuItem
@@ -358,47 +369,6 @@ export function ProjectDetailPage() {
                     Eliminar Gateway
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
-                {device.sensors.length > 0 && <DropdownMenuSeparator />}
-                {device.sensors.length > 0 && (
-                  <DropdownMenuGroup>
-                    <DropdownMenuLabel>Sensores conectados</DropdownMenuLabel>
-                    {device.sensors.map((sensor) => (
-                      <React.Fragment key={sensor.id}>
-                        <DropdownMenuItem
-                          onClick={() => {
-                            setEditingSensor(sensor)
-                            setIsEditSensorDialogOpen(true)
-                          }}
-                        >
-                          <Pencil className="h-3.5 w-3.5 mr-2" />
-                          Editar {sensor.name}
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          className="text-destructive"
-                          onClick={() => {
-                            setDeletingSensor(sensor)
-                            setIsDeleteSensorOpen(true)
-                          }}
-                        >
-                          <Trash2 className="h-3.5 w-3.5 mr-2" />
-                          Eliminar {sensor.name}
-                        </DropdownMenuItem>
-                      </React.Fragment>
-                    ))}
-                  </DropdownMenuGroup>
-                )}
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onSelect={(e) => {
-                    e.preventDefault()
-                    setAddSensorDeviceId(device.id)
-                    setIsAddSensorDialogOpen(true)
-                  }}
-                  className="text-primary font-medium"
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Agregar nuevo sensor
-                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
             <Dialog
