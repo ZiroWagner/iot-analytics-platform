@@ -326,17 +326,13 @@ export function ProjectDetailPage() {
           </TableCell>
           <TableCell className="text-right">
             <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-8 text-xs"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <Radio className="h-4 w-4 mr-1" />
-                  Sensores ({device.sensors.length})
-                  <ChevronDown className="h-3 w-3 ml-1" />
-                </Button>
+              <DropdownMenuTrigger
+                className="inline-flex items-center gap-1 h-8 px-2 text-xs rounded-md text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <Radio className="h-4 w-4" />
+                Sensores ({device.sensors.length})
+                <ChevronDown className="h-3 w-3" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuLabel>Acciones del Gateway</DropdownMenuLabel>
