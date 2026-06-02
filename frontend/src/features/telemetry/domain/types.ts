@@ -8,7 +8,7 @@ export interface DeviceState {
 
 /** Sensor reading payload as it arrives in a telemetry event. */
 export interface TelemetrySensorReading {
-  sensor_id: string
+  sensorId: string
   payload: Record<string, unknown>
 }
 

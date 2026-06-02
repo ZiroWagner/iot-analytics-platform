@@ -69,7 +69,7 @@ export const useTelemetryStore = create<TelemetryStore>((set) => ({
           for (const [metric, value] of Object.entries(sensor.payload)) {
             if (typeof value === 'number') {
               points.push({
-                sensorId: sensor.sensor_id,
+                sensorId: sensor.sensorId,
                 metric,
                 value,
                 timestamp: event.timestamp,

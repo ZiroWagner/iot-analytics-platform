@@ -43,7 +43,7 @@ export function applyEventToDevices(
 
     if (event.sensors) {
       for (const s of event.sensors) {
-        sensorData[s.sensor_id] = s.payload
+        sensorData[s.sensorId] = s.payload
       }
     }
 
