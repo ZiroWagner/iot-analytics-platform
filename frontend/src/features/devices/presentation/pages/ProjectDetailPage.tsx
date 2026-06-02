@@ -115,6 +115,11 @@ export function ProjectDetailPage() {
   const [isDeleteSensorOpen, setIsDeleteSensorOpen] = useState(false)
   const [deletingSensorLoading, setDeletingSensorLoading] = useState(false)
 
+  const [isSubmittingDevice, setIsSubmittingDevice] = useState(false)
+  const [isSubmittingSensor, setIsSubmittingSensor] = useState(false)
+  const [isEditingDevice, setIsEditingDevice] = useState(false)
+  const [isEditingSensor, setIsEditingSensor] = useState(false)
+
   const deviceForm = useForm<CreateDeviceInput>({
     resolver: zodResolver(createDeviceSchema),
     defaultValues: { name: "", type: "ESP32", macAddress: "" },
@@ -178,7 +183,9 @@ export function ProjectDetailPage() {
   )
 
   async function onSubmitDevice(values: CreateDeviceInput) {
+    if (isSubmittingDevice) return
     try {
+      setIsSubmittingDevice(true)
       const created = await httpDevicesRepository.create(projectId, values)
       setNewApiKey(created.apiKey || null)
       toast.success("Gateway registrado. Copia la API Key para el Hardware.")
@@ -187,12 +194,15 @@ export function ProjectDetailPage() {
     } catch (error) {
       const message = error instanceof Error ? error.message : "Error al registrar el Gateway"
       toast.error(message)
+    } finally {
+      setIsSubmittingDevice(false)
     }
   }
 
   async function onSubmitSensor(values: CreateSensorFormInput) {
-    if (!addSensorDeviceId) return
+    if (isSubmittingSensor || !addSensorDeviceId) return
     try {
+      setIsSubmittingSensor(true)
       await httpSensorsRepository.create({
         name: values.name,
         deviceId: addSensorDeviceId,
@@ -208,12 +218,15 @@ export function ProjectDetailPage() {
     } catch (error) {
       const message = error instanceof Error ? error.message : "Error al registrar el Sensor"
       toast.error(message)
+    } finally {
+      setIsSubmittingSensor(false)
     }
   }
 
   async function onEditDevice(values: CreateDeviceInput) {
-    if (!editingDevice) return
+    if (isEditingDevice || !editingDevice) return
     try {
+      setIsEditingDevice(true)
       await httpDevicesRepository.update(editingDevice.id, values)
       toast.success("Gateway actualizado exitosamente")
       setIsEditDeviceDialogOpen(false)
@@ -221,6 +234,8 @@ export function ProjectDetailPage() {
       refetchDevices()
     } catch {
       toast.error("Hubo un problema al actualizar el Gateway")
+    } finally {
+      setIsEditingDevice(false)
     }
   }
 
@@ -241,8 +256,9 @@ export function ProjectDetailPage() {
   }
 
   async function onEditSensor(values: CreateSensorFormInput) {
-    if (!editingSensor) return
+    if (isEditingSensor || !editingSensor) return
     try {
+      setIsEditingSensor(true)
       await httpSensorsRepository.update(editingSensor.id, {
         name: values.name,
         metadata: parseSensorMetadata(values.metadata),
@@ -253,6 +269,8 @@ export function ProjectDetailPage() {
       refetchDevices()
     } catch {
       toast.error("Hubo un problema al actualizar el Sensor")
+    } finally {
+      setIsEditingSensor(false)
     }
   }
 
@@ -641,8 +659,8 @@ export function ProjectDetailPage() {
                           <Button variant="ghost" type="button" onClick={() => setIsDeviceDialogOpen(false)}>
                             Cancelar
                           </Button>
-                          <Button type="submit" className="bg-blue-600 hover:bg-blue-500">
-                            Generar Credenciales
+                          <Button type="submit" className="bg-blue-600 hover:bg-blue-500" disabled={isSubmittingDevice}>
+                            {isSubmittingDevice ? "Registrando..." : "Generar Credenciales"}
                           </Button>
                         </div>
                       </form>
@@ -762,7 +780,9 @@ export function ProjectDetailPage() {
                 >
                   Cancelar
                 </Button>
-                <Button type="submit">Guardar Cambios</Button>
+                <Button type="submit" disabled={isEditingDevice}>
+                  {isEditingDevice ? "Guardando..." : "Guardar Cambios"}
+                </Button>
               </div>
             </form>
           </Form>
@@ -847,7 +867,9 @@ export function ProjectDetailPage() {
                 >
                   Cancelar
                 </Button>
-                <Button type="submit">Agregar Sensor</Button>
+                <Button type="submit" disabled={isSubmittingSensor}>
+                  {isSubmittingSensor ? "Agregando..." : "Agregar Sensor"}
+                </Button>
               </div>
             </form>
           </Form>
@@ -912,7 +934,9 @@ export function ProjectDetailPage() {
                 >
                   Cancelar
                 </Button>
-                <Button type="submit">Guardar Cambios</Button>
+                <Button type="submit" disabled={isEditingSensor}>
+                  {isEditingSensor ? "Guardando..." : "Guardar Cambios"}
+                </Button>
               </div>
             </form>
           </Form>

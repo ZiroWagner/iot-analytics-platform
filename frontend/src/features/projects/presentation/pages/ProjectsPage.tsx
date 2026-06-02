@@ -52,6 +52,9 @@ export function ProjectsPage() {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
   const [deleting, setDeleting] = useState(false)
 
+  const [isCreating, setIsCreating] = useState(false)
+  const [isUpdating, setIsUpdating] = useState(false)
+
   const form = useForm<CreateProjectInput>({
     resolver: zodResolver(createProjectSchema),
     defaultValues: { name: "" },
@@ -73,7 +76,9 @@ export function ProjectsPage() {
   }, [editingProject, editForm])
 
   async function onSubmit(values: CreateProjectInput) {
+    if (isCreating) return
     try {
+      setIsCreating(true)
       await httpProjectsRepository.create(values)
       toast.success("Proyecto creado exitosamente")
       setIsDialogOpen(false)
@@ -81,12 +86,15 @@ export function ProjectsPage() {
       refetch()
     } catch {
       toast.error("Hubo un problema al crear el proyecto")
+    } finally {
+      setIsCreating(false)
     }
   }
 
   async function onEditSubmit(values: CreateProjectInput) {
-    if (!editingProject) return
+    if (isUpdating || !editingProject) return
     try {
+      setIsUpdating(true)
       await httpProjectsRepository.update(editingProject.id, values)
       toast.success("Proyecto actualizado exitosamente")
       setIsEditDialogOpen(false)
@@ -94,6 +102,8 @@ export function ProjectsPage() {
       refetch()
     } catch {
       toast.error("Hubo un problema al actualizar el proyecto")
+    } finally {
+      setIsUpdating(false)
     }
   }
 
@@ -259,7 +269,9 @@ export function ProjectsPage() {
                   >
                     Cancelar
                   </Button>
-                  <Button type="submit">Guardar</Button>
+                  <Button type="submit" disabled={isCreating}>
+                    {isCreating ? "Guardando..." : "Guardar"}
+                  </Button>
                 </div>
               </form>
             </Form>
@@ -311,7 +323,9 @@ export function ProjectsPage() {
                 >
                   Cancelar
                 </Button>
-                <Button type="submit">Guardar Cambios</Button>
+                <Button type="submit" disabled={isUpdating}>
+                  {isUpdating ? "Guardando..." : "Guardar Cambios"}
+                </Button>
               </div>
             </form>
           </Form>
