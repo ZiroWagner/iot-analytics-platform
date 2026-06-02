@@ -38,11 +38,11 @@ describe('TelemetryStore', () => {
 
   it('should apply a batch of events and update device state', () => {
     const events: TelemetryEvent[] = [
-      { type: 'device_data', deviceId: 'd1', projectId: 'p1', timestamp: 't1', sensors: [{ sensorId: 's1', payload: 10 }] }
+      { type: 'device_data', deviceId: 'd1', projectId: 'p1', timestamp: 't1', sensors: [{ sensorId: 's1', payload: { value: 10 } }] }
     ]
     useTelemetryStore.getState().applyBatch(events)
 
-    expect(useTelemetryStore.getState().devices['d1'].sensors?.['s1']).toBe(10)
+    expect(useTelemetryStore.getState().devices['d1'].sensors?.['s1']).toEqual({ value: 10 })
   })
 
   it('should mark a device offline', () => {
