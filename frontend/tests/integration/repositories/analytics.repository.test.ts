@@ -57,7 +57,7 @@ describe('httpAnalyticsRepository', () => {
       '/dashboards/project/project-1',
       expect.objectContaining({
         method: 'POST',
-        body: JSON.stringify({ layout_config: layoutConfig }),
+        body: JSON.stringify({ layoutConfig }),
       }),
     )
   })

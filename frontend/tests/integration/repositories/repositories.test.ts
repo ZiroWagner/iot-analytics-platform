@@ -146,7 +146,7 @@ describe('HTTP repositories', () => {
       API_ENDPOINTS.DASHBOARDS.SAVE(projectId),
       expect.objectContaining({
         method: 'POST',
-        body: JSON.stringify({ layout_config: layoutConfig }),
+        body: JSON.stringify({ layoutConfig }),
       }),
     )
 

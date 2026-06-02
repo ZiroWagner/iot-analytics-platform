@@ -16,6 +16,14 @@ import {
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -314,34 +322,77 @@ export function ProjectDetailPage() {
             )}
           </TableCell>
           <TableCell className="text-right">
-            <div className="flex items-center justify-end gap-1">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 text-muted-foreground hover:text-foreground"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  setEditingDevice(device)
-                  setIsEditDeviceDialogOpen(true)
-                }}
-                title="Editar Gateway"
-              >
-                <Pencil className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  setDeletingDevice(device)
-                  setIsDeleteDeviceOpen(true)
-                }}
-                title="Eliminar Gateway"
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 text-xs"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <Radio className="h-4 w-4 mr-1" />
+                  Sensores ({device.sensors.length})
+                  <ChevronDown className="h-3 w-3 ml-1" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel>Acciones del Gateway</DropdownMenuLabel>
+                <DropdownMenuItem
+                  onClick={() => {
+                    setEditingDevice(device)
+                    setIsEditDeviceDialogOpen(true)
+                  }}
+                >
+                  <Pencil className="h-4 w-4 mr-2" />
+                  Editar Gateway
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="text-destructive"
+                  onClick={() => {
+                    setDeletingDevice(device)
+                    setIsDeleteDeviceOpen(true)
+                  }}
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Eliminar Gateway
+                </DropdownMenuItem>
+                {device.sensors.length > 0 && <DropdownMenuSeparator />}
+                {device.sensors.map((sensor) => (
+                  <React.Fragment key={sensor.id}>
+                    <DropdownMenuItem
+                      onClick={() => {
+                        setEditingSensor(sensor)
+                        setIsEditSensorDialogOpen(true)
+                      }}
+                    >
+                      <Pencil className="h-3.5 w-3.5 mr-2" />
+                      Editar {sensor.name}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      className="text-destructive"
+                      onClick={() => {
+                        setDeletingSensor(sensor)
+                        setIsDeleteSensorOpen(true)
+                      }}
+                    >
+                      <Trash2 className="h-3.5 w-3.5 mr-2" />
+                      Eliminar {sensor.name}
+                    </DropdownMenuItem>
+                  </React.Fragment>
+                ))}
+                {device.sensors.length > 0 && <DropdownMenuSeparator />}
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setActiveDeviceIdForSensor(device.id)
+                  }}
+                  className="text-primary font-medium"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Agregar nuevo sensor
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             <Dialog
               open={activeDeviceIdForSensor === device.id}
               onOpenChange={(open) => !open && setActiveDeviceIdForSensor(null)}

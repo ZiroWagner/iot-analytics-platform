@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -42,12 +42,14 @@ type PasswordInput = z.infer<typeof passwordSchema>
 
 export default function SettingsPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [loading, setLoading] = useState(true)
   const [savingProfile, setSavingProfile] = useState(false)
   const [savingPassword, setSavingPassword] = useState(false)
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "profile")
 
   const profileForm = useForm<ProfileInput>({
     resolver: zodResolver(profileSchema),
@@ -148,7 +150,7 @@ export default function SettingsPage() {
         </p>
       </div>
 
-      <Tabs defaultValue="profile" className="w-full max-w-4xl">
+      <Tabs value={activeTab} onValueChange={setActiveTab} defaultValue="profile" className="w-full max-w-4xl">
         <TabsList className="bg-surface-container-low border border-border w-full justify-start h-auto p-1 overflow-x-auto">
           <TabsTrigger value="profile" className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary py-2 px-4">
             <User className="h-4 w-4 mr-2" />

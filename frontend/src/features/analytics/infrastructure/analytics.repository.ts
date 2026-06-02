@@ -46,7 +46,7 @@ export const httpAnalyticsRepository: AnalyticsRepository = {
   saveDashboardConfig: (projectId, layoutConfig) =>
     apiClient<void>(API_ENDPOINTS.DASHBOARDS.SAVE(projectId), {
       method: 'POST',
-      body: JSON.stringify({ layout_config: layoutConfig }),
+      body: JSON.stringify({ layoutConfig }),
     }),
 
   multiTimeseries: (projectId, params) =>
