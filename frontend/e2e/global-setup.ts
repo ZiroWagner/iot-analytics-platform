@@ -9,7 +9,7 @@ export const TEST_USER = {
 export const getApiBaseUrl = () =>
   process.env.CI
     ? 'http://backend:3000'
-    : process.env.API_URL || 'http://localhost:3001'
+    : process.env.API_URL || 'http://localhost:3000'
 
 export const getApiUrl = () => `${getApiBaseUrl()}/api/v1`
 
