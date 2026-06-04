@@ -186,7 +186,7 @@ pipeline {
                         -e CI=true \\
                         -e API_URL=http://backend:3000 \\
                         mcr.microsoft.com/playwright:v1.60.0 \\
-                        sh -c "npm ci && npx playwright test --config=e2e/playwright.config.ts --reporter=list"
+                        sh -c 'npm --version && ls -la package-lock.json && npm ci && npx playwright test --config=e2e/playwright.config.ts --reporter=list'
                 '''
             }
         }
