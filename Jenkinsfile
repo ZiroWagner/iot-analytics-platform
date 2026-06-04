@@ -178,16 +178,21 @@ pipeline {
 
         stage('Smoke E2E Tests') {
             steps {
-                sh '''
-                    docker run --rm \\
-                        --network iot-net \\
-                        -v "${WORKSPACE}/frontend:/app" \\
-                        -w /app \\
-                        -e CI=true \\
-                        -e API_URL=http://backend:3000 \\
-                        mcr.microsoft.com/playwright:v1.60.0 \\
-                        sh -c 'npm --version && ls -la package-lock.json; npm install && npx playwright test --config=e2e/playwright.config.ts --reporter=list'
-                '''
+                dir('frontend') {
+                    sh '''
+                        docker rm -f e2e-runner 2>/dev/null || true
+                        docker create --name e2e-runner \\
+                            --network iot-net \\
+                            -w /app \\
+                            -e CI=true \\
+                            -e API_URL=http://backend:3000 \\
+                            mcr.microsoft.com/playwright:v1.60.0 \\
+                            sh -c 'npm install && npx playwright test --config=e2e/playwright.config.ts --reporter=list'
+                        docker cp . e2e-runner:/app
+                        trap 'docker rm -f e2e-runner' EXIT
+                        docker start -a e2e-runner
+                    '''
+                }
             }
         }
     }
