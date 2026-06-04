@@ -20,7 +20,7 @@ test.describe('Login', () => {
     await loginPage.fillPassword('wrongpassword')
     await submitLogin(page)
 
-    const alert = page.getByRole('alert')
+    const alert = page.getByRole('alert').first()
     await expect(alert).toBeVisible({ timeout: 10000 })
   })
 
