@@ -163,6 +163,7 @@ pipeline {
                     sh '''
                         docker compose -f deploy/docker-compose.stg.yml up -d --force-recreate
                     '''
+                    script { env.DEPLOY_STARTED = "true" }
                 }
             }
         }
@@ -184,7 +185,7 @@ pipeline {
                         -w /app \\
                         -e CI=true \\
                         -e API_URL=http://backend:3000 \\
-                        mcr.microsoft.com/playwright:v1.60.0-focal \\
+                        mcr.microsoft.com/playwright:v1.60.0 \\
                         sh -c "npm ci && npx playwright test --config=e2e/playwright.config.ts --reporter=list"
                 '''
             }
