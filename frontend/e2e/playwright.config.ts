@@ -2,6 +2,7 @@ import { defineConfig } from '@playwright/test'
 
 export default defineConfig({
   testDir: './specs',
+  outputDir: './test-results',
   timeout: 15000,
   expect: { timeout: 8000 },
   fullyParallel: false,
@@ -29,5 +30,5 @@ export default defineConfig({
 
   reporter: process.env.CI
     ? [['github'], ['list']]
-    : [['html', { open: 'never' }]],
+    : [['html', { outputFolder: './playwright-report', open: 'never' }]],
 })
