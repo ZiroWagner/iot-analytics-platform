@@ -13,7 +13,7 @@ export default defineConfig({
   use: {
     baseURL: process.env.CI
       ? 'http://frontend:3000'
-      : process.env.BASE_URL || 'http://localhost:3002',
+      : process.env.BASE_URL || 'http://localhost:3000',
     headless: true,
     screenshot: 'only-on-failure',
     trace: 'off',
