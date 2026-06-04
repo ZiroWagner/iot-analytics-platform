@@ -21,7 +21,7 @@ services:
       - REDIS_HOST=${REDIS_HOST:?REDIS_HOST es requerido}
       - REDIS_PORT=${REDIS_PORT:?REDIS_PORT es requerido}
     ports:
-      - "3000:3000"
+      - "3001:3000"
     networks:
       - iot-net
     depends_on:

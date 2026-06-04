@@ -171,8 +171,8 @@ pipeline {
         stage('Health Checks') {
             steps {
                 sleep time: 15, unit: 'SECONDS'
-                sh "curl -f http://host.docker.internal:3000/api/v1/health"
-                sh "curl -f http://host.docker.internal:3002/api/health"
+                sh "curl -f http://host.docker.internal:3001/api/v1/health"
+                sh "curl -f http://host.docker.internal:3000/api/health"
             }
         }
 
@@ -185,7 +185,7 @@ pipeline {
                             --network iot-net \\
                             -w /app \\
                             -e CI=true \\
-                            -e API_URL=http://backend:3000 \\
+                            -e API_URL=http://backend:3001 \\
                             mcr.microsoft.com/playwright:v1.60.0 \\
                             sh -c 'npm install && npx playwright test --config=e2e/playwright.config.ts --reporter=list'
                         docker cp . e2e-runner:/app
