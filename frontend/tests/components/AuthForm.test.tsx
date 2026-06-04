@@ -8,12 +8,12 @@ const mockLoginUseCase = vi.fn()
 const mockRegisterUseCase = vi.fn()
 
 const mockLoginSchema = z.object({
-  email: z.string().email(),
+  email: z.email(),
   password: z.string().min(1),
 })
 
 const mockRegisterSchema = z.object({
-  email: z.string().email(),
+  email: z.email(),
   password: z.string().min(1),
   name: z.string().min(1),
 })
@@ -47,7 +47,6 @@ describe('AuthForm', () => {
   it('renders login form by default', async () => {
     const { AuthForm } = await import('@/components/auth/AuthForm')
     render(<AuthForm />)
-
     expect(screen.getByText('Inicia sesión para acceder a tu panel')).toBeInTheDocument()
     expect(screen.getByLabelText('Formulario de inicio de sesión')).toBeInTheDocument()
     expect(screen.getByText('Iniciar sesión')).toBeInTheDocument()
@@ -56,7 +55,6 @@ describe('AuthForm', () => {
   it('renders email and password fields in login mode', async () => {
     const { AuthForm } = await import('@/components/auth/AuthForm')
     render(<AuthForm />)
-
     expect(screen.getByText('Correo electrónico')).toBeInTheDocument()
     expect(screen.getByText('Contraseña')).toBeInTheDocument()
     expect(screen.getByPlaceholderText('m@ejemplo.com')).toBeInTheDocument()
@@ -75,7 +73,6 @@ describe('AuthForm', () => {
       expect(screen.getByLabelText('Formulario de registro')).toBeInTheDocument()
       expect(screen.getByText('Crear cuenta')).toBeInTheDocument()
     })
-
     expect(screen.getByText('Nombre')).toBeInTheDocument()
     expect(screen.getByPlaceholderText('Tu nombre')).toBeInTheDocument()
   })
@@ -88,7 +85,6 @@ describe('AuthForm', () => {
 
     await user.type(screen.getByPlaceholderText('m@ejemplo.com'), 'test@example.com')
     await user.type(screen.getByPlaceholderText('••••••••'), 'password123')
-
     await user.click(screen.getByText('Iniciar sesión'))
 
     await waitFor(() => {
@@ -97,7 +93,6 @@ describe('AuthForm', () => {
         password: 'password123',
       })
     })
-
     expect(mockRouterPush).toHaveBeenCalledWith('/dashboard')
   })
 
@@ -108,15 +103,11 @@ describe('AuthForm', () => {
     render(<AuthForm />)
 
     await user.click(screen.getByText('¿No tienes cuenta? Regístrate'))
-
-    await waitFor(() => {
-      expect(screen.getByText('Crear cuenta')).toBeInTheDocument()
-    })
+    await waitFor(() => expect(screen.getByText('Crear cuenta')).toBeInTheDocument())
 
     await user.type(screen.getByPlaceholderText('Tu nombre'), 'Test User')
     await user.type(screen.getByPlaceholderText('m@ejemplo.com'), 'test@example.com')
     await user.type(screen.getByPlaceholderText('••••••••'), 'password123')
-
     await user.click(screen.getByText('Crear cuenta'))
 
     await waitFor(() => {
@@ -126,7 +117,6 @@ describe('AuthForm', () => {
         name: 'Test User',
       })
     })
-
     expect(mockRouterPush).toHaveBeenCalledWith('/dashboard')
   })
 
@@ -138,7 +128,6 @@ describe('AuthForm', () => {
 
     await user.type(screen.getByPlaceholderText('m@ejemplo.com'), 'test@example.com')
     await user.type(screen.getByPlaceholderText('••••••••'), 'password123')
-
     await user.click(screen.getByText('Iniciar sesión'))
 
     await waitFor(() => {
@@ -149,11 +138,9 @@ describe('AuthForm', () => {
   it('renders OAuth buttons for Google and GitHub', async () => {
     const { AuthForm } = await import('@/components/auth/AuthForm')
     render(<AuthForm />)
-
     const socialLinks = screen.getAllByRole('link')
     const googleLink = socialLinks.find(l => l.getAttribute('href')?.includes('google'))
     const githubLink = socialLinks.find(l => l.getAttribute('href')?.includes('github'))
-
     expect(googleLink).toBeInTheDocument()
     expect(githubLink).toBeInTheDocument()
     expect(googleLink).toHaveAttribute('href', 'http://localhost:3000/api/auth/google')

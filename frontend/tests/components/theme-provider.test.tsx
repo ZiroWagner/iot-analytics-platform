@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
+import { ThemeProvider } from '@/components/theme-provider'
 
 vi.mock('next-themes', () => ({
   ThemeProvider: ({ children }: { children: React.ReactNode }) => (
@@ -8,8 +9,7 @@ vi.mock('next-themes', () => ({
 }))
 
 describe('ThemeProvider', () => {
-  it('renders children inside the theme provider', async () => {
-    const { ThemeProvider } = await import('@/components/theme-provider')
+  it('renders children inside the theme provider', () => {
     render(
       <ThemeProvider>
         <div data-testid="child">Hello</div>
@@ -19,8 +19,7 @@ describe('ThemeProvider', () => {
     expect(screen.getByTestId('child')).toHaveTextContent('Hello')
   })
 
-  it('forwards additional props to NextThemesProvider', async () => {
-    const { ThemeProvider } = await import('@/components/theme-provider')
+  it('forwards additional props to NextThemesProvider', () => {
     render(
       <ThemeProvider attribute="class" defaultTheme="dark">
         <span>content</span>
