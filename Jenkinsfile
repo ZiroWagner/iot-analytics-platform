@@ -127,7 +127,7 @@ pipeline {
                 stage('Build Frontend') {
                     steps {
                         dir('frontend') {
-                            sh "docker build --build-arg NEXT_PUBLIC_API_URL=http://backend:3000 -t ${FRONTEND_IMAGE} -t iot-frontend:latest ."
+                            sh "docker build --build-arg NEXT_PUBLIC_API_URL=http://backend:3000 --build-arg NEXT_PUBLIC_WS_URL=http://localhost:3001 -t ${FRONTEND_IMAGE} -t iot-frontend:latest ."
                         }
                     }
                 }
