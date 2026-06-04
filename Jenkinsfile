@@ -185,7 +185,7 @@ pipeline {
                             --network iot-net \\
                             -w /app \\
                             -e CI=true \\
-                            -e API_URL=http://backend:3001 \\
+                            -e API_URL=http://backend:3000 \\
                             mcr.microsoft.com/playwright:v1.60.0 \\
                             sh -c 'npm install && npx playwright test --config=e2e/playwright.config.ts --reporter=list'
                         docker cp . e2e-runner:/app
