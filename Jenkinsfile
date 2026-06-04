@@ -174,6 +174,21 @@ pipeline {
                 sh "curl -f http://host.docker.internal:3002/api/health"
             }
         }
+
+        stage('Smoke E2E Tests') {
+            steps {
+                sh '''
+                    docker run --rm \\
+                        --network iot-net \\
+                        -v "${WORKSPACE}/frontend:/app" \\
+                        -w /app \\
+                        -e CI=true \\
+                        -e API_URL=http://backend:3000 \\
+                        mcr.microsoft.com/playwright:v1.60.0-focal \\
+                        sh -c "npm ci && npx playwright test --config=e2e/playwright.config.ts --reporter=list"
+                '''
+            }
+        }
     }
 
     post {
