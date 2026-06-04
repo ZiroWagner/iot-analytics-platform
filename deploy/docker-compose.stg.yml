@@ -41,7 +41,7 @@ services:
     environment:
       - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:?NEXT_PUBLIC_API_URL es requerido}
     ports:
-      - "3002:3000"
+      - "3000:3000"
     networks:
       - iot-net
     depends_on:
