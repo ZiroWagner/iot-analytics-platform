@@ -1,4 +1,4 @@
-const http = require('http');
+import http from "node:http";
 
 // CONFIGURACIÓN (REEMPLAZA ESTA API KEY POR LA GENERADA EN EL DASHBOARD)
 const API_KEY = "iot_b476334fcfbf2b22cb3b6061b17295cc";
@@ -21,8 +21,8 @@ function sendPayload() {
       {
         sensor_id: "temp_01",
         payload: {
-          temperature: parseFloat(getRandomArbitrary(20, 30).toFixed(2)),
-          humidity: parseFloat(getRandomArbitrary(40, 60).toFixed(2))
+          temperature: Number.parseFloat(getRandomArbitrary(20, 30).toFixed(2)),
+          humidity: Number.parseFloat(getRandomArbitrary(40, 60).toFixed(2))
         }
       },
       {

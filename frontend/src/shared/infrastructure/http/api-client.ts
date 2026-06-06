@@ -33,12 +33,12 @@ export async function apiClient<T>(
 ): Promise<T> {
   const token = tokenStorage.get()
   const headers: HeadersInit = {
-    ...(options.headers || {}),
+    ...(options.headers),
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
   }
 
   if (options.body && typeof options.body === 'string') {
-    ;(headers as Record<string, string>)['Content-Type'] = 'application/json'
+    ; (headers as Record<string, string>)['Content-Type'] = 'application/json'
   }
 
   const res = await fetch(`${API_URL}${path}`, {

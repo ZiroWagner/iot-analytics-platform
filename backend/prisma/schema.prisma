@@ -75,7 +75,7 @@ model Sensor {
 model DataPoint {
   id        String   @id @default(cuid())
   sensorId  String
-  timestamp DateTime @default(now())
+  timestamp DateTime
   payload   Json
   sensor    Sensor   @relation(fields: [sensorId], references: [id], onDelete: Cascade)
 
