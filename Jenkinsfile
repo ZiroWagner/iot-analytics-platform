@@ -195,9 +195,31 @@ pipeline {
                 }
             }
         }
+
+        stage('Security Scan (ZAP)') {
+            steps {
+                sh 'mkdir -p reports'
+                echo "Ejecutando escaneo de seguridad OWASP ZAP en Frontend..."
+                sh 'zap -cmd -quickurl http://host.docker.internal:3000 -quickout reports/zap-frontend-report.html || true'
+                echo "Ejecutando escaneo de seguridad OWASP ZAP en Backend..."
+                sh 'zap -cmd -quickurl http://host.docker.internal:3001 -quickout reports/zap-backend-report.html || true'
+            }
+        }
+
+        stage('Performance Scan (k6)') {
+            steps {
+                sh 'mkdir -p reports'
+                echo "Ejecutando pruebas de rendimiento con K6..."
+                sh 'k6 run -e TARGET_URL=http://host.docker.internal:3001 tests/performance/load-test.js'
+            }
+        }
     }
 
     post {
+        always {
+            echo "Archivando reportes de pruebas..."
+            archiveArtifacts artifacts: 'reports/**/*.html', allowEmptyArchive: true
+        }
         success {
             echo "✅ Pipeline completado exitosamente."
         }
@@ -214,3 +236,4 @@ pipeline {
         }
     }
 }
+

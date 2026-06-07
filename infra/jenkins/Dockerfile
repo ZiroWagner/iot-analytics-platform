@@ -33,6 +33,20 @@ RUN npm install -g pnpm yarn
 # Permisos Docker
 RUN groupadd -f docker && usermod -aG docker jenkins
 
+# Instalar k6
+RUN curl -fsSL -o /tmp/k6.tar.gz https://github.com/grafana/k6/releases/download/v0.51.0/k6-v0.51.0-linux-amd64.tar.gz && \
+    tar -xzf /tmp/k6.tar.gz -C /tmp && \
+    mv /tmp/k6-v0.51.0-linux-amd64/k6 /usr/local/bin/k6 && \
+    rm -rf /tmp/k6.tar.gz /tmp/k6-v0.51.0-linux-amd64
+
+# Instalar OWASP ZAP
+RUN curl -fsSL -o /tmp/zap.tar.gz https://github.com/zaproxy/zap-archive/releases/download/zap-v2.15.0/ZAP_2.15.0_Linux.tar.gz && \
+    tar -xzf /tmp/zap.tar.gz -C /opt && \
+    mv /opt/ZAP_2.15.0 /opt/zap && \
+    ln -s /opt/zap/zap.sh /usr/local/bin/zap && \
+    chown -R jenkins:jenkins /opt/zap && \
+    rm /tmp/zap.tar.gz
+
 USER jenkins
 
 # Plugins Jenkins
