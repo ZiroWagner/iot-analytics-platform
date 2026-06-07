@@ -1,0 +1,12 @@
+{
+  "name": "iot-analytics-platform",
+  "version": "1.0.0",
+  "private": true,
+  "description": "IoT Analytics Platform Monorepo Root",
+  "scripts": {
+    "test:perf": "node scripts/dev-test.js perf",
+    "test:perf:docker": "node scripts/dev-test.js perf --docker",
+    "test:security": "node scripts/dev-test.js security",
+    "test:all": "node scripts/dev-test.js all --docker"
+  }
+}

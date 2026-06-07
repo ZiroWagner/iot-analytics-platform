@@ -200,9 +200,9 @@ pipeline {
             steps {
                 sh 'mkdir -p reports'
                 echo "Ejecutando escaneo de seguridad OWASP ZAP en Frontend..."
-                sh 'zap -cmd -quickurl http://host.docker.internal:3000 -quickout reports/zap-frontend-report.html || true'
+                sh '/usr/local/bin/zap -cmd -quickurl http://host.docker.internal:3000 -quickout reports/zap-frontend-report.html || true'
                 echo "Ejecutando escaneo de seguridad OWASP ZAP en Backend..."
-                sh 'zap -cmd -quickurl http://host.docker.internal:3001 -quickout reports/zap-backend-report.html || true'
+                sh '/usr/local/bin/zap -cmd -quickurl http://host.docker.internal:3001 -quickout reports/zap-backend-report.html || true'
             }
         }
 
@@ -210,7 +210,7 @@ pipeline {
             steps {
                 sh 'mkdir -p reports'
                 echo "Ejecutando pruebas de rendimiento con K6..."
-                sh 'k6 run -e TARGET_URL=http://host.docker.internal:3001 tests/performance/load-test.js'
+                sh '/usr/local/bin/k6 run -e TARGET_URL=http://host.docker.internal:3001 tests/performance/load-test.js'
             }
         }
     }

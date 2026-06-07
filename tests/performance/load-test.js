@@ -14,10 +14,10 @@ export const options = {
   },
 };
 
-export default function () {
+export default function def() {
   // Por defecto apunta al puerto expuesto de backend de Staging (3001)
   const baseUrl = __ENV.TARGET_URL || 'http://host.docker.internal:3001';
-  
+
   // 1. Consultar endpoint de salud pública
   let resHealth = http.get(`${baseUrl}/api/v1/health`);
   check(resHealth, {
