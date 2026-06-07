@@ -37,11 +37,10 @@ export default function def() {
   // 3. Simular intento fallido de ingesta de datos (API Key inválida)
   const payload = JSON.stringify({
     device: {
-      id: 'test-device-k6',
       api_key: 'invalid-key-for-testing'
     },
-    metrics: [
-      { name: 'temperature', value: 24.5, timestamp: new Date().toISOString() }
+    sensors: [
+      { sensor_id: 'temp-01', payload: { name: 'temperature', value: 24.5 } }
     ]
   });
 

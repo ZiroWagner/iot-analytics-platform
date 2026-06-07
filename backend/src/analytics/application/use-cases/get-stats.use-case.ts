@@ -8,7 +8,7 @@ export class GetStatsUseCase {
   constructor(
     @Inject(ANALYTICS_REPOSITORY_TOKEN)
     private readonly analyticsRepository: AnalyticsRepositoryInterface,
-  ) { }
+  ) {}
 
   async execute(
     userId: string,

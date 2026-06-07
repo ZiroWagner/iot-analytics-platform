@@ -26,4 +26,4 @@ import { PrismaDashboardRepository } from '@/dashboards/infrastructure/repositor
     SaveDashboardConfigUseCase,
   ],
 })
-export class DashboardsModule { }
+export class DashboardsModule {}

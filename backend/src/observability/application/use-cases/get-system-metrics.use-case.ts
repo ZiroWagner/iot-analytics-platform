@@ -9,7 +9,7 @@ export class GetSystemMetricsUseCase {
   constructor(
     @Inject(OBSERVABILITY_REPOSITORY_TOKEN)
     private readonly observabilityRepository: ObservabilityRepositoryInterface,
-  ) { }
+  ) {}
 
   async execute(userId?: string): Promise<SystemMetrics | null> {
     try {

@@ -30,4 +30,4 @@ import { StreamIngestProcessor } from '@/ingest/infrastructure/processors/stream
     StreamIngestProcessor,
   ],
 })
-export class IngestModule { }
+export class IngestModule {}

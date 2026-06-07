@@ -5,7 +5,7 @@ import { Project } from '@/projects/domain/entities/project.entity';
 
 @Injectable()
 export class PrismaProjectRepository implements ProjectRepositoryInterface {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   async create(data: {
     name: string;

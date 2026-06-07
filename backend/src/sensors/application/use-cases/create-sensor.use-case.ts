@@ -8,7 +8,7 @@ export class CreateSensorUseCase {
   constructor(
     @Inject(SENSOR_REPOSITORY_TOKEN)
     private readonly sensorRepository: SensorRepositoryInterface,
-  ) { }
+  ) {}
 
   async execute(
     userId: string,

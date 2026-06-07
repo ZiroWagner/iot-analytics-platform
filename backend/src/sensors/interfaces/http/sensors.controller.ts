@@ -46,7 +46,7 @@ export class SensorsController {
     private readonly updateSensorUseCase: UpdateSensorUseCase,
     private readonly deleteSensorUseCase: DeleteSensorUseCase,
     private readonly getSensorDataPointsUseCase: GetSensorDataPointsUseCase,
-  ) { }
+  ) {}
 
   @ApiOperation({ summary: 'Create a new sensor' })
   @ApiResponse({ status: 201, description: 'Sensor created successfully' })

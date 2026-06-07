@@ -29,7 +29,7 @@ export class AnalyticsController {
     private readonly getTimeseriesUseCase: GetTimeseriesUseCase,
     private readonly getMultiTimeseriesUseCase: GetMultiTimeseriesUseCase,
     private readonly getStatsUseCase: GetStatsUseCase,
-  ) { }
+  ) {}
 
   @ApiOperation({ summary: 'Get available metrics for a project' })
   @ApiResponse({ status: 200, description: 'List of available metrics' })

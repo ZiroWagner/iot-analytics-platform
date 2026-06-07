@@ -26,7 +26,8 @@ const FLUSH_INTERVAL_MS = 500;
 })
 @Injectable()
 export class TelemetryGateway
-  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
+{
   @WebSocketServer()
   server: Server;
 
@@ -37,7 +38,7 @@ export class TelemetryGateway
   constructor(
     @Inject(TELEMETRY_ADAPTER_TOKEN)
     private readonly telemetryAdapter: TelemetryAdapterInterface,
-  ) { }
+  ) {}
 
   afterInit() {
     this.logger.log('TelemetryGateway initialized');

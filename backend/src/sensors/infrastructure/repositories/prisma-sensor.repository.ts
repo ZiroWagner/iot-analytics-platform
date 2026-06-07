@@ -9,7 +9,7 @@ import { Sensor } from '@/sensors/domain/entities/sensor.entity';
 
 @Injectable()
 export class PrismaSensorRepository implements SensorRepositoryInterface {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   async create(data: {
     name: string;

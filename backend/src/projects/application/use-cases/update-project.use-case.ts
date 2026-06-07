@@ -13,7 +13,7 @@ export class UpdateProjectUseCase {
   constructor(
     @Inject(PROJECT_REPOSITORY_TOKEN)
     private readonly projectRepository: ProjectRepositoryInterface,
-  ) { }
+  ) {}
 
   async execute(
     userId: string,

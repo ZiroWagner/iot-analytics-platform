@@ -23,4 +23,4 @@ import {
   ],
   exports: [TelemetryGateway],
 })
-export class TelemetryModule { }
+export class TelemetryModule {}

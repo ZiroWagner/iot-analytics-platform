@@ -10,7 +10,7 @@ import * as crypto from 'crypto';
 
 @Injectable()
 export class PrismaDeviceRepository implements DeviceRepositoryInterface {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   async create(data: {
     name: string;

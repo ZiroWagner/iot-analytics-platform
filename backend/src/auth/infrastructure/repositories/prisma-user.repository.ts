@@ -8,7 +8,7 @@ const BCRYPT_SALT_ROUNDS = 10;
 
 @Injectable()
 export class PrismaUserRepository implements UserRepositoryInterface {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   async findByEmail(email: string): Promise<User | null> {
     const user = await this.prisma.user.findUnique({ where: { email } });
@@ -105,7 +105,10 @@ export class PrismaUserRepository implements UserRepositoryInterface {
       updateData.name = data.name;
     }
     if (data.password !== undefined) {
-      updateData.password = await bcrypt.hash(data.password, BCRYPT_SALT_ROUNDS);
+      updateData.password = await bcrypt.hash(
+        data.password,
+        BCRYPT_SALT_ROUNDS,
+      );
     }
     const user = await this.prisma.user.update({
       where: { id },

@@ -9,7 +9,7 @@ import { DashboardConfig } from '@/dashboards/domain/entities/dashboard-config.e
 
 @Injectable()
 export class PrismaDashboardRepository implements DashboardRepositoryInterface {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   async getConfig(
     projectId: string,

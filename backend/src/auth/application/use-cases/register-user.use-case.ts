@@ -8,7 +8,7 @@ export class RegisterUserUseCase {
   constructor(
     @Inject(USER_REPOSITORY_TOKEN)
     private readonly userRepository: UserRepositoryInterface,
-  ) { }
+  ) {}
 
   async execute(data: {
     email: string;

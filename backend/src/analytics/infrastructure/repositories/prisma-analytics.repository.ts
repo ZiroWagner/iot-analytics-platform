@@ -14,7 +14,7 @@ import {
 
 @Injectable()
 export class PrismaAnalyticsRepository implements AnalyticsRepositoryInterface {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   async getAvailableMetrics(
     userId: string,

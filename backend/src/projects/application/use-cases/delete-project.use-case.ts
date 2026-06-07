@@ -12,7 +12,7 @@ export class DeleteProjectUseCase {
   constructor(
     @Inject(PROJECT_REPOSITORY_TOKEN)
     private readonly projectRepository: ProjectRepositoryInterface,
-  ) { }
+  ) {}
 
   async execute(userId: string, projectId: string): Promise<void> {
     const project = await this.projectRepository.findById(projectId);

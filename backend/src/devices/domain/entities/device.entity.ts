@@ -26,7 +26,7 @@ export class Device {
     public readonly updatedAt: Date,
     public lastSeenAt: Date | null,
     public readonly sensors?: any[],
-  ) { }
+  ) {}
 
   static create(props: {
     id: string;

@@ -16,38 +16,43 @@ describe('DataPointInsert Entity', () => {
     });
 
     it('creates a data point insert with numeric values', () => {
-      const dataPoint = DataPointInsert.create(
-        testData.uuid(),
-        new Date(),
-        { value: 42 },
-      );
+      const dataPoint = DataPointInsert.create(testData.uuid(), new Date(), {
+        value: 42,
+      });
       expect(dataPoint.payload).toEqual({ value: 42 });
     });
 
     it('creates a data point insert with string values', () => {
-      const dataPoint = DataPointInsert.create(
-        testData.uuid(),
-        new Date(),
-        { status: 'online', message: 'all good' },
-      );
-      expect(dataPoint.payload).toEqual({ status: 'online', message: 'all good' });
+      const dataPoint = DataPointInsert.create(testData.uuid(), new Date(), {
+        status: 'online',
+        message: 'all good',
+      });
+      expect(dataPoint.payload).toEqual({
+        status: 'online',
+        message: 'all good',
+      });
     });
 
     it('creates a data point insert with array payload', () => {
-      const dataPoint = DataPointInsert.create(
-        testData.uuid(),
-        new Date(),
-        { values: [1, 2, 3, 4, 5] },
-      );
+      const dataPoint = DataPointInsert.create(testData.uuid(), new Date(), {
+        values: [1, 2, 3, 4, 5],
+      });
       expect(dataPoint.payload).toEqual({ values: [1, 2, 3, 4, 5] });
     });
 
     it('creates a data point insert with nested object payload', () => {
       const payload = {
         location: { lat: 19.43, lng: -99.13, alt: 2250 },
-        readings: [{ sensor: 'a', value: 10 }, { sensor: 'b', value: 20 }],
+        readings: [
+          { sensor: 'a', value: 10 },
+          { sensor: 'b', value: 20 },
+        ],
       };
-      const dataPoint = DataPointInsert.create(testData.uuid(), new Date(), payload);
+      const dataPoint = DataPointInsert.create(
+        testData.uuid(),
+        new Date(),
+        payload,
+      );
       expect(dataPoint.payload).toEqual(payload);
     });
   });

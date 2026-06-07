@@ -9,7 +9,7 @@ export class ValidateUserUseCase {
   constructor(
     @Inject(USER_REPOSITORY_TOKEN)
     private readonly userRepository: UserRepositoryInterface,
-  ) { }
+  ) {}
 
   async execute(email: string, password: string): Promise<User> {
     const user = await this.userRepository.findByEmail(email);

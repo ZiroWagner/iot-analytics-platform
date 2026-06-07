@@ -33,4 +33,4 @@ import { OfflineDevicesScheduler } from '@/observability/infrastructure/schedule
   ],
   exports: [GetSystemMetricsUseCase],
 })
-export class ObservabilityModule { }
+export class ObservabilityModule {}

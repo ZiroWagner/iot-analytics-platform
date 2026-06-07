@@ -1,4 +1,9 @@
-import { Inject, Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { USER_REPOSITORY_TOKEN } from '@/auth/domain/repositories/user.repository.interface';
 import type { UserRepositoryInterface } from '@/auth/domain/repositories/user.repository.interface';
 import { User } from '@/auth/domain/entities/user.entity';
@@ -9,7 +14,7 @@ export class UpdateProfileUseCase {
   constructor(
     @Inject(USER_REPOSITORY_TOKEN)
     private readonly userRepository: UserRepositoryInterface,
-  ) { }
+  ) {}
 
   async execute(
     userId: string,

@@ -35,4 +35,4 @@ import { PrismaSensorRepository } from './infrastructure/repositories/prisma-sen
   ],
   exports: [SENSOR_REPOSITORY_TOKEN],
 })
-export class SensorsModule { }
+export class SensorsModule {}

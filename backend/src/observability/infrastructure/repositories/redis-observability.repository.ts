@@ -16,7 +16,7 @@ export class RedisObservabilityRepository implements ObservabilityRepositoryInte
   constructor(
     private readonly redisService: RedisService,
     private readonly prisma: PrismaService,
-  ) { }
+  ) {}
 
   async getStreamLength(): Promise<number> {
     try {

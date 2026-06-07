@@ -43,7 +43,7 @@ export class ProjectsController {
     private readonly updateProjectUseCase: UpdateProjectUseCase,
     private readonly deleteProjectUseCase: DeleteProjectUseCase,
     private readonly getProjectOverviewUseCase: GetProjectOverviewUseCase,
-  ) { }
+  ) {}
 
   @ApiOperation({ summary: 'Create a new project' })
   @ApiResponse({ status: 201, description: 'Project created successfully' })

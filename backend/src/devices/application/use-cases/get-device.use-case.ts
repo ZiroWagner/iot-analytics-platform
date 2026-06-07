@@ -8,7 +8,7 @@ export class GetDeviceUseCase {
   constructor(
     @Inject(DEVICE_REPOSITORY_TOKEN)
     private readonly deviceRepository: DeviceRepositoryInterface,
-  ) { }
+  ) {}
 
   async execute(userId: string, deviceId: string): Promise<Device | null> {
     return this.deviceRepository.findById(deviceId, userId);

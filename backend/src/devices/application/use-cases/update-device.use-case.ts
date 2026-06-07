@@ -8,7 +8,7 @@ export class UpdateDeviceUseCase {
   constructor(
     @Inject(DEVICE_REPOSITORY_TOKEN)
     private readonly deviceRepository: DeviceRepositoryInterface,
-  ) { }
+  ) {}
 
   async execute(
     userId: string,

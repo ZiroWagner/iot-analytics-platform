@@ -6,7 +6,7 @@ import { CheckOfflineDevicesUseCase } from '@/observability/application/use-case
 export class OfflineDevicesScheduler {
   constructor(
     private readonly checkOfflineDevicesUseCase: CheckOfflineDevicesUseCase,
-  ) { }
+  ) {}
 
   @Cron('*/5 * * * * *')
   async handleCron(): Promise<void> {

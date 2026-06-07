@@ -42,7 +42,7 @@ export class DevicesController {
     private readonly getDeviceUseCase: GetDeviceUseCase,
     private readonly updateDeviceUseCase: UpdateDeviceUseCase,
     private readonly deleteDeviceUseCase: DeleteDeviceUseCase,
-  ) { }
+  ) {}
 
   @ApiOperation({ summary: 'Create a new device' })
   @ApiResponse({ status: 201, description: 'Device created successfully' })

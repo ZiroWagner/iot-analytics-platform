@@ -11,7 +11,7 @@ export class CheckOfflineDevicesUseCase {
   constructor(
     @Inject(OBSERVABILITY_REPOSITORY_TOKEN)
     private readonly observabilityRepository: ObservabilityRepositoryInterface,
-  ) { }
+  ) {}
 
   async execute(): Promise<void> {
     try {

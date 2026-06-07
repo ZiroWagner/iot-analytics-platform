@@ -7,13 +7,15 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { ProcessIngestUseCase } from '@/ingest/application/use-cases/process-ingest.use-case';
 import { IngestBodyDto } from './dto/ingest.dto';
 
 @ApiTags('Ingest')
+@Throttle({ short: { limit: 10, ttl: 1000 }, long: { limit: 60, ttl: 60000 } })
 @Controller('ingest')
 export class IngestController {
-  constructor(private readonly processIngestUseCase: ProcessIngestUseCase) { }
+  constructor(private readonly processIngestUseCase: ProcessIngestUseCase) {}
 
   @ApiOperation({ summary: 'Ingest IoT sensor data (device-triggered)' })
   @ApiResponse({ status: 202, description: 'Data accepted for processing' })

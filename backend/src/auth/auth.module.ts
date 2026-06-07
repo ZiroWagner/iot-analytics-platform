@@ -59,4 +59,4 @@ import { LocalStrategy } from '@/auth/infrastructure/strategies/local.strategy';
     LocalStrategy,
   ],
 })
-export class AuthModule { }
+export class AuthModule {}

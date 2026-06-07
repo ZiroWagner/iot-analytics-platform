@@ -8,7 +8,7 @@ export class GetAvailableMetricsUseCase {
   constructor(
     @Inject(ANALYTICS_REPOSITORY_TOKEN)
     private readonly analyticsRepository: AnalyticsRepositoryInterface,
-  ) { }
+  ) {}
 
   async execute(userId: string, projectId: string): Promise<SensorMetric[]> {
     return this.analyticsRepository.getAvailableMetrics(userId, projectId);

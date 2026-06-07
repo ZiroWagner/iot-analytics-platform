@@ -8,7 +8,7 @@ export class SaveDashboardConfigUseCase {
   constructor(
     @Inject(DASHBOARD_REPOSITORY_TOKEN)
     private readonly dashboardRepository: DashboardRepositoryInterface,
-  ) { }
+  ) {}
 
   async execute(
     userId: string,

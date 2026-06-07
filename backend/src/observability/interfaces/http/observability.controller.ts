@@ -20,7 +20,7 @@ interface JwtUser {
 export class ObservabilityController {
   constructor(
     private readonly getSystemMetricsUseCase: GetSystemMetricsUseCase,
-  ) { }
+  ) {}
 
   @ApiOperation({
     summary: 'Get system metrics scoped to the authenticated user',

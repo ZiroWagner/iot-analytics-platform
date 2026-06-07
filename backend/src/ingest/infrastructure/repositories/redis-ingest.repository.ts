@@ -15,7 +15,7 @@ export class RedisIngestRepository implements IngestRepositoryInterface {
   constructor(
     private readonly prisma: PrismaService,
     private readonly redisService: RedisService,
-  ) { }
+  ) {}
 
   async resolveDeviceId(apiKey: string): Promise<string> {
     const cacheKey = `device:apikey:${apiKey}`;

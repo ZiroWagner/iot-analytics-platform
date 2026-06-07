@@ -59,11 +59,25 @@ async function bootstrap() {
   app.useGlobalInterceptors(new ResponseInterceptor());
   app.useGlobalFilters(new HttpExceptionFilter());
 
+  // Request timeout (30s) para evitar conexiones colgadas
+  app.getHttpServer().requestTimeout = 30000;
+
   // CORS
   app.enableCors({
     origin: config.get('FRONTEND_URL') || 'http://localhost:3000',
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+  });
+
+  // Cabeceras de control de caché (anti-caché global para la API)
+  app.use((req, res, next) => {
+    res.setHeader(
+      'Cache-Control',
+      'no-store, no-cache, must-revalidate, proxy-revalidate',
+    );
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    next();
   });
 
   // Prefijo global

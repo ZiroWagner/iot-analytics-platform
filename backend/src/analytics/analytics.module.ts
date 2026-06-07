@@ -30,4 +30,4 @@ import { PrismaAnalyticsRepository } from './infrastructure/repositories/prisma-
     GetStatsUseCase,
   ],
 })
-export class AnalyticsModule { }
+export class AnalyticsModule {}

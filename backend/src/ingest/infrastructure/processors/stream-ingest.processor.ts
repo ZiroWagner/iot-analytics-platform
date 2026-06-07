@@ -25,7 +25,7 @@ export class StreamIngestProcessor implements OnModuleInit, OnModuleDestroy {
   constructor(
     private readonly prisma: PrismaService,
     private readonly redisService: RedisService,
-  ) { }
+  ) {}
 
   async onModuleInit() {
     this.isRunning = true;

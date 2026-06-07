@@ -23,7 +23,13 @@ import { UpdateProfileUseCase } from '@/auth/application/use-cases/update-profil
 import { DeleteUserUseCase } from '@/auth/application/use-cases/delete-user.use-case';
 import { USER_REPOSITORY_TOKEN } from '@/auth/domain/repositories/user.repository.interface';
 import type { UserRepositoryInterface } from '@/auth/domain/repositories/user.repository.interface';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBody,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import type { Request, Response } from 'express';
 import { ConfigService } from '@nestjs/config';
 
@@ -43,7 +49,7 @@ export class AuthController {
     private readonly deleteUserUseCase: DeleteUserUseCase,
     @Inject(USER_REPOSITORY_TOKEN)
     private readonly userRepository: UserRepositoryInterface,
-  ) { }
+  ) {}
 
   @ApiOperation({ summary: 'Registrar nuevo usuario' })
   @ApiResponse({ status: 201, description: 'Usuario creado exitosamente' })

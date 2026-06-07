@@ -13,6 +13,9 @@ export class PrismaService
     const connectionString = configService.get<string>('DATABASE_URL');
     const pool = new Pool({
       connectionString,
+      max: 20,
+      connectionTimeoutMillis: 10000,
+      idleTimeoutMillis: 30000,
       ssl: connectionString?.includes('localhost')
         ? false
         : { rejectUnauthorized: false },

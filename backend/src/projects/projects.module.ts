@@ -35,4 +35,4 @@ import { PrismaProjectRepository } from './infrastructure/repositories/prisma-pr
   ],
   exports: [PROJECT_REPOSITORY_TOKEN],
 })
-export class ProjectsModule { }
+export class ProjectsModule {}

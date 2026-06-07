@@ -8,7 +8,7 @@ export class GetSensorsByDeviceUseCase {
   constructor(
     @Inject(SENSOR_REPOSITORY_TOKEN)
     private readonly sensorRepository: SensorRepositoryInterface,
-  ) { }
+  ) {}
 
   async execute(userId: string, deviceId: string): Promise<Sensor[]> {
     return this.sensorRepository.findByDevice(deviceId, userId);

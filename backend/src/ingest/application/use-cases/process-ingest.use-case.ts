@@ -8,7 +8,7 @@ export class ProcessIngestUseCase {
   constructor(
     @Inject(INGEST_REPOSITORY_TOKEN)
     private readonly ingestRepository: IngestRepositoryInterface,
-  ) { }
+  ) {}
 
   async execute(payload: {
     device: { api_key: string; mac_address?: string; type?: string };
