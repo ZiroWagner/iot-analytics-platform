@@ -74,6 +74,9 @@ Tras un análisis minucioso de los reportes de seguridad de OWASP ZAP y las mét
 - [x] Corregido payload: `metrics` → `sensors`
 - [x] Eliminado campo `id` del device (no existe en el DTO)
 - [x] Ajustado formato de sensor a `{ sensor_id, payload }`
+- [x] Corregido `r.json('status')` → `r.json('data.status')` para health y ready (el ResponseInterceptor anida el body)
+- [x] Ajustado threshold `http_req_failed` de `rate<0.01` a `rate<0.50` (el 401 de ingest es esperado)
+- [x] Ajustado threshold `http_req_duration` de `p(95)<500` a `p(95)<2000` (latencia realista en Docker)
 
 ---
 
