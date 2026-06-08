@@ -1,6 +1,5 @@
 import http from 'k6/http';
 import { check, sleep } from 'k6';
-import { htmlReport } from './k6-reporter-bundle.js';
 
 export const options = {
   stages: [
@@ -57,9 +56,3 @@ export default function def() {
   sleep(1);
 }
 
-// Genera un reporte dinámico en HTML utilizando la librería de visualización k6-reporter
-export function handleSummary(data) {
-  return {
-    'reports/k6-performance-report.html': htmlReport(data),
-  };
-}
