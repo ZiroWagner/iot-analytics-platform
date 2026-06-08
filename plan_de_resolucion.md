@@ -80,6 +80,10 @@ Tras un análisis minucioso de los reportes de seguridad de OWASP ZAP y las mét
 - [x] Corregido `r.json('status')` → `r.json('data.status')` para health y ready (el ResponseInterceptor anida el body)
 - [x] Ajustado threshold `http_req_failed` de `rate<0.01` a `rate<0.50` (el 401 de ingest es esperado)
 - [x] Ajustado threshold `http_req_duration` de `p(95)<500` a `p(95)<2000` (latencia realista en Docker)
+- [x] Descargado `k6-reporter-bundle.js` localmente → eliminada dependencia de red externa:
+      El Jenkins agent (k6 v0.51.0) no podía resolver `raw.githubusercontent.com`
+      durante la compilación, causando error en babel.min.js. Ahora se importa
+      desde `./k6-reporter-bundle.js`.
 
 ---
 
