@@ -3,7 +3,7 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { SkipThrottle } from '@nestjs/throttler';
 
 @ApiTags('Health')
-@SkipThrottle()
+@SkipThrottle({ short: true, long: true })
 @Controller('health')
 export class HealthController {
   @Get()

@@ -12,7 +12,7 @@ if (!fs.existsSync(reportsDir)) {
 function runK6(useDocker = false) {
   console.log('\n🚀 Iniciando pruebas de rendimiento con K6...');
   const targetUrl = process.env.TARGET_URL || 'http://localhost:3001';
-  
+
   if (useDocker) {
     console.log('🐳 Ejecutando K6 a través de Docker...');
     // Para Docker en Windows/macOS, mapeamos la carpeta y usamos host.docker.internal
@@ -49,9 +49,9 @@ function runK6(useDocker = false) {
 
 function runZAP() {
   console.log('\n🔒 Iniciando escaneo de seguridad con OWASP ZAP (vía Docker)...');
-  const targetBackend = process.env.TARGET_BACKEND_URL || 'http://host.docker.internal:3001';
-  const targetFrontend = process.env.TARGET_FRONTEND_URL || 'http://host.docker.internal:3000';
-  
+  const targetBackend = process.env.TARGET_BACKEND_URL || 'http://localhost:3001';
+  const targetFrontend = process.env.TARGET_FRONTEND_URL || 'http://localhost:3000';
+
   console.log('🐳 Ejecutando OWASP ZAP para Frontend...');
   const cmdFrontend = `docker run --rm -v "${reportsDir}:/zap/wrk:rw" --add-host=host.docker.internal:host-gateway zaproxy/zap-stable zap-baseline.py -t ${targetFrontend} -r zap-frontend-report.html`;
   console.log(`Ejecutando: ${cmdFrontend}`);

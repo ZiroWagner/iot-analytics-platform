@@ -60,7 +60,10 @@ Tras un análisis minucioso de los reportes de seguridad de OWASP ZAP y las mét
   - `long`: 100 req/min (por defecto)
 
 ### Backend — Rate limiting por ruta
-- [x] **HealthController**: `@SkipThrottle()` — sin restricciones, es público y liviano
+- [x] **HealthController**: `@SkipThrottle({ short: true, long: true })` — sin restricciones, es público y liviano
+      ⚠️ `@SkipThrottle()` sin argumentos no funciona en v6.5.0 porque el default es
+         `{ default: true }`, pero los throttlers se llaman `short` y `long`, no
+         `default`. Hay que nombrarlos explícitamente.
 - [x] **IngestController**: `@Throttle({ short: 10 req/s, long: 60 req/min })` — tolera burst de 20 VUs
 - [x] **Resto de rutas**: heredan defaults (5 req/s, 100 req/min)
 
