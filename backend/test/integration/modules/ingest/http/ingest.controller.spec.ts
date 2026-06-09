@@ -2,6 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { IngestController } from '@/ingest/interfaces/http/ingest.controller';
 import { ProcessIngestUseCase } from '@/ingest/application/use-cases/process-ingest.use-case';
 import { UnauthorizedException } from '@nestjs/common';
+import { RedisService } from '@/redis/redis.service';
+import { ApiKeyGuard } from '@/ingest/interfaces/http/guards/api-key.guard';
 
 describe('IngestController', () => {
   let controller: IngestController;
@@ -12,7 +14,14 @@ describe('IngestController', () => {
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [IngestController],
-      providers: [{ provide: ProcessIngestUseCase, useValue: useCase }],
+      providers: [
+        ApiKeyGuard,
+        { provide: ProcessIngestUseCase, useValue: useCase },
+        {
+          provide: RedisService,
+          useValue: { client: { get: jest.fn().mockResolvedValue(null) } },
+        },
+      ],
     }).compile();
 
     controller = module.get<IngestController>(IngestController);

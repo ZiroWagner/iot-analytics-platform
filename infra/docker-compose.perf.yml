@@ -1,0 +1,41 @@
+services:
+  influxdb:
+    image: influxdb:1.8
+    container_name: perf_influxdb
+    ports:
+      - "8086:8086"
+    volumes:
+      - perf_influxdb_data:/var/lib/influxdb
+    environment:
+      - INFLUXDB_DB=k6
+      - INFLUXDB_USER=k6
+      - INFLUXDB_USER_PASSWORD=changeme
+    restart: unless-stopped
+    networks:
+      - iot-net
+
+  grafana:
+    image: grafana/grafana:12.4.4
+    container_name: perf_grafana
+    ports:
+      - "3002:3000"
+    volumes:
+      - perf_grafana_data:/var/lib/grafana
+      - ./grafana/datasources:/etc/grafana/provisioning/datasources
+      - ./grafana/dashboards:/etc/grafana/provisioning/dashboards
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    restart: unless-stopped
+    depends_on:
+      - influxdb
+    networks:
+      - iot-net
+
+volumes:
+  perf_influxdb_data:
+  perf_grafana_data:
+
+networks:
+  iot-net:
+    external: true

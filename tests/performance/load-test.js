@@ -1,23 +1,61 @@
 import http from 'k6/http';
 import { check, sleep } from 'k6';
 
-export const options = {
-  stages: [
-    { duration: '10s', target: 20 }, // Ramp-up a 20 VUs
-    { duration: '20s', target: 20 }, // Carga sostenida con 20 VUs
-    { duration: '10s', target: 0 },  // Ramp-down a 0 VUs
-  ],
-  thresholds: {
-    http_req_failed: ['rate<0.50'],  // <50%: el 401 de ingest es esperado, no es fallo real
-    http_req_duration: ['p(95)<2000'], // El 95% de las peticiones deben tardar < 2000ms
+const SCENARIO = __ENV.SCENARIO || 'smoke';
+
+const scenarioConfigs = {
+  smoke: {
+    executor: 'constant-vus',
+    vus: 1,
+    duration: '1m',
+  },
+  load: {
+    executor: 'ramping-vus',
+    startVUs: 0,
+    stages: [
+      { duration: '2m', target: 30 },
+      { duration: '4m', target: 30 },
+      { duration: '2m', target: 0 },
+    ],
+  },
+  stress: {
+    executor: 'ramping-vus',
+    startVUs: 0,
+    stages: [
+      { duration: '3m', target: 100 },
+      { duration: '6m', target: 100 },
+      { duration: '3m', target: 0 },
+    ],
+  },
+  spike: {
+    executor: 'ramping-vus',
+    startVUs: 0,
+    stages: [
+      { duration: '2m', target: 200 },
+      { duration: '3m', target: 200 },
+      { duration: '2m', target: 0 },
+    ],
+  },
+  soak: {
+    executor: 'constant-vus',
+    vus: 20,
+    duration: '30m',
   },
 };
 
+export const options = {
+  scenarios: {},
+  thresholds: {
+    http_req_failed: ['rate<0.50'],
+    http_req_duration: ['p(95)<2000'],
+  },
+};
+
+options.scenarios[SCENARIO] = scenarioConfigs[SCENARIO];
+
 export default function def() {
-  // Por defecto apunta al puerto expuesto de backend de Staging (3001)
   const baseUrl = __ENV.TARGET_URL || 'http://host.docker.internal:3001';
 
-  // 1. Consultar endpoint de salud pública
   let resHealth = http.get(`${baseUrl}/api/v1/health`);
   check(resHealth, {
     'health status is 200': (r) => r.status === 200,
@@ -25,7 +63,6 @@ export default function def() {
   });
   sleep(1);
 
-  // 2. Consultar endpoint de readiness pública
   let resReady = http.get(`${baseUrl}/api/v1/health/ready`);
   check(resReady, {
     'ready status is 200': (r) => r.status === 200,
@@ -33,7 +70,6 @@ export default function def() {
   });
   sleep(1);
 
-  // 3. Simular intento fallido de ingesta de datos (API Key inválida)
   const payload = JSON.stringify({
     device: {
       api_key: 'invalid-key-for-testing'
@@ -55,4 +91,3 @@ export default function def() {
   });
   sleep(1);
 }
-

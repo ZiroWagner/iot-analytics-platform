@@ -5,6 +5,9 @@ import { RedisModule } from '@/redis/redis.module';
 // Controllers
 import { IngestController } from '@/ingest/interfaces/http/ingest.controller';
 
+// Guards
+import { ApiKeyGuard } from '@/ingest/interfaces/http/guards/api-key.guard';
+
 // Use Cases
 import { ProcessIngestUseCase } from '@/ingest/application/use-cases/process-ingest.use-case';
 
@@ -19,6 +22,8 @@ import { StreamIngestProcessor } from '@/ingest/infrastructure/processors/stream
   imports: [PrismaModule, RedisModule],
   controllers: [IngestController],
   providers: [
+    // Guards
+    ApiKeyGuard,
     // Repositories
     {
       provide: INGEST_REPOSITORY_TOKEN,

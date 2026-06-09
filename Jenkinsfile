@@ -12,10 +12,14 @@ pipeline {
         DEPLOY_STARTED = "false"
     }
 
+    triggers {
+        cron(env.BRANCH_NAME == 'main' ? '0 2 * * *' : '')
+    }
+
     options {
         buildDiscarder(logRotator(numToKeepStr: '10'))
         disableConcurrentBuilds()
-        timeout(time: 30, unit: 'MINUTES')
+        timeout(time: 90, unit: 'MINUTES')
     }
 
     stages {
@@ -206,11 +210,37 @@ pipeline {
             }
         }
 
-        stage('Performance Scan (k6)') {
+        stage('Performance: Smoke + Load') {
+            when {
+                beforeAgent true
+                not { triggeredBy 'cron' }
+            }
             steps {
                 sh 'mkdir -p reports'
-                echo "Ejecutando pruebas de rendimiento con K6..."
-                sh '/usr/local/bin/k6 run -e TARGET_URL=http://host.docker.internal:3001 tests/performance/load-test.js'
+                echo "Ejecutando pruebas Smoke + Load con K6..."
+                sh '/usr/local/bin/k6 run -e TARGET_URL=http://host.docker.internal:3001 -e SCENARIO=smoke --out influxdb=http://influxdb:8086/k6 tests/performance/load-test.js'
+                sh '/usr/local/bin/k6 run -e TARGET_URL=http://host.docker.internal:3001 -e SCENARIO=load --out influxdb=http://influxdb:8086/k6 tests/performance/load-test.js'
+            }
+        }
+
+        stage('Performance: Full Battery (Nightly)') {
+            when {
+                beforeAgent true
+                triggeredBy 'cron'
+            }
+            steps {
+                sh 'mkdir -p reports'
+                echo "Ejecutando batería completa de rendimiento (stress + spike + soak)..."
+                sh 'docker compose -f infra/docker-compose.perf.yml up -d'
+                sh 'sleep 10'
+                sh '/usr/local/bin/k6 run -e TARGET_URL=http://host.docker.internal:3001 -e SCENARIO=stress --out influxdb=http://influxdb:8086/k6 tests/performance/load-test.js'
+                sh '/usr/local/bin/k6 run -e TARGET_URL=http://host.docker.internal:3001 -e SCENARIO=spike --out influxdb=http://influxdb:8086/k6 tests/performance/load-test.js'
+                sh '/usr/local/bin/k6 run -e TARGET_URL=http://host.docker.internal:3001 -e SCENARIO=soak --out influxdb=http://influxdb:8086/k6 tests/performance/load-test.js'
+            }
+            post {
+                always {
+                    sh 'docker compose -f infra/docker-compose.perf.yml down || true'
+                }
             }
         }
     }

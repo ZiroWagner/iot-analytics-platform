@@ -4,6 +4,7 @@ import { RedisService } from '@/redis/redis.service';
 import { SensorReading } from '@/ingest/domain/entities/sensor-reading.entity';
 import { IngestDomainService } from '@/ingest/domain/services/ingest-domain.service';
 import type { IngestRepositoryInterface } from '@/ingest/domain/repositories/ingest.repository.interface';
+import { createHash } from 'crypto';
 
 const DEVICE_STATUS_TTL = 15;
 const STREAM_MAX_LENGTH = 100000;
@@ -18,15 +19,24 @@ export class RedisIngestRepository implements IngestRepositoryInterface {
   ) {}
 
   async resolveDeviceId(apiKey: string): Promise<string> {
+    const keyHash = createHash('sha256').update(apiKey).digest('hex').substring(0, 16);
     const cacheKey = `device:apikey:${apiKey}`;
+    const invalidKey = `device:invalidkey:${keyHash}`;
+
     const cachedId = await this.redisService.client.get(cacheKey);
     if (cachedId) return cachedId;
+
+    const isInvalid = await this.redisService.client.get(invalidKey);
+    if (isInvalid) {
+      throw new UnauthorizedException('Invalid API Key');
+    }
 
     const deviceRecord = await this.prisma.device.findUnique({
       where: { api_key: apiKey },
       select: { id: true, projectId: true },
     });
     if (!deviceRecord) {
+      await this.redisService.client.setex(invalidKey, API_KEY_CACHE_TTL, '1');
       throw new UnauthorizedException('Invalid API Key');
     }
 
