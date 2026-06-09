@@ -221,8 +221,8 @@ pipeline {
                 sh 'docker compose -f infra/docker-compose.perf.yml up -d influxdb'
                 sh 'sleep 5'
                 echo "Ejecutando pruebas Smoke + Load con K6..."
-                sh '/usr/local/bin/k6 run -e TARGET_URL=http://backend:3001 -e SCENARIO=smoke --out influxdb=http://influxdb:8086/k6 tests/performance/load-test.js'
-                sh '/usr/local/bin/k6 run -e TARGET_URL=http://backend:3001 -e SCENARIO=load --out influxdb=http://influxdb:8086/k6 tests/performance/load-test.js'
+                sh '/usr/local/bin/k6 run -e TARGET_URL=http://host.docker.internal:3001 -e SCENARIO=smoke --out influxdb=http://influxdb:8086/k6 tests/performance/load-test.js'
+                sh '/usr/local/bin/k6 run -e TARGET_URL=http://host.docker.internal:3001 -e SCENARIO=load --out influxdb=http://influxdb:8086/k6 tests/performance/load-test.js'
             }
         }
 
