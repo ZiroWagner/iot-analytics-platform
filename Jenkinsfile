@@ -217,9 +217,17 @@ pipeline {
             }
             steps {
                 sh 'mkdir -p reports'
+                echo "Starting InfluxDB..."
+                sh 'docker compose -f infra/docker-compose.perf.yml up -d influxdb'
+                sh 'sleep 5'
                 echo "Ejecutando pruebas Smoke + Load con K6..."
-                sh '/usr/local/bin/k6 run -e TARGET_URL=http://host.docker.internal:3001 -e SCENARIO=smoke --out influxdb=http://influxdb:8086/k6 tests/performance/load-test.js'
-                sh '/usr/local/bin/k6 run -e TARGET_URL=http://host.docker.internal:3001 -e SCENARIO=load --out influxdb=http://influxdb:8086/k6 tests/performance/load-test.js'
+                sh '/usr/local/bin/k6 run -e TARGET_URL=http://host.docker.internal:3001 -e SCENARIO=smoke --out influxdb=http://localhost:8086/k6 tests/performance/load-test.js'
+                sh '/usr/local/bin/k6 run -e TARGET_URL=http://host.docker.internal:3001 -e SCENARIO=load --out influxdb=http://localhost:8086/k6 tests/performance/load-test.js'
+            }
+            post {
+                always {
+                    sh 'docker compose -f infra/docker-compose.perf.yml down || true'
+                }
             }
         }
 
@@ -233,9 +241,9 @@ pipeline {
                 echo "Ejecutando batería completa de rendimiento (stress + spike + soak)..."
                 sh 'docker compose -f infra/docker-compose.perf.yml up -d'
                 sh 'sleep 10'
-                sh '/usr/local/bin/k6 run -e TARGET_URL=http://host.docker.internal:3001 -e SCENARIO=stress --out influxdb=http://influxdb:8086/k6 tests/performance/load-test.js'
-                sh '/usr/local/bin/k6 run -e TARGET_URL=http://host.docker.internal:3001 -e SCENARIO=spike --out influxdb=http://influxdb:8086/k6 tests/performance/load-test.js'
-                sh '/usr/local/bin/k6 run -e TARGET_URL=http://host.docker.internal:3001 -e SCENARIO=soak --out influxdb=http://influxdb:8086/k6 tests/performance/load-test.js'
+                sh '/usr/local/bin/k6 run -e TARGET_URL=http://host.docker.internal:3001 -e SCENARIO=stress --out influxdb=http://localhost:8086/k6 tests/performance/load-test.js'
+                sh '/usr/local/bin/k6 run -e TARGET_URL=http://host.docker.internal:3001 -e SCENARIO=spike --out influxdb=http://localhost:8086/k6 tests/performance/load-test.js'
+                sh '/usr/local/bin/k6 run -e TARGET_URL=http://host.docker.internal:3001 -e SCENARIO=soak --out influxdb=http://localhost:8086/k6 tests/performance/load-test.js'
             }
             post {
                 always {
