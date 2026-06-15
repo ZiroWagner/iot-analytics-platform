@@ -230,6 +230,15 @@ pipeline {
                         --out influxdb=http://influxdb:8086/k6 \
                         /workspace/tests/performance/load-test.js
                 '''
+                sh '''
+                    docker run --rm --network iot-net \
+                        -v "${WORKSPACE}:/workspace" -w /workspace \
+                        grafana/k6:0.51.0 run \
+                        -e TARGET_URL=http://backend:3000 \
+                        -e SCENARIO=load \
+                        --out influxdb=http://influxdb:8086/k6 \
+                        /workspace/tests/performance/load-test.js
+                '''
             }
         }
 

@@ -11,7 +11,9 @@ import { createHash } from 'crypto';
 
 @Injectable()
 export class ApiKeyGuard implements CanActivate {
-  constructor(@Inject(RedisService) private readonly redisService: RedisService) {}
+  constructor(
+    @Inject(RedisService) private readonly redisService: RedisService,
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     try {
@@ -22,7 +24,10 @@ export class ApiKeyGuard implements CanActivate {
         return true;
       }
 
-      const keyHash = createHash('sha256').update(apiKey).digest('hex').substring(0, 16);
+      const keyHash = createHash('sha256')
+        .update(apiKey)
+        .digest('hex')
+        .substring(0, 16);
 
       const [cachedId, isInvalid] = await Promise.all([
         this.redisService.client.get(`device:apikey:${apiKey}`),

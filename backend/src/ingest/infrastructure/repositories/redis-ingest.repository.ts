@@ -19,7 +19,10 @@ export class RedisIngestRepository implements IngestRepositoryInterface {
   ) {}
 
   async resolveDeviceId(apiKey: string): Promise<string> {
-    const keyHash = createHash('sha256').update(apiKey).digest('hex').substring(0, 16);
+    const keyHash = createHash('sha256')
+      .update(apiKey)
+      .digest('hex')
+      .substring(0, 16);
     const cacheKey = `device:apikey:${apiKey}`;
     const invalidKey = `device:invalidkey:${keyHash}`;
 
