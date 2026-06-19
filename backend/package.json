@@ -88,6 +88,7 @@
     "typescript-eslint": "^8.20.0"
   },
   "overrides": {
-    "ws": "^8.20.2"
+    "ws": "^8.20.2",
+    "multer": "^2.2.0"
   }
 }
