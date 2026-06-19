@@ -227,7 +227,7 @@ pipeline {
                         grafana/k6:0.51.0 run \
                         -e TARGET_URL=http://backend:3000 \
                         -e SCENARIO=smoke \
-                        --out influxdb=http://influxdb:8086/k6 \
+                        --out influxdb=http://perf_influxdb:8086/k6 \
                         /workspace/tests/performance/load-test.js
                 '''
                 sh '''
@@ -236,7 +236,7 @@ pipeline {
                         grafana/k6:0.51.0 run \
                         -e TARGET_URL=http://backend:3000 \
                         -e SCENARIO=load \
-                        --out influxdb=http://influxdb:8086/k6 \
+                        --out influxdb=http://perf_influxdb:8086/k6 \
                         /workspace/tests/performance/load-test.js
                 '''
             }
