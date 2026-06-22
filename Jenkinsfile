@@ -220,6 +220,14 @@ pipeline {
                 echo "Starting InfluxDB..."
                 sh 'docker compose -f infra/docker-compose.perf.yml up -d influxdb grafana'
                 sh 'sleep 5'
+                echo "Configurando provisioning de Grafana..."
+                sh '''
+                    docker cp infra/grafana/datasources/datasource.yml perf_grafana:/etc/grafana/provisioning/datasources/datasource.yml
+                    docker cp infra/grafana/dashboards/dashboard.yml perf_grafana:/etc/grafana/provisioning/dashboards/dashboard.yml
+                    docker cp infra/grafana/dashboards/k6-dashboard.json perf_grafana:/etc/grafana/provisioning/dashboards/k6-dashboard.json
+                    docker restart perf_grafana
+                '''
+                sh 'sleep 5'
                 echo "Ejecutando pruebas Smoke + Load con K6 (Docker)..."
                 sh '''
                     docker run --rm --network iot-net -i \
@@ -250,6 +258,14 @@ pipeline {
                 echo "Starting InfluxDB + Grafana..."
                 sh 'docker compose -f infra/docker-compose.perf.yml up -d'
                 sh 'sleep 10'
+                echo "Configurando provisioning de Grafana..."
+                sh '''
+                    docker cp infra/grafana/datasources/datasource.yml perf_grafana:/etc/grafana/provisioning/datasources/datasource.yml
+                    docker cp infra/grafana/dashboards/dashboard.yml perf_grafana:/etc/grafana/provisioning/dashboards/dashboard.yml
+                    docker cp infra/grafana/dashboards/k6-dashboard.json perf_grafana:/etc/grafana/provisioning/dashboards/k6-dashboard.json
+                    docker restart perf_grafana
+                '''
+                sh 'sleep 5'
                 echo "Ejecutando batería completa de rendimiento (stress + spike + soak)..."
                 sh '''
                     docker run --rm --network iot-net -i \
