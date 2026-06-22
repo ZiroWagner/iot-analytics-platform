@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ObservabilityController } from '@/observability/interfaces/http/observability.controller';
 import { GetSystemMetricsUseCase } from '@/observability/application/use-cases/get-system-metrics.use-case';
+import { ThrottlerGuard } from '@nestjs/throttler';
 
 describe('ObservabilityController', () => {
   let controller: ObservabilityController;
@@ -12,7 +13,10 @@ describe('ObservabilityController', () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [ObservabilityController],
       providers: [{ provide: GetSystemMetricsUseCase, useValue: useCase }],
-    }).compile();
+    })
+      .overrideGuard(ThrottlerGuard)
+      .useValue({ canActivate: () => true })
+      .compile();
 
     controller = module.get<ObservabilityController>(ObservabilityController);
   });

@@ -6,6 +6,7 @@ import { GetProjectUseCase } from '@/projects/application/use-cases/get-project.
 import { UpdateProjectUseCase } from '@/projects/application/use-cases/update-project.use-case';
 import { DeleteProjectUseCase } from '@/projects/application/use-cases/delete-project.use-case';
 import { GetProjectOverviewUseCase } from '@/projects/application/use-cases/get-project-overview.use-case';
+import { ThrottlerGuard } from '@nestjs/throttler';
 
 describe('ProjectsController', () => {
   let controller: ProjectsController;
@@ -45,7 +46,10 @@ describe('ProjectsController', () => {
         { provide: DeleteProjectUseCase, useValue: deleteUseCase },
         { provide: GetProjectOverviewUseCase, useValue: getOverviewUseCase },
       ],
-    }).compile();
+    })
+      .overrideGuard(ThrottlerGuard)
+      .useValue({ canActivate: () => true })
+      .compile();
 
     controller = module.get<ProjectsController>(ProjectsController);
   });

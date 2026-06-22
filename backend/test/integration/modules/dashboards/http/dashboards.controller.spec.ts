@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { DashboardsController } from '@/dashboards/interfaces/http/dashboards.controller';
 import { GetDashboardConfigUseCase } from '@/dashboards/application/use-cases/get-dashboard-config.use-case';
 import { SaveDashboardConfigUseCase } from '@/dashboards/application/use-cases/save-dashboard-config.use-case';
+import { ThrottlerGuard } from '@nestjs/throttler';
 
 describe('DashboardsController', () => {
   let controller: DashboardsController;
@@ -20,7 +21,10 @@ describe('DashboardsController', () => {
         { provide: GetDashboardConfigUseCase, useValue: getUseCase },
         { provide: SaveDashboardConfigUseCase, useValue: saveUseCase },
       ],
-    }).compile();
+    })
+      .overrideGuard(ThrottlerGuard)
+      .useValue({ canActivate: () => true })
+      .compile();
 
     controller = module.get<DashboardsController>(DashboardsController);
   });

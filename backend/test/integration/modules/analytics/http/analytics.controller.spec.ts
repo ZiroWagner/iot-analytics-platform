@@ -4,6 +4,7 @@ import { GetAvailableMetricsUseCase } from '@/analytics/application/use-cases/ge
 import { GetTimeseriesUseCase } from '@/analytics/application/use-cases/get-timeseries.use-case';
 import { GetMultiTimeseriesUseCase } from '@/analytics/application/use-cases/get-multi-timeseries.use-case';
 import { GetStatsUseCase } from '@/analytics/application/use-cases/get-stats.use-case';
+import { ThrottlerGuard } from '@nestjs/throttler';
 
 describe('AnalyticsController', () => {
   let controller: AnalyticsController;
@@ -30,7 +31,10 @@ describe('AnalyticsController', () => {
         },
         { provide: GetStatsUseCase, useValue: getStatsUseCase },
       ],
-    }).compile();
+    })
+      .overrideGuard(ThrottlerGuard)
+      .useValue({ canActivate: () => true })
+      .compile();
 
     controller = module.get<AnalyticsController>(AnalyticsController);
   });

@@ -5,6 +5,7 @@ import { GetDevicesByProjectUseCase } from '@/devices/application/use-cases/get-
 import { GetDeviceUseCase } from '@/devices/application/use-cases/get-device.use-case';
 import { UpdateDeviceUseCase } from '@/devices/application/use-cases/update-device.use-case';
 import { DeleteDeviceUseCase } from '@/devices/application/use-cases/delete-device.use-case';
+import { ThrottlerGuard } from '@nestjs/throttler';
 
 describe('DevicesController', () => {
   let controller: DevicesController;
@@ -38,7 +39,10 @@ describe('DevicesController', () => {
         { provide: UpdateDeviceUseCase, useValue: updateUseCase },
         { provide: DeleteDeviceUseCase, useValue: deleteUseCase },
       ],
-    }).compile();
+    })
+      .overrideGuard(ThrottlerGuard)
+      .useValue({ canActivate: () => true })
+      .compile();
 
     controller = module.get<DevicesController>(DevicesController);
   });

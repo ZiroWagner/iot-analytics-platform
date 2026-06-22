@@ -6,6 +6,7 @@ import { ConfigService } from '@nestjs/config';
 import { UpdateProfileUseCase } from '@/auth/application/use-cases/update-profile.use-case';
 import { DeleteUserUseCase } from '@/auth/application/use-cases/delete-user.use-case';
 import { USER_REPOSITORY_TOKEN } from '@/auth/domain/repositories/user.repository.interface';
+import { ThrottlerGuard } from '@nestjs/throttler';
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -36,7 +37,10 @@ describe('AuthController', () => {
         { provide: DeleteUserUseCase, useValue: deleteUserUseCase },
         { provide: USER_REPOSITORY_TOKEN, useValue: userRepository },
       ],
-    }).compile();
+    })
+      .overrideGuard(ThrottlerGuard)
+      .useValue({ canActivate: () => true })
+      .compile();
 
     controller = module.get<AuthController>(AuthController);
   });

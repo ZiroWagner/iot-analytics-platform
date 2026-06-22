@@ -4,6 +4,7 @@ import { ProcessIngestUseCase } from '@/ingest/application/use-cases/process-ing
 import { UnauthorizedException } from '@nestjs/common';
 import { RedisService } from '@/redis/redis.service';
 import { ApiKeyGuard } from '@/ingest/interfaces/http/guards/api-key.guard';
+import { ThrottlerGuard } from '@nestjs/throttler';
 
 describe('IngestController', () => {
   let controller: IngestController;
@@ -22,7 +23,10 @@ describe('IngestController', () => {
           useValue: { client: { get: jest.fn().mockResolvedValue(null) } },
         },
       ],
-    }).compile();
+    })
+      .overrideGuard(ThrottlerGuard)
+      .useValue({ canActivate: () => true })
+      .compile();
 
     controller = module.get<IngestController>(IngestController);
   });

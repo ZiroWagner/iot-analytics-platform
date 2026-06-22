@@ -6,6 +6,7 @@ import { GetSensorUseCase } from '@/sensors/application/use-cases/get-sensor.use
 import { UpdateSensorUseCase } from '@/sensors/application/use-cases/update-sensor.use-case';
 import { DeleteSensorUseCase } from '@/sensors/application/use-cases/delete-sensor.use-case';
 import { GetSensorDataPointsUseCase } from '@/sensors/application/use-cases/get-sensor-data-points.use-case';
+import { ThrottlerGuard } from '@nestjs/throttler';
 
 describe('SensorsController', () => {
   let controller: SensorsController;
@@ -43,7 +44,10 @@ describe('SensorsController', () => {
         { provide: DeleteSensorUseCase, useValue: deleteUseCase },
         { provide: GetSensorDataPointsUseCase, useValue: getDataPointsUseCase },
       ],
-    }).compile();
+    })
+      .overrideGuard(ThrottlerGuard)
+      .useValue({ canActivate: () => true })
+      .compile();
 
     controller = module.get<SensorsController>(SensorsController);
   });
