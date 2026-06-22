@@ -13,6 +13,7 @@ import {
   ApiQuery,
   ApiBearerAuth,
 } from '@nestjs/swagger';
+import { ThrottlerGuard } from '@nestjs/throttler';
 
 interface JwtUser {
   sub: string;
@@ -21,6 +22,7 @@ interface JwtUser {
 
 @ApiTags('Analytics')
 @ApiBearerAuth()
+@UseGuards(ThrottlerGuard)
 @UseGuards(AuthGuard('jwt'))
 @Controller('analytics')
 export class AnalyticsController {

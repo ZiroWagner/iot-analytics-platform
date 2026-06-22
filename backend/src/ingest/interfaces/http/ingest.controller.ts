@@ -8,12 +8,13 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
-import { Throttle } from '@nestjs/throttler';
+import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { ProcessIngestUseCase } from '@/ingest/application/use-cases/process-ingest.use-case';
 import { IngestBodyDto } from './dto/ingest.dto';
 import { ApiKeyGuard } from './guards/api-key.guard';
 
 @ApiTags('Ingest')
+@UseGuards(ThrottlerGuard)
 @UseGuards(ApiKeyGuard)
 @Throttle({ short: { limit: 10, ttl: 1000 }, long: { limit: 60, ttl: 60000 } })
 @Controller('ingest')

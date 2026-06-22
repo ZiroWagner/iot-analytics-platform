@@ -28,6 +28,7 @@ import {
   ApiBearerAuth,
   ApiQuery,
 } from '@nestjs/swagger';
+import { ThrottlerGuard } from '@nestjs/throttler';
 
 interface JwtUser {
   sub: string;
@@ -36,6 +37,7 @@ interface JwtUser {
 
 @ApiTags('Sensors')
 @ApiBearerAuth()
+@UseGuards(ThrottlerGuard)
 @UseGuards(AuthGuard('jwt'))
 @Controller('sensors')
 export class SensorsController {

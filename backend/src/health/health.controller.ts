@@ -1,8 +1,9 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { SkipThrottle } from '@nestjs/throttler';
+import { SkipThrottle, ThrottlerGuard } from '@nestjs/throttler';
 
 @ApiTags('Health')
+@UseGuards(ThrottlerGuard)
 @SkipThrottle({ short: true, long: true })
 @Controller('health')
 export class HealthController {

@@ -32,6 +32,7 @@ import {
 } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
 import { ConfigService } from '@nestjs/config';
+import { ThrottlerGuard } from '@nestjs/throttler';
 
 interface JwtUser {
   sub: string;
@@ -39,6 +40,7 @@ interface JwtUser {
 }
 
 @ApiTags('Auth')
+@UseGuards(ThrottlerGuard)
 @Controller('auth')
 export class AuthController {
   constructor(
