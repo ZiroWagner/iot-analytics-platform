@@ -222,22 +222,20 @@ pipeline {
                 sh 'sleep 5'
                 echo "Ejecutando pruebas Smoke + Load con K6 (Docker)..."
                 sh '''
-                    docker run --rm --network iot-net \
-                        -v "${WORKSPACE}:/workspace" -w /workspace \
+                    docker run --rm --network iot-net -i \
                         grafana/k6:0.51.0 run \
                         -e TARGET_URL=http://backend:3000 \
                         -e SCENARIO=smoke \
                         --out influxdb=http://influxdb:8086/k6 \
-                        /workspace/tests/performance/load-test.js
+                        - < tests/performance/load-test.js
                 '''
                 sh '''
-                    docker run --rm --network iot-net \
-                        -v "${WORKSPACE}:/workspace" -w /workspace \
+                    docker run --rm --network iot-net -i \
                         grafana/k6:0.51.0 run \
                         -e TARGET_URL=http://backend:3000 \
                         -e SCENARIO=load \
                         --out influxdb=http://influxdb:8086/k6 \
-                        /workspace/tests/performance/load-test.js
+                        - < tests/performance/load-test.js
                 '''
             }
         }
@@ -254,31 +252,28 @@ pipeline {
                 sh 'sleep 10'
                 echo "Ejecutando batería completa de rendimiento (stress + spike + soak)..."
                 sh '''
-                    docker run --rm --network iot-net \
-                        -v "${WORKSPACE}:/workspace" -w /workspace \
+                    docker run --rm --network iot-net -i \
                         grafana/k6:0.51.0 run \
                         -e TARGET_URL=http://backend:3000 \
                         -e SCENARIO=stress \
                         --out influxdb=http://influxdb:8086/k6 \
-                        /workspace/tests/performance/load-test.js
+                        - < tests/performance/load-test.js
                 '''
                 sh '''
-                    docker run --rm --network iot-net \
-                        -v "${WORKSPACE}:/workspace" -w /workspace \
+                    docker run --rm --network iot-net -i \
                         grafana/k6:0.51.0 run \
                         -e TARGET_URL=http://backend:3000 \
                         -e SCENARIO=spike \
                         --out influxdb=http://influxdb:8086/k6 \
-                        /workspace/tests/performance/load-test.js
+                        - < tests/performance/load-test.js
                 '''
                 sh '''
-                    docker run --rm --network iot-net \
-                        -v "${WORKSPACE}:/workspace" -w /workspace \
+                    docker run --rm --network iot-net -i \
                         grafana/k6:0.51.0 run \
                         -e TARGET_URL=http://backend:3000 \
                         -e SCENARIO=soak \
                         --out influxdb=http://influxdb:8086/k6 \
-                        /workspace/tests/performance/load-test.js
+                        - < tests/performance/load-test.js
                 '''
             }
         }
