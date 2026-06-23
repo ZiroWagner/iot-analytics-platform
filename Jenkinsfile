@@ -128,7 +128,7 @@ pipeline {
                             mkdir -p reports
                             HTTP_CODE=$(curl -s -o /tmp/cnes-report.zip -w "%{http_code}" \
                                 -u "${SONAR_AUTH_TOKEN}:" \
-                                "${SONAR_HOST_URL}/api/cnesreport/report?key=iot-platform&author=CI&language=en_US&enableMd=false&enableCsv=false&enableDocx=true&enableXlsx=true&token=${SONAR_AUTH_TOKEN}")
+                                "${SONAR_HOST_URL}/api/cnesreport/report?key=iot-platform&author=CI&language=en_US&enableMd=false&enableCsv=false&enableDocx=true&enableXlsx=true")
                             echo "CNES API HTTP status: $HTTP_CODE"
                             if [ "$HTTP_CODE" != "200" ]; then
                                 echo "Contenido del error:"
