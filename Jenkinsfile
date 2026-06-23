@@ -125,24 +125,18 @@ pipeline {
                             echo "Iniciando reports-server para recibir reportes..."
                             docker compose -f infra/docker-compose.perf.yml up -d reports-server
                             chmod +x scripts/provision-reports-server.sh && ./scripts/provision-reports-server.sh
-                            echo "Descargando reporte CNES SonarQube (DOCX + XLSX)..."
+                            echo "Generando reporte CNES via jar interno (SonarQube)..."
+                            docker exec -u root sonarqube mkdir -p /home/sonarqube/.cnesreport/log
+                            docker exec -u root sonarqube chown -R sonarqube:sonarqube /home/sonarqube/.cnesreport
                             mkdir -p reports
-                            HTTP_CODE=$(curl -s -o /tmp/cnes-report.zip -w "%{http_code}" \
-                                -u "${SONAR_AUTH_TOKEN}:" \
-                                "${SONAR_HOST_URL}/api/cnesreport/report?key=iot-platform&author=CI&language=en_US&enableMd=false&enableCsv=false&enableDocx=true&enableXlsx=true&token=${CNES_USER_TOKEN}")
-                            echo "CNES API HTTP status: $HTTP_CODE"
-                            if [ "$HTTP_CODE" != "200" ]; then
-                                echo "Contenido del error:"
-                                cat /tmp/cnes-report.zip 2>/dev/null | head -c 500
-                                echo ""
-                                echo "ERROR: CNES report API returned $HTTP_CODE. Reportes CNES omitidos."
-                            else
-                                unzip -o /tmp/cnes-report.zip "*.docx" "*.xlsx" -d reports/
-                                for f in reports/*.docx reports/*.xlsx; do
-                                    [ -f "$f" ] && docker cp "$f" perf_reports:/usr/share/nginx/html/reports/
-                                done
-                            fi
-                            rm -f /tmp/cnes-report.zip
+                            docker exec sonarqube java -jar /opt/sonarqube/extensions/plugins/sonar-cnes-report-4.3.0.jar \
+                                -s http://localhost:9000 -p iot-platform -t "${CNES_USER_TOKEN}" -a CI -l en_US \
+                                -o /tmp/cnes-report -f -m
+                            echo "Copiando reportes CNES al workspace..."
+                            docker cp sonarqube:/tmp/cnes-report/. reports/
+                            for f in reports/*.docx reports/*.xlsx; do
+                                [ -f "$f" ] && docker cp "$f" perf_reports:/usr/share/nginx/html/reports/
+                            done
                         '''
                         }
                     }
