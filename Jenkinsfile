@@ -229,9 +229,9 @@ pipeline {
                 sh 'docker compose -f infra/docker-compose.perf.yml up -d reports-server'
                 sh 'chmod +x scripts/provision-reports-server.sh && ./scripts/provision-reports-server.sh'
                 echo "Ejecutando escaneo de seguridad OWASP ZAP en Frontend (puerto 9090)..."
-                sh '/usr/local/bin/zap -cmd -quickurl http://host.docker.internal:3000 -port 9090 -quickout reports/zap-frontend-report.html || true'
+                sh '/usr/local/bin/zap -cmd -quickurl http://host.docker.internal:3000 -port 9090 -quickout "$(pwd)/reports/zap-frontend-report.html" || true'
                 echo "Ejecutando escaneo de seguridad OWASP ZAP en Backend (puerto 9091)..."
-                sh '/usr/local/bin/zap -cmd -quickurl http://host.docker.internal:3001 -port 9091 -quickout reports/zap-backend-report.html || true'
+                sh '/usr/local/bin/zap -cmd -quickurl http://host.docker.internal:3001 -port 9091 -quickout "$(pwd)/reports/zap-backend-report.html" || true'
                 echo "Copiando reportes ZAP al reports-server..."
                 sh '''
                     if [ -f reports/zap-frontend-report.html ]; then
