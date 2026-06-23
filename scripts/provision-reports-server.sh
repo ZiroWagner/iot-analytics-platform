@@ -22,6 +22,7 @@ done
 docker cp "$SRC/nginx.conf" "$CONTAINER:/etc/nginx/conf.d/default.conf"
 docker cp "$SRC/index.html" "$CONTAINER:$NGINX_HTML/"
 docker cp "$SRC/print.html" "$CONTAINER:$NGINX_HTML/"
+docker cp "$SRC/preview.html" "$CONTAINER:$NGINX_HTML/"
 docker cp "$SRC/style.css" "$CONTAINER:$NGINX_HTML/"
 
 docker exec "$CONTAINER" nginx -s reload
