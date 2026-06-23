@@ -417,6 +417,37 @@ footer {
   margin: 0.5rem 0 0 1.5rem;
 }
 
+.xlsx-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 1rem;
+}
+
+.xlsx-tab {
+  padding: 0.5rem 1rem;
+  background: #1e293b;
+  color: #94a3b8;
+  border: 1px solid #334155;
+  border-radius: 6px 6px 0 0;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: background 0.15s, color 0.15s;
+}
+
+.xlsx-tab:hover {
+  background: #334155;
+  color: #e2e8f0;
+}
+
+.xlsx-tab.active {
+  background: #1e3a5f;
+  color: #93c5fd;
+  border-color: #2563eb;
+  border-bottom-color: #1e3a5f;
+}
+
 .xlsx-info {
   background: #eff6ff;
   border: 1px solid #3b82f6;

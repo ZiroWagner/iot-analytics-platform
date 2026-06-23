@@ -101,13 +101,30 @@
   function renderXlsx(buffer) {
     try {
       var workbook = XLSX.read(new Uint8Array(buffer), { type: 'array' });
-      var firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-      var html = XLSX.utils.sheet_to_html(firstSheet, { id: 'xlsx-table', editable: false });
       loadingEl.style.display = 'none';
       contentEl.style.display = 'block';
-      contentEl.innerHTML = '<div class="xlsx-info">Mostrando primera hoja: <strong>' +
-        workbook.SheetNames[0] + '</strong> (' + workbook.SheetNames.length + ' hoja(s) total)</div>' +
-        html;
+
+      var tabsHtml = '<div class="xlsx-tabs">';
+      workbook.SheetNames.forEach(function(name, i) {
+        tabsHtml += '<button class="xlsx-tab' + (i === 0 ? ' active' : '') + '" data-index="' + i + '">' + name + '</button>';
+      });
+      tabsHtml += '</div>';
+
+      var infoHtml = '<div class="xlsx-info">' + workbook.SheetNames.length + ' hoja(s) en total</div>';
+      var tableHtml = '<div id="xlsx-sheet-container">' + XLSX.utils.sheet_to_html(workbook.Sheets[workbook.SheetNames[0]], { id: 'xlsx-table', editable: false }) + '</div>';
+
+      contentEl.innerHTML = tabsHtml + infoHtml + tableHtml;
+
+      contentEl.querySelectorAll('.xlsx-tab').forEach(function(tab) {
+        tab.addEventListener('click', function() {
+          contentEl.querySelectorAll('.xlsx-tab').forEach(function(t) { t.classList.remove('active'); });
+          tab.classList.add('active');
+          var index = parseInt(tab.getAttribute('data-index'));
+          var sheet = workbook.Sheets[workbook.SheetNames[index]];
+          document.getElementById('xlsx-sheet-container').innerHTML =
+            XLSX.utils.sheet_to_html(sheet, { id: 'xlsx-table', editable: false });
+        });
+      });
     } catch (err) {
       showError('Error al convertir el XLSX: ' + err.message);
     }
