@@ -234,10 +234,18 @@ pipeline {
                 sh '/usr/local/bin/zap -cmd -quickurl http://host.docker.internal:3001 -quickout reports/zap-backend-report.html || true'
                 echo "Copiando reportes ZAP al reports-server..."
                 sh '''
-                    echo "Copiando reports/zap-frontend-report.html..."
-                    docker cp reports/zap-frontend-report.html perf_reports:/usr/share/nginx/html/reports/
-                    echo "Copiando reports/zap-backend-report.html..."
-                    docker cp reports/zap-backend-report.html perf_reports:/usr/share/nginx/html/reports/
+                    if [ -f reports/zap-frontend-report.html ]; then
+                        echo "Copiando reports/zap-frontend-report.html..."
+                        docker cp reports/zap-frontend-report.html perf_reports:/usr/share/nginx/html/reports/
+                    else
+                        echo "WARNING: reports/zap-frontend-report.html no encontrado (ZAP frontend scan falló)"
+                    fi
+                    if [ -f reports/zap-backend-report.html ]; then
+                        echo "Copiando reports/zap-backend-report.html..."
+                        docker cp reports/zap-backend-report.html perf_reports:/usr/share/nginx/html/reports/
+                    else
+                        echo "WARNING: reports/zap-backend-report.html no encontrado (ZAP backend scan falló)"
+                    fi
                 '''
             }
         }
