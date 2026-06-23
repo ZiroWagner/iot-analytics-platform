@@ -120,6 +120,16 @@ pipeline {
                                 echo "$GATE_RESPONSE"
                                 exit 1
                             fi
+
+                            echo "Descargando reporte CNES SonarQube (DOCX + XLSX)..."
+                            curl -s -u "${SONAR_AUTH_TOKEN}:" -o /tmp/cnes-report.zip \
+                                "${SONAR_HOST_URL}/api/cnesreport/report?key=iot-platform&author=CI&language=en_US&enableMd=false&enableCsv=false&enableDocx=true&enableXlsx=true"
+                            mkdir -p reports
+                            unzip -o /tmp/cnes-report.zip "*.docx" "*.xlsx" -d reports/
+                            for f in reports/*.docx reports/*.xlsx; do
+                                [ -f "$f" ] && docker cp "$f" perf_reports:/usr/share/nginx/html/reports/
+                            done
+                            rm -f /tmp/cnes-report.zip
                         '''
                     }
                 }
@@ -203,10 +213,18 @@ pipeline {
         stage('Security Scan (ZAP)') {
             steps {
                 sh 'mkdir -p reports'
+                echo "Iniciando reports-server..."
+                sh 'docker compose -f infra/docker-compose.perf.yml up -d reports-server'
+                sh 'sleep 3'
                 echo "Ejecutando escaneo de seguridad OWASP ZAP en Frontend..."
                 sh '/usr/local/bin/zap -cmd -quickurl http://host.docker.internal:3000 -quickout reports/zap-frontend-report.html || true'
                 echo "Ejecutando escaneo de seguridad OWASP ZAP en Backend..."
                 sh '/usr/local/bin/zap -cmd -quickurl http://host.docker.internal:3001 -quickout reports/zap-backend-report.html || true'
+                echo "Copiando reportes ZAP al reports-server..."
+                sh '''
+                    docker cp reports/zap-frontend-report.html perf_reports:/usr/share/nginx/html/reports/ 2>/dev/null || true
+                    docker cp reports/zap-backend-report.html perf_reports:/usr/share/nginx/html/reports/ 2>/dev/null || true
+                '''
             }
         }
 
@@ -217,8 +235,8 @@ pipeline {
             }
             steps {
                 sh 'mkdir -p reports'
-                echo "Starting InfluxDB..."
-                sh 'docker compose -f infra/docker-compose.perf.yml up -d influxdb grafana'
+                echo "Starting InfluxDB + Grafana + Reports Server..."
+                sh 'docker compose -f infra/docker-compose.perf.yml up -d influxdb grafana reports-server'
                 sh 'sleep 5'
                 echo "Configurando provisioning de Grafana..."
                 sh '''
@@ -255,7 +273,7 @@ pipeline {
             }
             steps {
                 sh 'mkdir -p reports'
-                echo "Starting InfluxDB + Grafana..."
+                echo "Starting InfluxDB + Grafana + Reports Server..."
                 sh 'docker compose -f infra/docker-compose.perf.yml up -d'
                 sh 'sleep 10'
                 echo "Configurando provisioning de Grafana..."
@@ -298,7 +316,7 @@ pipeline {
     post {
         always {
             echo "Archivando reportes de pruebas..."
-            archiveArtifacts artifacts: 'reports/**/*.html', allowEmptyArchive: true
+            archiveArtifacts artifacts: 'reports/**/*.html,reports/**/*.docx,reports/**/*.xlsx', allowEmptyArchive: true
         }
         success {
             echo "✅ Pipeline completado exitosamente."

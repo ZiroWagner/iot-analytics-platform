@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reportes - IOT Analytics Platform</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>Reportes de An&aacute;lisis</h1>
+    <p class="subtitle">IOT Analytics Platform &mdash; Pipeline CI/CD</p>
+    <p class="timestamp" id="timestamp">Cargando...</p>
+  </header>
+
+  <div class="cards">
+
+    <a href="reports/zap-frontend-report.html" class="card" target="_blank">
+      <div class="card-icon shield">&#x1F6E1;</div>
+      <h2>ZAP Frontend</h2>
+      <p>Escaneo de seguridad OWASP ZAP &mdash; Frontend</p>
+      <span class="tag">HTML</span>
+    </a>
+
+    <a href="reports/zap-backend-report.html" class="card" target="_blank">
+      <div class="card-icon shield">&#x1F6E1;</div>
+      <h2>ZAP Backend</h2>
+      <p>Escaneo de seguridad OWASP ZAP &mdash; Backend</p>
+      <span class="tag">HTML</span>
+    </a>
+
+    <a href="reports" class="card" id="cnes-docx">
+      <div class="card-icon doc">&#x1F4C4;</div>
+      <h2>CNES Reporte Word</h2>
+      <p>Reporte de calidad SonarQube en formato DOCX</p>
+      <span class="tag">DOCX</span>
+    </a>
+
+    <a href="reports" class="card" id="cnes-xlsx">
+      <div class="card-icon sheet">&#x1F4CA;</div>
+      <h2>CNES Reporte Excel</h2>
+      <p>Issues de SonarQube en formato XLSX</p>
+      <span class="tag">XLSX</span>
+    </a>
+
+    <a href="http://localhost:3002" class="card" target="_blank">
+      <div class="card-icon chart">&#x1F4C8;</div>
+      <h2>K6 Dashboard</h2>
+      <p>Dashboard de rendimiento en Grafana</p>
+      <span class="tag">Grafana</span>
+    </a>
+
+    <a href="print.html" class="card" target="_blank">
+      <div class="card-icon print">&#x1F5A8;</div>
+      <h2>Exportar a PDF</h2>
+      <p>Vista imprimible de todos los reportes</p>
+      <span class="tag">PDF</span>
+    </a>
+
+  </div>
+
+  <footer>
+    <p>IOT Analytics Platform &mdash; Reportes generados autom&aacute;ticamente por el pipeline CI/CD</p>
+  </footer>
+</div>
+
+<script>
+(function() {
+  document.getElementById('timestamp').textContent =
+    'Generado: ' + new Date().toLocaleString('es-CL', { timeZone: 'America/Santiago' });
+
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', 'reports/', true);
+  xhr.onload = function() {
+    if (xhr.status !== 200) return;
+    var html = xhr.responseText;
+    var docxMatch = html.match(/([^"'\s]+\.docx)/i);
+    var xlsxMatch = html.match(/([^"'\s]+\.xlsx)/i);
+    var docxEl = document.getElementById('cnes-docx');
+    var xlsxEl = document.getElementById('cnes-xlsx');
+    if (docxMatch) {
+      docxEl.href = 'reports/' + docxMatch[1];
+      docxEl.classList.add('available');
+    }
+    if (xlsxMatch) {
+      xlsxEl.href = 'reports/' + xlsxMatch[1];
+      xlsxEl.classList.add('available');
+    }
+  };
+  xhr.send();
+})();
+</script>
+</body>
+</html>

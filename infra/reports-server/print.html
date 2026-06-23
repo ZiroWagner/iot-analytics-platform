@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Exportar Reportes - IOT Analytics Platform</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="print-mode">
+<div class="container">
+  <header>
+    <h1>Reportes de An&aacute;lisis &mdash; Vista imprimible</h1>
+    <p class="subtitle">IOT Analytics Platform &mdash; Pipeline CI/CD</p>
+    <p class="timestamp" id="timestamp">Cargando...</p>
+  </header>
+
+  <div class="print-controls">
+    <button onclick="window.print()" class="btn-print">&#x1F5A8; Imprimir / Exportar PDF</button>
+  </div>
+
+  <div class="print-content" id="content">
+
+    <section class="report-section">
+      <h2>&#x1F6E1; ZAP Frontend &mdash; Escaneo de Seguridad</h2>
+      <iframe src="reports/zap-frontend-report.html" class="report-frame" onerror="this.parentElement.innerHTML = '<p class=\\'error\\'>Reporte no disponible. Ejecute el pipeline CI/CD para generarlo.</p>'"></iframe>
+    </section>
+
+    <section class="report-section">
+      <h2>&#x1F6E1; ZAP Backend &mdash; Escaneo de Seguridad</h2>
+      <iframe src="reports/zap-backend-report.html" class="report-frame" onerror="this.parentElement.innerHTML = '<p class=\\'error\\'>Reporte no disponible. Ejecute el pipeline CI/CD para generarlo.</p>'"></iframe>
+    </section>
+
+    <section class="report-section" id="section-docx">
+      <h2>&#x1F4C4; CNES Reporte Word &mdash; Calidad SonarQube</h2>
+      <p class="placeholder">Descargue el reporte DOCX desde la <a href="index.html">p&aacute;gina principal</a>.</p>
+    </section>
+
+    <section class="report-section" id="section-xlsx">
+      <h2>&#x1F4CA; CNES Reporte Excel &mdash; Issues SonarQube</h2>
+      <p class="placeholder">Descargue el reporte XLSX desde la <a href="index.html">p&aacute;gina principal</a>.</p>
+    </section>
+
+  </div>
+
+  <footer>
+    <p>IOT Analytics Platform &mdash; Reportes generados autom&aacute;ticamente por el pipeline CI/CD</p>
+  </footer>
+</div>
+
+<script>
+document.getElementById('timestamp').textContent =
+  'Generado: ' + new Date().toLocaleString('es-CL', { timeZone: 'America/Santiago' });
+</script>
+</body>
+</html>

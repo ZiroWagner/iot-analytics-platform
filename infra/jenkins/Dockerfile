@@ -8,7 +8,8 @@ RUN apt-get update && \
     ca-certificates \
     curl \
     gnupg \
-    lsb-release && \
+    lsb-release \
+    unzip && \
     rm -rf /var/lib/apt/lists/*
 
 # Instalar Docker CLI
