@@ -38,7 +38,7 @@ services:
     ports:
       - "8081:80"
     volumes:
-      - reports_data:/usr/share/nginx/html/reports:ro
+      - reports_data:/usr/share/nginx/html/reports
     networks:
       - iot-net
     restart: unless-stopped

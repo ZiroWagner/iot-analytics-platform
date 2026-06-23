@@ -234,8 +234,10 @@ pipeline {
                 sh '/usr/local/bin/zap -cmd -quickurl http://host.docker.internal:3001 -quickout reports/zap-backend-report.html || true'
                 echo "Copiando reportes ZAP al reports-server..."
                 sh '''
-                    docker cp reports/zap-frontend-report.html perf_reports:/usr/share/nginx/html/reports/ 2>/dev/null || true
-                    docker cp reports/zap-backend-report.html perf_reports:/usr/share/nginx/html/reports/ 2>/dev/null || true
+                    echo "Copiando reports/zap-frontend-report.html..."
+                    docker cp reports/zap-frontend-report.html perf_reports:/usr/share/nginx/html/reports/
+                    echo "Copiando reports/zap-backend-report.html..."
+                    docker cp reports/zap-backend-report.html perf_reports:/usr/share/nginx/html/reports/
                 '''
             }
         }
