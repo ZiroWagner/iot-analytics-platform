@@ -123,6 +123,7 @@ pipeline {
 
                             echo "Iniciando reports-server para recibir reportes..."
                             docker compose -f infra/docker-compose.perf.yml up -d reports-server
+                            chmod +x scripts/provision-reports-server.sh && ./scripts/provision-reports-server.sh
                             echo "Descargando reporte CNES SonarQube (DOCX + XLSX)..."
                             mkdir -p reports
                             HTTP_CODE=$(curl -s -o /tmp/cnes-report.zip -w "%{http_code}" \
@@ -226,7 +227,7 @@ pipeline {
                 sh 'mkdir -p reports'
                 echo "Iniciando reports-server..."
                 sh 'docker compose -f infra/docker-compose.perf.yml up -d reports-server'
-                sh 'sleep 3'
+                sh 'chmod +x scripts/provision-reports-server.sh && ./scripts/provision-reports-server.sh'
                 echo "Ejecutando escaneo de seguridad OWASP ZAP en Frontend..."
                 sh '/usr/local/bin/zap -cmd -quickurl http://host.docker.internal:3000 -quickout reports/zap-frontend-report.html || true'
                 echo "Ejecutando escaneo de seguridad OWASP ZAP en Backend..."
@@ -248,6 +249,7 @@ pipeline {
                 sh 'mkdir -p reports'
                 echo "Starting InfluxDB + Grafana + Reports Server..."
                 sh 'docker compose -f infra/docker-compose.perf.yml up -d influxdb grafana reports-server'
+                sh 'chmod +x scripts/provision-reports-server.sh && ./scripts/provision-reports-server.sh'
                 sh 'sleep 5'
                 echo "Configurando provisioning de Grafana..."
                 sh '''
@@ -286,6 +288,7 @@ pipeline {
                 sh 'mkdir -p reports'
                 echo "Starting InfluxDB + Grafana + Reports Server..."
                 sh 'docker compose -f infra/docker-compose.perf.yml up -d'
+                sh 'chmod +x scripts/provision-reports-server.sh && ./scripts/provision-reports-server.sh'
                 sh 'sleep 10'
                 echo "Configurando provisioning de Grafana..."
                 sh '''
