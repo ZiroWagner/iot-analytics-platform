@@ -22,22 +22,18 @@
 
     <section class="report-section">
       <h2>&#x1F6E1; ZAP Frontend &mdash; Escaneo de Seguridad</h2>
-      <iframe src="reports/zap-frontend-report.html" class="report-frame" onerror="this.parentElement.innerHTML = '<p class=\\'error\\'>Reporte no disponible. Ejecute el pipeline CI/CD para generarlo.</p>'"></iframe>
+      <iframe src="reports/zap-frontend-report.html" class="report-frame" onerror="this.parentElement.innerHTML = '<p class=\\'error\\'>Reporte no disponible.</p>'"></iframe>
     </section>
 
     <section class="report-section">
       <h2>&#x1F6E1; ZAP Backend &mdash; Escaneo de Seguridad</h2>
-      <iframe src="reports/zap-backend-report.html" class="report-frame" onerror="this.parentElement.innerHTML = '<p class=\\'error\\'>Reporte no disponible. Ejecute el pipeline CI/CD para generarlo.</p>'"></iframe>
+      <iframe src="reports/zap-backend-report.html" class="report-frame" onerror="this.parentElement.innerHTML = '<p class=\\'error\\'>Reporte no disponible.</p>'"></iframe>
     </section>
 
-    <section class="report-section" id="section-docx">
-      <h2>&#x1F4C4; CNES Reporte Word &mdash; Calidad SonarQube</h2>
-      <p class="placeholder">Descargue el reporte DOCX desde la <a href="index.html">p&aacute;gina principal</a>.</p>
-    </section>
-
-    <section class="report-section" id="section-xlsx">
-      <h2>&#x1F4CA; CNES Reporte Excel &mdash; Issues SonarQube</h2>
-      <p class="placeholder">Descargue el reporte XLSX desde la <a href="index.html">p&aacute;gina principal</a>.</p>
+    <section class="report-section" id="section-cnes">
+      <h2>&#x1F4CA; CNES Reportes &mdash; Calidad SonarQube</h2>
+      <div id="cnes-placeholder" class="placeholder">Cargando reportes CNES...</div>
+      <ul id="cnes-files" class="file-list" style="display:none"></ul>
     </section>
 
   </div>
@@ -48,8 +44,55 @@
 </div>
 
 <script>
-document.getElementById('timestamp').textContent =
-  'Generado: ' + new Date().toLocaleString('es-CL', { timeZone: 'America/Santiago' });
+(function() {
+  document.getElementById('timestamp').textContent =
+    'Generado: ' + new Date().toLocaleString('es-CL', { timeZone: 'America/Santiago' });
+
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', 'reports/', true);
+  xhr.onload = function() {
+    if (xhr.status !== 200) return;
+    var html = xhr.responseText;
+    var files = [];
+    var linkRegex = /<a\s+href="([^"]+\.(docx|xlsx))"[^>]*>([^<]+)<\/a>\s*(\d{2}-\w{3}-\d{4}\s+\d{2}:\d{2})\s+([\d.]+[KMG]?)/gi;
+    var match;
+    while ((match = linkRegex.exec(html)) !== null) {
+      files.push({ href: match[1], ext: match[2], name: match[3], date: match[4], size: match[5] });
+    }
+
+    var placeholder = document.getElementById('cnes-placeholder');
+    var fileList = document.getElementById('cnes-files');
+
+    if (files.length === 0) {
+      placeholder.innerHTML = 'No se encontraron reportes CNES. Ejecute el pipeline CI/CD para generarlos.';
+      return;
+    }
+
+    placeholder.style.display = 'none';
+    fileList.style.display = 'block';
+    var icons = { docx: '&#x1F4C4;', xlsx: '&#x1F4CA;' };
+
+    files.forEach(function(file) {
+      var li = document.createElement('li');
+      li.className = 'file-list-item';
+      var icon = icons[file.ext] || '&#x1F4C4;';
+      var downloadUrl = 'reports/' + file.href;
+      var previewUrl = 'preview.html?file=reports/' + file.href;
+      var extLabel = file.ext.toUpperCase();
+      li.innerHTML = '<span class="file-icon">' + icon + '</span> ' +
+        '<span class="file-name">' + file.name + '</span> ' +
+        '<span class="file-size">(' + file.size + ')</span> ' +
+        '<span class="file-date">' + file.date + '</span> ' +
+        '<span class="file-tag tag">' + extLabel + '</span> ' +
+        '<div class="file-links">' +
+          '<a href="' + downloadUrl + '" class="card-btn download-btn" download>Descargar</a> ' +
+          '<a href="' + previewUrl + '" class="card-btn preview-btn" target="_blank">Vista Previa</a>' +
+        '</div>';
+      fileList.appendChild(li);
+    });
+  };
+  xhr.send();
+})();
 </script>
 </body>
 </html>

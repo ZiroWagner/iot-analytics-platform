@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vista Previa - Reportes IOT Analytics</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="container">
+  <header class="preview-header">
+    <div class="preview-nav">
+      <a href="index.html" class="btn-back">&larr; Volver</a>
+      <h1 id="fileTitle">Cargando...</h1>
+      <div class="preview-actions">
+        <a id="downloadBtn" class="btn-action" download>Descargar</a>
+        <button onclick="window.print()" class="btn-action btn-print-action">Imprimir</button>
+      </div>
+    </div>
+  </header>
+
+  <div id="loading" class="loading">
+    <div class="spinner"></div>
+    <p>Procesando archivo...</p>
+  </div>
+
+  <div id="error" class="error" style="display:none">
+    <p id="errorMsg"></p>
+    <p>Intente <a id="errorDownload" href="#">descargar el archivo directamente</a>.</p>
+  </div>
+
+  <div id="preview-content" class="preview-content" style="display:none"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js"></script>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+<script>
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  var filePath = params.get('file');
+  var titleEl = document.getElementById('fileTitle');
+  var loadingEl = document.getElementById('loading');
+  var errorEl = document.getElementById('error');
+  var errorMsg = document.getElementById('errorMsg');
+  var contentEl = document.getElementById('preview-content');
+  var downloadBtn = document.getElementById('downloadBtn');
+  var errorDownload = document.getElementById('errorDownload');
+
+  if (!filePath) {
+    showError('No se especific&oacute; ning&uacute;n archivo.');
+    return;
+  }
+
+  var fileName = filePath.split('/').pop();
+  titleEl.textContent = fileName;
+  downloadBtn.href = filePath;
+  errorDownload.href = filePath;
+  errorDownload.textContent = fileName;
+
+  var isDocx = fileName.match(/\.docx$/i);
+  var isXlsx = fileName.match(/\.xlsx$/i);
+
+  if (!isDocx && !isXlsx) {
+    showError('Formato no soportado para vista previa: ' + fileName);
+    return;
+  }
+
+  fetch(filePath)
+    .then(function(res) {
+      if (!res.ok) throw new Error('HTTP ' + res.status + ' - ' + res.statusText);
+      return res.arrayBuffer();
+    })
+    .then(function(buffer) {
+      if (isDocx) return renderDocx(buffer);
+      if (isXlsx) return renderXlsx(buffer);
+    })
+    .catch(function(err) {
+      showError('Error al cargar el archivo: ' + err.message);
+    });
+
+  function renderDocx(buffer) {
+    mammoth.convertToHtml({ arrayBuffer: buffer })
+      .then(function(result) {
+        loadingEl.style.display = 'none';
+        contentEl.style.display = 'block';
+        contentEl.innerHTML = result.value;
+        if (result.messages.length > 0) {
+          var warn = document.createElement('div');
+          warn.className = 'preview-warnings';
+          warn.innerHTML = '<p>Advertencias:</p><ul>' +
+            result.messages.map(function(m) { return '<li>' + m.message + '</li>'; }).join('') +
+            '</ul>';
+          contentEl.insertBefore(warn, contentEl.firstChild);
+        }
+      })
+      .catch(function(err) {
+        showError('Error al convertir el DOCX: ' + err.message);
+      });
+  }
+
+  function renderXlsx(buffer) {
+    try {
+      var workbook = XLSX.read(new Uint8Array(buffer), { type: 'array' });
+      var firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+      var html = XLSX.utils.sheet_to_html(firstSheet, { id: 'xlsx-table', editable: false });
+      loadingEl.style.display = 'none';
+      contentEl.style.display = 'block';
+      contentEl.innerHTML = '<div class="xlsx-info">Mostrando primera hoja: <strong>' +
+        workbook.SheetNames[0] + '</strong> (' + workbook.SheetNames.length + ' hoja(s) total)</div>' +
+        html;
+    } catch (err) {
+      showError('Error al convertir el XLSX: ' + err.message);
+    }
+  }
+
+  function showError(msg) {
+    loadingEl.style.display = 'none';
+    errorEl.style.display = 'block';
+    errorMsg.innerHTML = msg;
+  }
+})();
+</script>
+</body>
+</html>
