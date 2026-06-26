@@ -12,6 +12,10 @@ vi.mock('socket.io-client', () => ({
   })),
 }))
 
+vi.mock('@/shared/infrastructure/http', () => ({
+  getApiBaseUrl: vi.fn(() => 'http://backend:3000'),
+}))
+
 describe('socket', () => {
   beforeEach(() => {
     __resetSocketForTests()

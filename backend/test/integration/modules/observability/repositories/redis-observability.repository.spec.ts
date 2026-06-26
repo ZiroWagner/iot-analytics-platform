@@ -7,17 +7,19 @@ describe('RedisObservabilityRepository Integration', () => {
   let repository: RedisObservabilityRepository;
   let redisClient: any;
 
-  beforeEach(async () => {
-    redisClient = {
-      xinfo: jest.fn(),
-      pipeline: jest.fn().mockReturnValue({
-        get: jest.fn(),
-        exec: jest.fn().mockResolvedValue([]),
-      }),
-      scan: jest.fn().mockResolvedValue(['0', []]),
-      publish: jest.fn(),
-      hset: jest.fn(),
-    };
+    beforeEach(async () => {
+      redisClient = {
+        xinfo: jest.fn(),
+        xpending: jest.fn(),
+        info: jest.fn(),
+        pipeline: jest.fn().mockReturnValue({
+          get: jest.fn(),
+          exec: jest.fn().mockResolvedValue([]),
+        }),
+        scan: jest.fn().mockResolvedValue(['0', []]),
+        publish: jest.fn(),
+        hset: jest.fn(),
+      };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -86,6 +88,48 @@ describe('RedisObservabilityRepository Integration', () => {
     });
   });
 
+  describe('getPendingMessages', () => {
+    it('should return pending count from xpending', async () => {
+      redisClient.xpending.mockResolvedValue(['stream', '5', 'start', 'end']);
+      const result = await repository.getPendingMessages();
+      expect(result).toBe(5);
+    });
+
+    it('should return 0 if pending result is not array', async () => {
+      redisClient.xpending.mockResolvedValue(null);
+      const result = await repository.getPendingMessages();
+      expect(result).toBe(0);
+    });
+
+    it('should return 0 on error', async () => {
+      redisClient.xpending.mockRejectedValue(new Error('fail'));
+      const result = await repository.getPendingMessages();
+      expect(result).toBe(0);
+    });
+  });
+
+  describe('getRedisMemoryUsage', () => {
+    it('should parse used_memory from INFO', async () => {
+      redisClient.info.mockResolvedValue(
+        '# Memory\nused_memory:1048576\nused_memory_human:1.00M\n',
+      );
+      const result = await repository.getRedisMemoryUsage();
+      expect(result).toBe(1048576);
+    });
+
+    it('should return 0 if used_memory not found', async () => {
+      redisClient.info.mockResolvedValue('# Memory\nno_match:123\n');
+      const result = await repository.getRedisMemoryUsage();
+      expect(result).toBe(0);
+    });
+
+    it('should return 0 on error', async () => {
+      redisClient.info.mockRejectedValue(new Error('fail'));
+      const result = await repository.getRedisMemoryUsage();
+      expect(result).toBe(0);
+    });
+  });
+
   describe('countOnlineDevices', () => {
     it('should scan and filter online devices', async () => {
       redisClient.scan.mockResolvedValueOnce([
@@ -125,6 +169,18 @@ describe('RedisObservabilityRepository Integration', () => {
 
       const result = await repository.countOnlineDevicesForUser('u1');
       expect(result).toBe(1);
+    });
+
+    it('should return 0 on pipeline error', async () => {
+      const prisma = (repository as any).prisma;
+      prisma.device = { findMany: jest.fn().mockResolvedValue([{ id: 'd1' }]) };
+      redisClient.pipeline.mockReturnValue({
+        hmget: jest.fn(),
+        exec: jest.fn().mockRejectedValue(new Error('pipeline fail')),
+      });
+
+      const result = await repository.countOnlineDevicesForUser('u1');
+      expect(result).toBe(0);
     });
   });
 

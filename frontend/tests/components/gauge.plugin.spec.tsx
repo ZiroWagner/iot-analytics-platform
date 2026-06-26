@@ -101,4 +101,67 @@ describe('gauge.plugin', () => {
       expect(screen.getByLabelText('Límite Crítico')).toBeInTheDocument()
     })
   })
+
+  describe('GaugeRender — edge cases', () => {
+    it('renders gauge normally when loading with existing data', () => {
+      const data = makeData([45])
+      render(
+        <gaugePlugin.RenderComponent config={baseConfig} data={data} isLive={false} loading={true} />
+      )
+      expect(screen.getByText('45.0')).toBeInTheDocument()
+    })
+
+    it('renders when value equals min boundary', () => {
+      const data = makeData([0])
+      render(
+        <gaugePlugin.RenderComponent config={baseConfig} data={data} isLive={false} loading={false} />
+      )
+      expect(screen.getByText('0.0')).toBeInTheDocument()
+      expect(screen.getByText('óptimo')).toBeInTheDocument()
+    })
+
+    it('renders when value equals max boundary', () => {
+      const data = makeData([100])
+      render(
+        <gaugePlugin.RenderComponent config={baseConfig} data={data} isLive={false} loading={false} />
+      )
+      expect(screen.getByText('100.0')).toBeInTheDocument()
+      expect(screen.getByText('crítico')).toBeInTheDocument()
+    })
+
+    it('renders when value is at warning threshold boundary', () => {
+      const data = makeData([70])
+      render(
+        <gaugePlugin.RenderComponent config={baseConfig} data={data} isLive={false} loading={false} />
+      )
+      expect(screen.getByText('advertencia')).toBeInTheDocument()
+    })
+
+    it('renders when value is at critical threshold boundary', () => {
+      const data = makeData([90])
+      render(
+        <gaugePlugin.RenderComponent config={baseConfig} data={data} isLive={false} loading={false} />
+      )
+      expect(screen.getByText('crítico')).toBeInTheDocument()
+    })
+
+    it('renders with custom min/max values', () => {
+      const config = { ...baseConfig, gaugeMin: -50, gaugeMax: 50, warningThreshold: 20, criticalThreshold: 40 }
+      const data = makeData([30])
+      render(
+        <gaugePlugin.RenderComponent config={config} data={data} isLive={false} loading={false} />
+      )
+      expect(screen.getByText('MÍN: -50')).toBeInTheDocument()
+      expect(screen.getByText('MÁX: 50')).toBeInTheDocument()
+      expect(screen.getByText('advertencia')).toBeInTheDocument()
+    })
+
+    it('shows awaiting telemetry when series array is empty', () => {
+      const config = { ...baseConfig, series: [] }
+      render(
+        <gaugePlugin.RenderComponent config={config} data={[]} isLive={false} loading={false} />
+      )
+      expect(screen.getByText('Esperando telemetría...')).toBeInTheDocument()
+    })
+  })
 })

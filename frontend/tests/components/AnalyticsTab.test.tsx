@@ -5,6 +5,7 @@ import { AnalyticsTab } from '@/features/analytics/presentation/AnalyticsTab'
 
 const mockGetDashboardConfig = vi.fn()
 const mockSaveDashboardConfig = vi.fn()
+const mockMigrateLegacyConfig = vi.fn()
 
 vi.mock('@/features/analytics/infrastructure/analytics.repository', () => ({
   httpAnalyticsRepository: {
@@ -20,9 +21,10 @@ vi.mock('sonner', () => ({
   toast: { success: vi.fn(), error: vi.fn() },
 }))
 
+let legacyIsLegacy = false
 vi.mock('@/features/analytics/domain/legacy', () => ({
-  isLegacyFormat: () => false,
-  migrateLegacyConfig: vi.fn(),
+  isLegacyFormat: () => legacyIsLegacy,
+  migrateLegacyConfig: (...args: unknown[]) => mockMigrateLegacyConfig(...args),
 }))
 
 vi.mock('@/features/analytics/presentation/components/ChartWidget', () => ({
@@ -76,6 +78,7 @@ describe('AnalyticsTab', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockSaveDashboardConfig.mockResolvedValue(undefined)
+    legacyIsLegacy = false
   })
 
   it('renders loading spinner while fetching config', () => {
@@ -165,5 +168,56 @@ describe('AnalyticsTab', () => {
 
     await waitFor(() => expect(screen.getByText('Tu dashboard está vacío')).toBeInTheDocument())
     expect(mockSaveDashboardConfig).toHaveBeenCalledWith('project-1', [])
+  })
+
+  it('opens edit dialog when edit button is clicked', async () => {
+    mockGetDashboardConfig.mockResolvedValue({
+      layout_config: [{ id: 'widget-1', title: 'Temperature Chart', series: [], size: 'md', timeRange: '15m', showGrid: true, showLegend: true, showReferenceLines: false, yAxisAutoRange: true, refreshInterval: 30000 }],
+    })
+    const user = userEvent.setup()
+    render(<AnalyticsTab projectId="project-1" />)
+
+    await waitFor(() => expect(screen.getByText('Temperature Chart')).toBeInTheDocument())
+    await user.click(screen.getByTestId('edit-widget'))
+    expect(screen.getByTestId('chart-config-dialog')).toBeInTheDocument()
+  })
+
+  it('handles legacy config migration', async () => {
+    legacyIsLegacy = true
+    mockGetDashboardConfig.mockResolvedValue({
+      layout_config: [{ id: 'old-widget', type: 'line', metric: 'temperature', title: 'Legacy Widget' }],
+    })
+    mockMigrateLegacyConfig.mockReturnValue([{ id: 'migrated-1', title: 'Migrated Widget', series: [], size: 'md', timeRange: '15m', showGrid: true, showLegend: true, showReferenceLines: false, yAxisAutoRange: true, refreshInterval: 30000 }])
+    render(<AnalyticsTab projectId="project-1" />)
+
+    await waitFor(() => expect(screen.getByText('Migrated Widget')).toBeInTheDocument())
+    expect(mockMigrateLegacyConfig).toHaveBeenCalled()
+    expect(mockSaveDashboardConfig).toHaveBeenCalled()
+  })
+
+  it('handles error loading config gracefully', async () => {
+    mockGetDashboardConfig.mockRejectedValue(new Error('Network error'))
+    render(<AnalyticsTab projectId="project-1" />)
+
+    await waitFor(() => {
+      expect(screen.getByText('Tu dashboard está vacío')).toBeInTheDocument()
+    })
+  })
+
+  it('handles error during save when deleting widget', async () => {
+    mockSaveDashboardConfig.mockRejectedValue(new Error('Save failed'))
+    mockGetDashboardConfig.mockResolvedValue({
+      layout_config: [{ id: 'widget-1', title: 'Temperature Chart', series: [], size: 'md', timeRange: '15m', showGrid: true, showLegend: true, showReferenceLines: false, yAxisAutoRange: true, refreshInterval: 30000 }],
+    })
+    const user = userEvent.setup()
+    render(<AnalyticsTab projectId="project-1" />)
+
+    await waitFor(() => expect(screen.getByText('Temperature Chart')).toBeInTheDocument())
+    await user.click(screen.getByTestId('remove-widget'))
+    await user.click(screen.getByTestId('confirm-delete'))
+
+    await waitFor(() => {
+      expect(screen.getByText('Tu dashboard está vacío')).toBeInTheDocument()
+    })
   })
 })

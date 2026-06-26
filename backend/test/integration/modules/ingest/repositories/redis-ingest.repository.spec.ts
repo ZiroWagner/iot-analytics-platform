@@ -69,6 +69,31 @@ describe('RedisIngestRepository Integration', () => {
         UnauthorizedException,
       );
     });
+
+    it('should throw if apiKey is cached as invalid', async () => {
+      redisClient.get.mockImplementation((key: string) => {
+        if (key.startsWith('device:apikey:')) return Promise.resolve(null);
+        if (key.startsWith('device:invalidkey:')) return Promise.resolve('1');
+        return Promise.resolve(null);
+      });
+      await expect(repository.resolveDeviceId('known-bad')).rejects.toThrow(
+        UnauthorizedException,
+      );
+    });
+  });
+
+  describe('resolveProjectId', () => {
+    it('should return cached project id', async () => {
+      redisClient.get.mockResolvedValue('p1');
+      const result = await repository.resolveProjectId('d1');
+      expect(result).toBe('p1');
+    });
+
+    it('should return "unknown" if no cached project', async () => {
+      redisClient.get.mockResolvedValue(null);
+      const result = await repository.resolveProjectId('d1');
+      expect(result).toBe('unknown');
+    });
   });
 
   describe('publishToStream', () => {

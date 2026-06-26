@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import { chartsPlugin } from '@/features/analytics/presentation/plugins/charts.plugin'
 
 const baseConfig = {
@@ -172,6 +172,119 @@ describe('charts.plugin', () => {
       expect(toggle).toBeChecked()
       toggle.click()
       expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ forecast: false }))
+    })
+  })
+
+  describe('ChartsRender — edge cases', () => {
+    it('renders without grid', () => {
+      const config = { ...baseConfig, showGrid: false }
+      const data = [
+        { 'Sensor A:temperature': 22, timeLabel: '10:00' },
+        { 'Sensor A:temperature': 25, timeLabel: '10:01' },
+      ]
+      const { container } = render(
+        <chartsPlugin.RenderComponent config={config} data={data} isLive={false} loading={false} />
+      )
+      expect(container.querySelector('.recharts-responsive-container')).toBeInTheDocument()
+    })
+
+    it('renders without legend', () => {
+      const config = { ...baseConfig, showLegend: false }
+      const data = [
+        { 'Sensor A:temperature': 22, timeLabel: '10:00' },
+        { 'Sensor A:temperature': 25, timeLabel: '10:01' },
+      ]
+      const { container } = render(
+        <chartsPlugin.RenderComponent config={config} data={data} isLive={false} loading={false} />
+      )
+      expect(container.querySelector('.recharts-responsive-container')).toBeInTheDocument()
+    })
+
+    it('renders with multiple Y axes', () => {
+      const config = {
+        ...baseConfig,
+        series: [
+          { id: 's1', sensorId: 'sens-1', sensorName: 'Sensor A', metric: 'temperature', chartType: 'line' as const, color: '#10b981', yAxisId: 'left' as const, unit: '°C' },
+          { id: 's2', sensorId: 'sens-2', sensorName: 'Sensor B', metric: 'humidity', chartType: 'line' as const, color: '#6366f1', yAxisId: 'right' as const, unit: '%' },
+        ],
+      }
+      const data = [
+        { 'Sensor A:temperature': 22, 'Sensor B:humidity': 60, timeLabel: '10:00' },
+        { 'Sensor A:temperature': 25, 'Sensor B:humidity': 55, timeLabel: '10:01' },
+      ]
+      const { container } = render(
+        <chartsPlugin.RenderComponent config={config} data={data} isLive={false} loading={false} />
+      )
+      expect(container.querySelector('.recharts-responsive-container')).toBeInTheDocument()
+    })
+
+    it('handles NaN values in anomaly detection gracefully', () => {
+      const config = { ...baseConfig, anomalyDetection: true, anomalyThreshold: 2.0 }
+      const data = [
+        { 'Sensor A:temperature': 22, timeLabel: '10:00' },
+        { 'Sensor A:temperature': NaN, timeLabel: '10:01' },
+        { 'Sensor A:temperature': 25, timeLabel: '10:02' },
+      ]
+      const { container } = render(
+        <chartsPlugin.RenderComponent config={config} data={data} isLive={false} loading={false} />
+      )
+      expect(container.querySelector('.recharts-responsive-container')).toBeInTheDocument()
+    })
+  })
+
+  describe('CustomLegend', () => {
+    it('renders chart with up trend direction', () => {
+      const config = { ...baseConfig, forecast: true }
+      const data = [
+        { 'Sensor A:temperature': 22, timeLabel: '10:00' },
+        { 'Sensor A:temperature': 25, timeLabel: '10:01' },
+      ]
+      const { container } = render(
+        <chartsPlugin.RenderComponent
+          config={config}
+          data={data}
+          isLive={false}
+          loading={false}
+          trendDirections={{ 'Sensor A:temperature': 'up' }}
+        />
+      )
+      expect(container.querySelector('.recharts-responsive-container')).toBeInTheDocument()
+    })
+
+    it('renders chart with down trend direction', () => {
+      const config = { ...baseConfig, forecast: true }
+      const data = [
+        { 'Sensor A:temperature': 22, timeLabel: '10:00' },
+        { 'Sensor A:temperature': 25, timeLabel: '10:01' },
+      ]
+      const { container } = render(
+        <chartsPlugin.RenderComponent
+          config={config}
+          data={data}
+          isLive={false}
+          loading={false}
+          trendDirections={{ 'Sensor A:temperature': 'down' }}
+        />
+      )
+      expect(container.querySelector('.recharts-responsive-container')).toBeInTheDocument()
+    })
+
+    it('renders chart with flat trend direction', () => {
+      const config = { ...baseConfig, forecast: true }
+      const data = [
+        { 'Sensor A:temperature': 22, timeLabel: '10:00' },
+        { 'Sensor A:temperature': 25, timeLabel: '10:01' },
+      ]
+      const { container } = render(
+        <chartsPlugin.RenderComponent
+          config={config}
+          data={data}
+          isLive={false}
+          loading={false}
+          trendDirections={{ 'Sensor A:temperature': 'flat' }}
+        />
+      )
+      expect(container.querySelector('.recharts-responsive-container')).toBeInTheDocument()
     })
   })
 })

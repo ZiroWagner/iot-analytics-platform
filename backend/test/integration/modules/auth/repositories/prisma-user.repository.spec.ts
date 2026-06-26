@@ -10,10 +10,12 @@ describe('PrismaUserRepository Integration', () => {
   let repository: PrismaUserRepository;
   let prismaService: any;
 
-  const prismaMock = {
+  const   prismaMock = {
     user: {
       findUnique: jest.fn(),
       create: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
     },
     account: {
       findUnique: jest.fn(),
@@ -142,6 +144,92 @@ describe('PrismaUserRepository Integration', () => {
           data: expect.objectContaining({ email: '' }),
         }),
       );
+    });
+  });
+
+  describe('findAccountByProvider', () => {
+    it('should return user if account found', async () => {
+      prismaMock.account.findUnique.mockResolvedValue({
+        user: { id: 'u1', email: 'test@test.com', name: 'Test', password: null, image: null },
+      });
+
+      const result = await repository.findAccountByProvider('google', 'g1');
+      expect(result).toEqual({ user: expect.any(User) });
+      expect(result?.user.email).toBe('test@test.com');
+    });
+
+    it('should return null if account not found', async () => {
+      prismaMock.account.findUnique.mockResolvedValue(null);
+      const result = await repository.findAccountByProvider('google', 'unknown');
+      expect(result).toBeNull();
+    });
+  });
+
+  describe('findById', () => {
+    it('should return user if found', async () => {
+      prismaMock.user.findUnique.mockResolvedValue({
+        id: 'u1', email: 'a@a.com', name: 'Alice', password: null, image: null,
+      });
+      const result = await repository.findById('u1');
+      expect(result).toBeInstanceOf(User);
+      expect(result?.email).toBe('a@a.com');
+    });
+
+    it('should return null if not found', async () => {
+      prismaMock.user.findUnique.mockResolvedValue(null);
+      const result = await repository.findById('nope');
+      expect(result).toBeNull();
+    });
+  });
+
+  describe('update', () => {
+    it('should update name only (password undefined branch)', async () => {
+      (bcrypt.hash as jest.Mock).mockResolvedValue('hashed');
+      prismaMock.user.update.mockResolvedValue({
+        id: 'u1', email: 'a@a.com', name: 'New Name', password: null, image: null,
+      });
+
+      const result = await repository.update('u1', { name: 'New Name' });
+      expect(result).toBeInstanceOf(User);
+      expect(prismaMock.user.update).toHaveBeenCalledWith({
+        where: { id: 'u1' },
+        data: { name: 'New Name' },
+      });
+    });
+
+    it('should hash and update password (name undefined branch)', async () => {
+      (bcrypt.hash as jest.Mock).mockResolvedValue('newhash');
+      prismaMock.user.update.mockResolvedValue({
+        id: 'u1', email: 'a@a.com', name: 'Test', password: 'newhash', image: null,
+      });
+
+      await repository.update('u1', { password: 'newpwd' });
+      expect(bcrypt.hash).toHaveBeenCalledWith('newpwd', 10);
+      expect(prismaMock.user.update).toHaveBeenCalledWith({
+        where: { id: 'u1' },
+        data: { password: 'newhash' },
+      });
+    });
+
+    it('should update both name and password', async () => {
+      (bcrypt.hash as jest.Mock).mockResolvedValue('newhash');
+      prismaMock.user.update.mockResolvedValue({
+        id: 'u1', email: 'a@a.com', name: 'Both', password: 'newhash', image: null,
+      });
+
+      await repository.update('u1', { name: 'Both', password: 'newpwd' });
+      expect(prismaMock.user.update).toHaveBeenCalledWith({
+        where: { id: 'u1' },
+        data: { name: 'Both', password: 'newhash' },
+      });
+    });
+  });
+
+  describe('delete', () => {
+    it('should call prisma.user.delete', async () => {
+      prismaMock.user.delete.mockResolvedValue({ id: 'u1' });
+      await repository.delete('u1');
+      expect(prismaMock.user.delete).toHaveBeenCalledWith({ where: { id: 'u1' } });
     });
   });
 });
