@@ -70,16 +70,10 @@ export class TelemetryGateway
     );
 
     // Emit system metrics to all connected clients every 5 seconds
-    setInterval(async () => {
-      try {
-        const metrics = await this.getSystemMetricsUseCase.execute();
-        if (metrics) {
-          this.server.emit('system_metrics', metrics.toPlain());
-        }
-      } catch {
-        // Silent — metrics emission is non-critical
-      }
-    }, SYSTEM_METRICS_INTERVAL_MS);
+    setInterval(
+      () => void this.emitSystemMetrics(),
+      SYSTEM_METRICS_INTERVAL_MS,
+    );
   }
 
   handleConnection(client: Socket) {
@@ -99,7 +93,7 @@ export class TelemetryGateway
     if (!projectId) return;
 
     const room = `project:${projectId}`;
-    client.join(room);
+    void client.join(room);
     this.logger.log(`Client ${client.id} joined room ${room}`);
 
     try {
@@ -123,8 +117,19 @@ export class TelemetryGateway
     if (!projectId) return;
 
     const room = `project:${projectId}`;
-    client.leave(room);
+    void client.leave(room);
     this.logger.log(`Client ${client.id} left room ${room}`);
+  }
+
+  private async emitSystemMetrics(): Promise<void> {
+    try {
+      const metrics = await this.getSystemMetricsUseCase.execute();
+      if (metrics) {
+        this.server.emit('system_metrics', metrics.toPlain());
+      }
+    } catch {
+      // Silent — metrics emission is non-critical
+    }
   }
 
   private bufferEvent(event: TelemetryEvent): void {
