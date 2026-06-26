@@ -28,8 +28,7 @@ const SYSTEM_METRICS_INTERVAL_MS = 5000;
 })
 @Injectable()
 export class TelemetryGateway
-  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
-{
+  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
@@ -41,7 +40,7 @@ export class TelemetryGateway
     @Inject(TELEMETRY_ADAPTER_TOKEN)
     private readonly telemetryAdapter: TelemetryAdapterInterface,
     private readonly getSystemMetricsUseCase: GetSystemMetricsUseCase,
-  ) {}
+  ) { }
 
   afterInit() {
     this.logger.log('TelemetryGateway initialized');
@@ -93,7 +92,7 @@ export class TelemetryGateway
     if (!projectId) return;
 
     const room = `project:${projectId}`;
-    void client.join(room);
+    client.join(room);
     this.logger.log(`Client ${client.id} joined room ${room}`);
 
     try {
@@ -117,7 +116,7 @@ export class TelemetryGateway
     if (!projectId) return;
 
     const room = `project:${projectId}`;
-    void client.leave(room);
+    client.leave(room);
     this.logger.log(`Client ${client.id} left room ${room}`);
   }
 
