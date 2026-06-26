@@ -1,0 +1,496 @@
+﻿
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.5 [39m[90mC:/Users/ZIRO/Documents/Dev/iot-analytics-platform/frontend[39m
+      [2mCoverage enabled with [22m[33mv8[39m
+
+ [32mÔ£ô[39m tests/components/SocialButton.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[33m 523[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m renders a link with the provided href [33m 439[2mms[22m[39m
+ [32mÔ£ô[39m tests/components/gauge.plugin.spec.tsx [2m([22m[2m8 tests[22m[2m)[22m[32m 207[2mms[22m[39m
+ [32mÔ£ô[39m tests/components/kpi-card.plugin.spec.tsx [2m([22m[2m9 tests[22m[2m)[22m[32m 256[2mms[22m[39m
+ [32mÔ£ô[39m tests/components/heatmap.plugin.spec.tsx [2m([22m[2m5 tests[22m[2m)[22m[33m 471[2mms[22m[39m
+node.exe : [90mstderr[2m | tests/components/AnalyticsTab.test.tsx[2m > [22m[2mAnalyticsTab[2m > [22m[2mrenders 
+loading spinner while fetching config
+En línea: 1 Carácter: 1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([90mstderr[2m...fetching config:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+[22m[39mAn update to AnalyticsTab inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+ [32mÔ£ô[39m tests/components/DeleteConfirmDialog.test.tsx [2m([22m[2m6 tests[22m[2m)[22m[33m 1119[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m renders the dialog with title and description [33m 468[2mms[22m[39m
+[90mstderr[2m | tests/components/scatter.plugin.spec.tsx[2m > [22m[2mscatter.plugin[2m > 
+[22m[2mScatterRender[2m > [22m[2mrenders chart with correlation badge when data is provided
+[22m[39mThe width(-1) and height(-1) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+
+[90mstderr[2m | tests/components/scatter.plugin.spec.tsx[2m > [22m[2mscatter.plugin[2m > 
+[22m[2mScatterRender[2m > [22m[2mshows correlation label text
+[22m[39mThe width(-1) and height(-1) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+
+ [32mÔ£ô[39m tests/components/scatter.plugin.spec.tsx [2m([22m[2m6 tests[22m[2m)[22m[32m 160[2mms[22m[39m
+[90mstderr[2m | tests/components/charts.plugin.spec.tsx[2m > [22m[2mcharts.plugin[2m > [22m[2mChartsRender[2m 
+> [22m[2mrenders chart with data
+[22m[39mThe width(-1) and height(-1) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+
+[90mstderr[2m | tests/components/charts.plugin.spec.tsx[2m > [22m[2mcharts.plugin[2m > [22m[2mChartsRender[2m 
+> [22m[2mrenders anomaly scatter points when anomaly detection is enabled
+[22m[39mThe width(-1) and height(-1) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+
+[90mstderr[2m | tests/components/charts.plugin.spec.tsx[2m > [22m[2mcharts.plugin[2m > [22m[2mChartsRender[2m 
+> [22m[2mrenders chart with trend directions when forecast is enabled
+[22m[39mThe width(-1) and height(-1) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+
+[90mstderr[2m | tests/components/charts.plugin.spec.tsx[2m > [22m[2mcharts.plugin[2m > [22m[2mChartsRender[2m 
+> [22m[2mrenders area chart type
+[22m[39mThe width(-1) and height(-1) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+
+[90mstderr[2m | tests/components/charts.plugin.spec.tsx[2m > [22m[2mcharts.plugin[2m > [22m[2mChartsRender[2m 
+> [22m[2mrenders bar chart type
+[22m[39mThe width(-1) and height(-1) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+
+ [32mÔ£ô[39m tests/components/charts.plugin.spec.tsx [2m([22m[2m12 tests[22m[2m)[22m[32m 274[2mms[22m[39m
+ [32mÔ£ô[39m tests/components/AnalyticsTab.test.tsx [2m([22m[2m8 tests[22m[2m)[22m[33m 1348[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m opens create dialog when clicking create button [33m 353[2mms[22m[39m
+[90mstderr[2m | tests/components/SettingsPage.test.tsx[2m > [22m[2mSettingsPage[2m > [22m[2mredirects to login 
+on profile fetch error
+[22m[39mError al cargar perfil: Error: Unauthorized
+    at C:/Users/ZIRO/Documents/Dev/iot-analytics-platform/frontend/tests/components/SettingsPage.test.tsx:142:42
+    at [90mfile:///C:/Users/ZIRO/Documents/Dev/iot-analytics-platform/frontend/[39mnode_modules/[4m@vitest/runner[2
+4m/dist/chunk-artifact.js:302:11
+    at [90mfile:///C:/Users/ZIRO/Documents/Dev/iot-analytics-platform/frontend/[39mnode_modules/[4m@vitest/runner[2
+4m/dist/chunk-artifact.js:1903:26
+    at [90mfile:///C:/Users/ZIRO/Documents/Dev/iot-analytics-platform/frontend/[39mnode_modules/[4m@vitest/runner[2
+4m/dist/chunk-artifact.js:2326:20
+    at new Promise (<anonymous>)
+    at runWithCancel [90m(file:///C:/Users/ZIRO/Documents/Dev/iot-analytics-platform/frontend/[39mnode_modules/[4m@v
+itest/runner[24m/dist/chunk-artifact.js:2323:10[90m)[39m
+    at [90mfile:///C:/Users/ZIRO/Documents/Dev/iot-analytics-platform/frontend/[39mnode_modules/[4m@vitest/runner[2
+4m/dist/chunk-artifact.js:2305:20
+    at new Promise (<anonymous>)
+    at runWithTimeout [90m(file:///C:/Users/ZIRO/Documents/Dev/iot-analytics-platform/frontend/[39mnode_modules/[4m@
+vitest/runner[24m/dist/chunk-artifact.js:2272:10[90m)[39m
+    at [90mfile:///C:/Users/ZIRO/Documents/Dev/iot-analytics-platform/frontend/[39mnode_modules/[4m@vitest/runner[2
+4m/dist/chunk-artifact.js:2955:64
+
+ [32mÔ£ô[39m tests/components/SettingsPage.test.tsx [2m([22m[2m8 tests[22m[2m)[22m[33m 3867[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m shows loading state initially [33m 1615[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m renders delete account section [33m 350[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m renders security tab for password users [33m 313[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m updates profile successfully [33m 580[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m shows delete confirmation dialog and deletes account [33m 536[2mms[22m[39m
+ [32mÔ£ô[39m tests/components/AuthForm.test.tsx [2m([22m[2m7 tests[22m[2m)[22m[33m 4336[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m renders login form by default [33m 845[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m switches to register mode when toggle is clicked [33m 444[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m calls loginUseCase on login form submit [33m 935[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m calls registerUseCase on register form submit [33m 1162[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m displays error message on failed login [33m 777[2mms[22m[39m
+ [32mÔ£ô[39m tests/components/theme-provider.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[32m 93[2mms[22m[39m
+ [32mÔ£ô[39m tests/hooks/useTelemetry.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 102[2mms[22m[39m
+ [32mÔ£ô[39m tests/hooks/useRealtimeSeries.test.ts [2m([22m[2m13 tests[22m[2m)[22m[32m 130[2mms[22m[39m
+ [32mÔ£ô[39m tests/integration/repositories/auth.repository.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 121[2mms[22m[39m
+[90mstderr[2m | tests/hooks/useDevicesByProject.test.ts[2m > [22m[2museDevicesByProject hook[2m > 
+[22m[2mshould refetch manually
+[22m[39mAn update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+[90mstderr[2m | tests/hooks/useDevicesByProject.test.ts[2m > [22m[2museDevicesByProject hook[2m > 
+[22m[2mshould refetch manually
+[22m[39mAn update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+ [32mÔ£ô[39m tests/hooks/useDevicesByProject.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 99[2mms[22m[39m
+[90mstderr[2m | tests/hooks/useProjects.test.ts[2m > [22m[2museProjects hook[2m > [22m[2mshould refetch 
+manually
+[22m[39mAn update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+[90mstderr[2m | tests/hooks/useProjects.test.ts[2m > [22m[2museProjects hook[2m > [22m[2mshould refetch 
+manually
+[22m[39mAn update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+[90mstderr[2m | tests/hooks/useProjects.test.ts[2m > [22m[2museProjects hook[2m > [22m[2mshould refetch 
+manually
+[22m[39mAn update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+ [32mÔ£ô[39m tests/hooks/useProjects.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 163[2mms[22m[39m
+ [32mÔ£ô[39m tests/hooks/useOverview.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 77[2mms[22m[39m
+ [32mÔ£ô[39m tests/hooks/useSensorData.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 89[2mms[22m[39m
+ [32mÔ£ô[39m tests/integration/http.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 43[2mms[22m[39m
+[90mstderr[2m | tests/hooks/useSystemMetrics.test.ts[2m > [22m[2museSystemMetrics hook[2m > [22m[2mshould 
+refresh manually
+[22m[39mAn update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+ [32mÔ£ô[39m tests/hooks/useSystemMetrics.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 69[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/utils/math-utils.test.ts [2m([22m[2m18 tests[22m[2m)[22m[32m 25[2mms[22m[39m
+ [32mÔ£ô[39m tests/integration/repositories/projects.repository.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 32[2mms[22m[39m
+ [32mÔ£ô[39m tests/integration/repositories/repositories.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 28[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/utils/cn.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 33[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/schemas/credentials.schema.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 31[2mms[22m[39m
+ [32mÔ£ô[39m tests/store/telemetry.store.test.ts [2m([22m[2m16 tests[22m[2m)[22m[32m 30[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/use-cases/login.use-case.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 33[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/utils/utils.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 28[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/use-cases/register.use-case.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 32[2mms[22m[39m
+ [32mÔ£ô[39m tests/integration/repositories/devices.repository.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 27[2mms[22m[39m
+ [32mÔ£ô[39m tests/components/ChartConfigDialog.spec.tsx [2m([22m[2m12 tests[22m[2m)[22m[33m 14413[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m renders create title when no existing config [33m 581[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m navigates to visual step after adding series [33m 2500[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m lists all widget types from registry in the visual step [33m 2826[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m renders chart-specific config form in visual step [33m 2025[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m shows advanced step with size selector [33m 1909[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m calls onSave when creating widget [33m 2121[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m allows going back to previous step [33m 1984[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/utils/telemetry-reducers.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 22[2mms[22m[39m
+ [32mÔ£ô[39m tests/integration/repositories/analytics.repository.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 26[2mms[22m[39m
+ [32mÔ£ô[39m tests/integration/repositories/sensors.repository.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 25[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/types/analytics.types.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 17[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/legacy.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 24[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/endpoints.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 20[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/rules/observability.rules.test.ts [2m([22m[2m18 tests[22m[2m)[22m[32m 21[2mms[22m[39m
+ [32mÔ£ô[39m tests/integration/telemetry-store.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 21[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/schemas/devices.schema.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 23[2mms[22m[39m
+ [32mÔ£ô[39m tests/telemetry/reducers.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 21[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/http-helpers.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 19[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/use-cases/handle-oauth-callback.use-case.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 20[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/schemas/projects.schema.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 21[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/rules/devices.rules.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 19[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/utils/sensor-metadata.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 18[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/session.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 20[2mms[22m[39m
+ [32mÔ£ô[39m tests/integration/repositories/observability.repository.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 18[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/session-full.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 18[2mms[22m[39m
+ [32mÔ£ô[39m tests/integration/socket.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 18[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/schemas/sensors-form.schema.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 20[2mms[22m[39m
+ [32mÔ£ô[39m tests/integration/store.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 18[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/types/project.types.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 18[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/utils/token-storage.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 20[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/utils/lag-color.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 17[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/metadata.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 17[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/schemas/sensors.schema.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 18[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/types/telemetry.types.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 16[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/rules/projects.rules.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 19[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/utils/chart-colors.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 16[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/use-cases/logout.use-case.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 12[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/types/sensor.types.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/types/device.types.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 13[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/utils/widget-registry.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 12[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m64 passed[39m[22m[90m (64)[39m
+[2m      Tests [22m [1m[32m404 passed[39m[22m[90m (404)[39m
+[2m   Start at [22m 03:13:33
+[2m   Duration [22m 43.33s[2m (transform 2.75s, setup 50.44s, import 46.74s, tests 28.88s, environment 269.87s)[22m
+
+[34m % [39m[2mCoverage report from [22m[33mv8[39m
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------|---------|----------|---------|---------|-------------------
+All files          |   63.88 |     57.2 |   64.11 |   63.73 |                   
+ components        |     100 |      100 |     100 |     100 |                   
+  ...irmDialog.tsx |     100 |      100 |     100 |     100 |                   
+  ...-provider.tsx |     100 |      100 |     100 |     100 |                   
+ components/auth   |   20.27 |    48.14 |      40 |   21.01 |                   
+  AuthForm.tsx     |     100 |    91.66 |     100 |     100 | 73,214            
+  ...leNetwork.tsx |       0 |        0 |       0 |       0 | 1-212             
+  SocialButton.tsx |     100 |      100 |     100 |     100 |                   
+ ...ures/analytics |       0 |        0 |       0 |       0 |                   
+  index.ts         |       0 |        0 |       0 |       0 |                   
+ ...alytics/domain |    98.3 |     87.5 |     100 |   98.93 |                   
+  chart-colors.ts  |     100 |      100 |     100 |     100 |                   
+  index.ts         |       0 |        0 |       0 |       0 |                   
+  legacy.ts        |     100 |      100 |     100 |     100 |                   
+  math-utils.ts    |   98.88 |       85 |     100 |     100 | 62-78,105         
+  ...stry.types.ts |       0 |        0 |       0 |       0 |                   
+  types.ts         |     100 |      100 |     100 |     100 |                   
+  ...t-registry.ts |    92.3 |       50 |     100 |    92.3 | 24                
+ ...infrastructure |     100 |      100 |     100 |     100 |                   
+  ...repository.ts |     100 |      100 |     100 |     100 |                   
+ ...s/presentation |   77.45 |       60 |   78.26 |   79.56 |                   
+  AnalyticsTab.tsx |   77.45 |       60 |   78.26 |   79.56 | ...63-171,220,266 
+  index.ts         |       0 |        0 |       0 |       0 |                   
+ ...ion/components |    51.8 |    51.38 |      50 |   52.83 |                   
+  ...figDialog.tsx |      82 |    79.14 |   68.75 |   83.59 | ...23,567-570,592 
+  ChartWidget.tsx  |       0 |        0 |       0 |       0 | 1-185             
+  ...lSelector.tsx |   85.71 |       25 |      75 |   83.33 | 24                
+  ...eSelector.tsx |       0 |        0 |       0 |       0 | 1-112             
+ ...tation/plugins |   85.14 |    64.83 |   74.62 |   88.41 |                   
+  ...ts.plugin.tsx |   68.51 |    45.65 |   57.14 |   68.08 | ...04,147,231-256 
+  gauge.plugin.tsx |   88.63 |    67.24 |   55.55 |   89.47 | 19-52             
+  ...ap.plugin.tsx |   90.27 |       75 |   94.11 |   98.27 | 25                
+  ...rd.plugin.tsx |    92.3 |    75.86 |      75 |   91.89 | 19-29,51          
+  ...er.plugin.tsx |   86.56 |    73.91 |   91.66 |   92.45 | 23-26,94          
+ features/auth     |       0 |        0 |       0 |       0 |                   
+  index.ts         |       0 |        0 |       0 |       0 |                   
+ ...th/application |       0 |        0 |       0 |       0 |                   
+  index.ts         |       0 |        0 |       0 |       0 |                   
+ ...tion/use-cases |      96 |    70.37 |     100 |   95.83 |                   
+  ...nt-session.ts |     100 |    66.66 |     100 |     100 | 13                
+  ...h-callback.ts |     100 |       80 |     100 |     100 | 16                
+  login.ts         |     100 |    71.42 |     100 |     100 | 26-27             
+  logout.ts        |     100 |    66.66 |     100 |     100 | 9                 
+  register.ts      |    87.5 |    66.66 |     100 |    87.5 | 35                
+ ...es/auth/domain |     100 |       90 |     100 |     100 |                   
+  ...als.schema.ts |     100 |      100 |     100 |     100 |                   
+  index.ts         |       0 |        0 |       0 |       0 |                   
+  session.ts       |     100 |       90 |     100 |     100 | 21                
+ ...infrastructure |     100 |      100 |     100 |     100 |                   
+  ...repository.ts |     100 |      100 |     100 |     100 |                   
+ ...h/presentation |       0 |        0 |       0 |       0 |                   
+  index.ts         |       0 |        0 |       0 |       0 |                   
+ ...entation/pages |       0 |        0 |       0 |       0 |                   
+  LoginPage.tsx    |       0 |      100 |       0 |       0 | 1-8               
+  ...lbackPage.tsx |       0 |        0 |       0 |       0 | 1-57              
+ features/devices  |       0 |        0 |       0 |       0 |                   
+  index.ts         |       0 |        0 |       0 |       0 |                   
+ ...devices/domain |   93.33 |     92.3 |     100 |     100 |                   
+  index.ts         |       0 |        0 |       0 |       0 |                   
+  rules.ts         |   92.85 |     92.3 |     100 |     100 | 36                
+  schemas.ts       |     100 |      100 |     100 |     100 |                   
+  types.ts         |       0 |        0 |       0 |       0 |                   
+ ...infrastructure |     100 |      100 |     100 |     100 |                   
+  ...repository.ts |     100 |      100 |     100 |     100 |                   
+ ...entation/hooks |     100 |    83.33 |     100 |     100 |                   
+  ...sByProject.ts |     100 |    83.33 |     100 |     100 | 37                
+ ...entation/pages |       0 |        0 |       0 |       0 |                   
+  ...etailPage.tsx |       0 |        0 |       0 |       0 | 1-932             
+ .../observability |       0 |        0 |       0 |       0 |                   
+  index.ts         |       0 |        0 |       0 |       0 |                   
+ ...ability/domain |     100 |      100 |     100 |     100 |                   
+  index.ts         |       0 |        0 |       0 |       0 |                   
+  rules.ts         |     100 |      100 |     100 |     100 |                   
+  types.ts         |       0 |        0 |       0 |       0 |                   
+ ...infrastructure |     100 |      100 |     100 |     100 |                   
+  ...repository.ts |     100 |      100 |     100 |     100 |                   
+ ...entation/hooks |     100 |      100 |     100 |     100 |                   
+  ...temMetrics.ts |     100 |      100 |     100 |     100 |                   
+ ...entation/pages |       0 |        0 |       0 |       0 |                   
+  MetricsPage.tsx  |       0 |        0 |       0 |       0 | 1-235             
+ features/projects |       0 |        0 |       0 |       0 |                   
+  index.ts         |       0 |        0 |       0 |       0 |                   
+ ...rojects/domain |   94.73 |    92.85 |     100 |     100 |                   
+  index.ts         |       0 |        0 |       0 |       0 |                   
+  rules.ts         |   94.44 |    92.85 |     100 |     100 | 36                
+  schemas.ts       |     100 |      100 |     100 |     100 |                   
+  types.ts         |       0 |        0 |       0 |       0 |                   
+ ...infrastructure |     100 |      100 |     100 |     100 |                   
+  ...repository.ts |     100 |      100 |     100 |     100 |                   
+ ...s/presentation |       0 |        0 |       0 |       0 |                   
+  index.ts         |       0 |        0 |       0 |       0 |                   
+ ...entation/hooks |   96.42 |    84.21 |    92.3 |     100 |                   
+  useOverview.ts   |    91.3 |       80 |      80 |     100 | 42                
+  useProjects.ts   |     100 |    85.71 |     100 |     100 | 40-41             
+ ...entation/pages |       0 |        0 |       0 |       0 |                   
+  OverviewPage.tsx |       0 |        0 |       0 |       0 | 1-168             
+  ProjectsPage.tsx |       0 |        0 |       0 |       0 | 1-321             
+ features/sensors  |       0 |        0 |       0 |       0 |                   
+  index.ts         |       0 |        0 |       0 |       0 |                   
+ ...sensors/domain |      75 |       50 |      75 |   77.77 |                   
+  index.ts         |       0 |        0 |       0 |       0 |                   
+  metadata.ts      |   72.72 |       50 |      75 |      75 | 19-20             
+  schemas.ts       |     100 |      100 |     100 |     100 |                   
+  types.ts         |       0 |        0 |       0 |       0 |                   
+ ...infrastructure |     100 |      100 |     100 |     100 |                   
+  ...repository.ts |     100 |      100 |     100 |     100 |                   
+ ...ion/components |       0 |        0 |       0 |       0 |                   
+  ...DataModal.tsx |       0 |        0 |       0 |       0 | 1-66              
+ ...entation/hooks |     100 |      100 |     100 |     100 |                   
+  useSensorData.ts |     100 |      100 |     100 |     100 |                   
+ ...ures/telemetry |       0 |        0 |       0 |       0 |                   
+  index.ts         |       0 |        0 |       0 |       0 |                   
+ ...lemetry/domain |     100 |    93.75 |     100 |     100 |                   
+  index.ts         |       0 |        0 |       0 |       0 |                   
+  reducers.ts      |     100 |    93.75 |     100 |     100 | 44                
+  types.ts         |       0 |        0 |       0 |       0 |                   
+ ...infrastructure |    90.9 |     87.5 |     100 |    90.9 |                   
+  socket.ts        |    90.9 |     87.5 |     100 |    90.9 | 14                
+ ...y/presentation |     100 |      100 |     100 |     100 |                   
+  index.ts         |       0 |        0 |       0 |       0 |                   
+  store.ts         |     100 |      100 |     100 |     100 |                   
+ ...entation/hooks |   98.33 |    90.56 |   96.29 |   98.98 |                   
+  ...timeSeries.ts |   96.96 |    93.93 |   91.66 |   98.27 | 105               
+  useTelemetry.ts  |     100 |       85 |     100 |     100 | 45,61,78          
+ lib               |       0 |        0 |       0 |       0 |                   
+  utils.ts         |       0 |        0 |       0 |       0 |                   
+ ...structure/http |   98.24 |    97.29 |   96.15 |     100 |                   
+  api-client.ts    |   95.83 |      100 |      80 |     100 |                   
+  config.ts        |     100 |       75 |     100 |     100 | 14                
+  endpoints.ts     |     100 |      100 |     100 |     100 |                   
+  index.ts         |       0 |        0 |       0 |       0 |                   
+  token-storage.ts |     100 |      100 |     100 |     100 |                   
+ shared/lib        |     100 |      100 |     100 |     100 |                   
+  index.ts         |       0 |        0 |       0 |       0 |                   
+  utils.ts         |     100 |      100 |     100 |     100 |                   
+-------------------|---------|----------|---------|---------|-------------------

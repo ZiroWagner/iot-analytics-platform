@@ -42,6 +42,33 @@ describe('scatter.plugin', () => {
       )
       expect(screen.getByText('Esperando datos combinados...')).toBeInTheDocument()
     })
+
+    it('renders chart with correlation badge when data is provided', () => {
+      const data = [
+        { 'Sensor A:temperature': 22, 'Sensor B:humidity': 60, timeLabel: '10:00' },
+        { 'Sensor A:temperature': 25, 'Sensor B:humidity': 55, timeLabel: '10:01' },
+        { 'Sensor A:temperature': 24, 'Sensor B:humidity': 58, timeLabel: '10:02' },
+        { 'Sensor A:temperature': 23, 'Sensor B:humidity': 62, timeLabel: '10:03' },
+      ]
+      const { container } = render(
+        <scatterPlugin.RenderComponent config={baseConfig} data={data} isLive={false} loading={false} />
+      )
+      expect(container.textContent).toContain('temperature')
+      expect(container.textContent).toContain('humidity')
+      expect(container.textContent).toContain('r =')
+    })
+
+    it('shows correlation label text', () => {
+      const data = [
+        { 'Sensor A:temperature': 22, 'Sensor B:humidity': 60, timeLabel: '10:00' },
+        { 'Sensor A:temperature': 25, 'Sensor B:humidity': 58, timeLabel: '10:01' },
+        { 'Sensor A:temperature': 24, 'Sensor B:humidity': 62, timeLabel: '10:02' },
+      ]
+      const { container } = render(
+        <scatterPlugin.RenderComponent config={baseConfig} data={data} isLive={false} loading={false} />
+      )
+      expect(container.textContent).toContain('Correlación')
+    })
   })
 
   describe('ScatterConfigForm', () => {

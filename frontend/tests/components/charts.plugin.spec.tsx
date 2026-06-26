@@ -36,6 +36,78 @@ describe('charts.plugin', () => {
       )
       expect(screen.getByText(/Sin datos históricos/)).toBeInTheDocument()
     })
+
+    it('renders chart with data', () => {
+      const data = [
+        { 'Sensor A:temperature': 22, timeLabel: '10:00' },
+        { 'Sensor A:temperature': 25, timeLabel: '10:01' },
+      ]
+      const { container } = render(
+        <chartsPlugin.RenderComponent config={baseConfig} data={data} isLive={false} loading={false} />
+      )
+      expect(container.querySelector('.recharts-responsive-container')).toBeInTheDocument()
+    })
+
+    it('renders anomaly scatter points when anomaly detection is enabled', () => {
+      const config = { ...baseConfig, anomalyDetection: true, anomalyThreshold: 1.5 }
+      const data = [
+        { 'Sensor A:temperature': 22, timeLabel: '10:00' },
+        { 'Sensor A:temperature': 25, timeLabel: '10:01' },
+        { 'Sensor A:temperature': 80, timeLabel: '10:02' },
+      ]
+      const { container } = render(
+        <chartsPlugin.RenderComponent config={config} data={data} isLive={false} loading={false} />
+      )
+      expect(container.querySelector('.recharts-responsive-container')).toBeInTheDocument()
+    })
+
+    it('renders chart with trend directions when forecast is enabled', () => {
+      const config = { ...baseConfig, forecast: true }
+      const data = [
+        { 'Sensor A:temperature': 22, timeLabel: '10:00' },
+        { 'Sensor A:temperature': 25, timeLabel: '10:01' },
+      ]
+      const { container } = render(
+        <chartsPlugin.RenderComponent
+          config={config}
+          data={data}
+          isLive={false}
+          loading={false}
+          trendDirections={{ 'Sensor A:temperature': 'up' }}
+        />
+      )
+      expect(container.querySelector('.recharts-responsive-container')).toBeInTheDocument()
+    })
+
+    it('renders area chart type', () => {
+      const config = {
+        ...baseConfig,
+        series: [{ ...baseConfig.series[0], chartType: 'area' as const }],
+      }
+      const data = [
+        { 'Sensor A:temperature': 22, timeLabel: '10:00' },
+        { 'Sensor A:temperature': 25, timeLabel: '10:01' },
+      ]
+      const { container } = render(
+        <chartsPlugin.RenderComponent config={config} data={data} isLive={false} loading={false} />
+      )
+      expect(container.querySelector('.recharts-responsive-container')).toBeInTheDocument()
+    })
+
+    it('renders bar chart type', () => {
+      const config = {
+        ...baseConfig,
+        series: [{ ...baseConfig.series[0], chartType: 'bar' as const }],
+      }
+      const data = [
+        { 'Sensor A:temperature': 22, timeLabel: '10:00' },
+        { 'Sensor A:temperature': 25, timeLabel: '10:01' },
+      ]
+      const { container } = render(
+        <chartsPlugin.RenderComponent config={config} data={data} isLive={false} loading={false} />
+      )
+      expect(container.querySelector('.recharts-responsive-container')).toBeInTheDocument()
+    })
   })
 
   describe('ChartsConfigForm', () => {
@@ -71,6 +143,19 @@ describe('charts.plugin', () => {
         />
       )
       expect(screen.getByLabelText('Umbral de anomalía (Z-Score)')).toBeInTheDocument()
+    })
+
+    it('shows threshold value when anomaly detection is enabled', () => {
+      const config = { ...baseConfig, anomalyDetection: true, anomalyThreshold: 2.5 }
+      render(
+        <chartsPlugin.ConfigFormComponent
+          config={config}
+          onChange={vi.fn()}
+          availableMetrics={[]}
+        />
+      )
+      const input = screen.getByLabelText('Umbral de anomalía (Z-Score)') as HTMLInputElement
+      expect(input.value).toBe('2.5')
     })
 
     it('enables forecast toggle when checked', () => {
