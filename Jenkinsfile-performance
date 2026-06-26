@@ -1,0 +1,64 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Setup Performance Stack') {
+            steps {
+                sh 'docker compose -f infra/docker-compose.perf.yml up -d influxdb grafana reports-server'
+                sh 'chmod +x scripts/provision-reports-server.sh && ./scripts/provision-reports-server.sh'
+                sh 'sleep 10'
+                sh '''
+                    docker cp infra/grafana/datasources/datasource.yml perf_grafana:/etc/grafana/provisioning/datasources/datasource.yml
+                    docker cp infra/grafana/dashboards/dashboard.yml perf_grafana:/etc/grafana/provisioning/dashboards/dashboard.yml
+                    docker cp infra/grafana/dashboards/k6-dashboard.json perf_grafana:/etc/grafana/provisioning/dashboards/k6-dashboard.json
+                    docker restart perf_grafana
+                '''
+                sh 'sleep 5'
+            }
+        }
+
+        stage('Performance: Full Battery') {
+            steps {
+                echo "Ejecutando stress test..."
+                sh '''
+                    docker run --rm --network iot-net -i \
+                        grafana/k6:0.51.0 run \
+                        -e TARGET_URL=http://backend:3000 \
+                        -e SCENARIO=stress \
+                        --out influxdb=http://influxdb:8086/k6 \
+                        - < tests/performance/load-test.js
+                '''
+                echo "Ejecutando spike test..."
+                sh '''
+                    docker run --rm --network iot-net -i \
+                        grafana/k6:0.51.0 run \
+                        -e TARGET_URL=http://backend:3000 \
+                        -e SCENARIO=spike \
+                        --out influxdb=http://influxdb:8086/k6 \
+                        - < tests/performance/load-test.js
+                '''
+                echo "Ejecutando soak test..."
+                sh '''
+                    docker run --rm --network iot-net -i \
+                        grafana/k6:0.51.0 run \
+                        -e TARGET_URL=http://backend:3000 \
+                        -e SCENARIO=soak \
+                        --out influxdb=http://influxdb:8086/k6 \
+                        - < tests/performance/load-test.js
+                '''
+            }
+        }
+    }
+
+    post {
+        always {
+            archiveArtifacts artifacts: 'reports/**/*.html', allowEmptyArchive: true
+        }
+    }
+}
