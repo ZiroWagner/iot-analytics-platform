@@ -12,14 +12,15 @@ pipeline {
         DEPLOY_STARTED = "false"
     }
 
-    triggers {
-        cron(env.BRANCH_NAME == 'main' ? '0 2 * * *' : '')
-    }
-
     options {
         buildDiscarder(logRotator(numToKeepStr: '10'))
         disableConcurrentBuilds()
         timeout(time: 90, unit: 'MINUTES')
+    }
+
+    parameters {
+        booleanParam(name: 'RUN_FULL_BATTERY', defaultValue: false,
+                     description: 'Ejecutar Performance: Full Battery (Nightly) en lugar de Smoke + Load')
     }
 
     stages {
@@ -249,7 +250,10 @@ pipeline {
         stage('Performance: Smoke + Load') {
             when {
                 beforeAgent true
-                not { triggeredBy 'cron' }
+                allOf {
+                    not { triggeredBy 'cron' }
+                    not { expression { params.RUN_FULL_BATTERY } }
+                }
             }
             steps {
                 sh 'mkdir -p reports'
@@ -288,7 +292,10 @@ pipeline {
         stage('Performance: Full Battery (Nightly)') {
             when {
                 beforeAgent true
-                triggeredBy 'cron'
+                anyOf {
+                    triggeredBy 'cron'
+                    expression { params.RUN_FULL_BATTERY }
+                }
             }
             steps {
                 sh 'mkdir -p reports'
@@ -339,7 +346,15 @@ pipeline {
             archiveArtifacts artifacts: 'reports/**/*.html,reports/**/*.docx,reports/**/*.xlsx', allowEmptyArchive: true
         }
         success {
-            echo "✅ Pipeline completado exitosamente."
+            echo "Pipeline completado exitosamente."
+            script {
+                def isCron = currentBuild.getBuildCauses().any { cause ->
+                    cause._class == 'hudson.triggers.TimerTrigger$TimerTriggerCause'
+                }
+                if (env.BRANCH_NAME == 'main' && !params.RUN_FULL_BATTERY && !isCron) {
+                    build job: 'iot-performance-full-battery', wait: false
+                }
+            }
         }
         failure {
             echo "❌ Pipeline falló."
