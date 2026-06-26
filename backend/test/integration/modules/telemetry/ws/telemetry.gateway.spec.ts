@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TelemetryGateway } from '@/telemetry/interfaces/ws/telemetry.gateway';
 import { TELEMETRY_ADAPTER_TOKEN } from '@/telemetry/infrastructure/adapters/redis-telemetry.adapter';
+import { GetSystemMetricsUseCase } from '@/observability/application/use-cases/get-system-metrics.use-case';
 
 describe('TelemetryGateway', () => {
   let gateway: TelemetryGateway;
@@ -22,6 +23,10 @@ describe('TelemetryGateway', () => {
       providers: [
         TelemetryGateway,
         { provide: TELEMETRY_ADAPTER_TOKEN, useValue: adapter },
+        {
+          provide: GetSystemMetricsUseCase,
+          useValue: { execute: jest.fn() },
+        },
       ],
     }).compile();
 

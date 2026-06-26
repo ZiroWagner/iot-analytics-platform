@@ -76,6 +76,9 @@ describe('SystemMetrics Entity', () => {
         consumerLag: 30,
         eventsPerSecond: 200,
         onlineDevices: 25,
+        pendingMessages: 0,
+        redisMemoryUsedBytes: 0,
+        dbInsertLatencyMs: 0,
         timestamp: metrics.timestamp,
       });
     });
