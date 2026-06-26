@@ -31,6 +31,10 @@ describe('useTelemetryStore', () => {
         consumerLag: 5,
         eventsPerSecond: 10,
         onlineDevices: 3,
+        timestamp: '2026-01-01T00:00:00Z',
+        pendingMessages: 10,
+        redisMemoryUsedBytes: 2048,
+        dbInsertLatencyMs: 3,
       }
       useTelemetryStore.getState().setSystemMetrics(metrics)
       expect(useTelemetryStore.getState().systemMetrics).toEqual(metrics)

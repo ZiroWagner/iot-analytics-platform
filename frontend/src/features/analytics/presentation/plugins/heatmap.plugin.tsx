@@ -5,7 +5,6 @@ import { Calendar } from "lucide-react"
 import { WidgetPlugin, WidgetPluginProps, WidgetConfigFormProps } from '../../domain/registry.types'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Label } from "@/components/ui/label"
-import type { SeriesConfig } from '../../domain/types'
 
 const DAYS = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']
 const HOURS = Array.from({ length: 24 }, (_, i) => `${String(i).padStart(2, '0')}:00`)
@@ -41,7 +40,7 @@ function HeatmapConfigForm({ config, onChange }: WidgetConfigFormProps) {
 
 type HeatmapCell = { avg: number; count: number }
 
-function HeatmapRender({ config, data, isLive, loading }: WidgetPluginProps) {
+function HeatmapRender({ config, data, loading }: WidgetPluginProps) {
   const seriesInfo = config.series[0]
   const key = seriesInfo ? `${seriesInfo.sensorName}:${seriesInfo.metric}` : ''
   const unit = seriesInfo?.unit || ''
@@ -60,11 +59,11 @@ function HeatmapRender({ config, data, isLive, loading }: WidgetPluginProps) {
       return { matrix: emptyMatrix, minVal: 0, maxVal: 0, hasData: false }
     }
 
-    data.forEach((pt: any) => {
+    (data as Record<string, unknown>[]).forEach((pt) => {
       const val = Number(pt[key])
       if (isNaN(val)) return
 
-      const date = new Date(pt.timestamp)
+      const date = new Date(pt.timestamp as string)
       const day = date.getDay()
       const hour = date.getHours()
 

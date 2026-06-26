@@ -39,6 +39,12 @@ export function AnalyticsTab({ projectId }: { projectId: string }) {
   )
   const [globalRangeStart, setGlobalRangeStart] = useState<string>('')
   const [globalRangeEnd, setGlobalRangeEnd] = useState<string>('')
+  const [now, setNow] = useState(() => Date.now())
+
+  useEffect(() => {
+    const interval = setInterval(() => setNow(Date.now()), 1000)
+    return () => clearInterval(interval)
+  }, [])
 
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingWidget, setEditingWidget] = useState<ChartWidgetConfig | undefined>()
@@ -165,12 +171,11 @@ export function AnalyticsTab({ projectId }: { projectId: string }) {
       return { from: '', to: '' }
     }
     const ms = TIME_RANGE_MS[globalTimeRange]
-    const now = Date.now()
     return {
       from: new Date(now - ms).toISOString(),
       to: new Date(now).toISOString(),
     }
-  }, [globalTimeRange, globalCustomDate, globalRangeStart, globalRangeEnd])
+  }, [globalTimeRange, globalCustomDate, globalRangeStart, globalRangeEnd, now])
 
   const openCreateDialog = () => {
     setEditingWidget(undefined)

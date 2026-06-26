@@ -19,15 +19,7 @@ const baseConfig = {
   anomalyDetection: false,
   anomalyThreshold: 3.0,
   forecast: false,
-  forecastPoints: 10,
 }
-
-const makeData = (values: number[]) =>
-  values.map((v, i) => ({
-    timestamp: new Date(Date.now() - (values.length - 1 - i) * 60000).toISOString(),
-    timeLabel: `${String(i).padStart(2, '0')}:00`,
-    'Sensor A:temperature': v,
-  }))
 
 describe('charts.plugin', () => {
   describe('ChartsRender', () => {

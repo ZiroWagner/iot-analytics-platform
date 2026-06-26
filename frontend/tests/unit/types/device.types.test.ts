@@ -13,16 +13,16 @@ describe('devices domain types', () => {
     expect(device.id).toBe('device-1')
   })
 
-  it('Device can have optional mac_address', () => {
+  it('Device can have optional macAddress', () => {
     const device: Device = {
       id: 'device-1',
       name: 'Gateway 1',
       type: 'ESP32',
       sensors: [],
       createdAt: '2026-01-01T00:00:00Z',
-      mac_address: '00:1B:44:11:3A:B7',
+      macAddress: '00:1B:44:11:3A:B7',
     }
-    expect(device.mac_address).toBe('00:1B:44:11:3A:B7')
+    expect(device.macAddress).toBe('00:1B:44:11:3A:B7')
   })
 
   it('Device can have lastSeenAt for online status', () => {

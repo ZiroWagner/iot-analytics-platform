@@ -58,7 +58,7 @@ describe('TelemetryStore', () => {
   })
 
   it('should set system metrics', () => {
-    const metrics = { streamSize: 100, consumerLag: 0, eventsPerSecond: 10, onlineDevices: 5 }
+    const metrics = { streamSize: 100, consumerLag: 0, eventsPerSecond: 10, onlineDevices: 5, timestamp: '2026-01-01T00:00:00Z', pendingMessages: 0, redisMemoryUsedBytes: 1024, dbInsertLatencyMs: 5 }
     useTelemetryStore.getState().setSystemMetrics(metrics)
     expect(useTelemetryStore.getState().systemMetrics).toEqual(metrics)
   })

@@ -4,26 +4,28 @@ import React, { useMemo } from 'react'
 import {
   ComposedChart, Line, Bar, Area,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  Legend, ReferenceLine, Scatter
+  Legend, Scatter
 } from "recharts"
 import { LineChart } from "lucide-react"
 import { WidgetPlugin, WidgetPluginProps, WidgetConfigFormProps } from '../../domain/registry.types'
 import { getAreaFillColor } from '../../domain/chart-colors'
 import { detectAnomalies } from '../../domain/math-utils'
 import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Label } from "@/components/ui/label"
-import type { SeriesConfig, TimeseriesPoint } from '../../domain/types'
+import type { SeriesConfig } from '../../domain/types'
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type TooltipEntry = { name: string; dataKey: string; color: string; value: number; payload: Record<string, any> }
 
 // Custom tooltip for Recharts
-function CustomTooltip({ active, payload, label, series }: any) {
+function CustomTooltip({ active, payload, label }: { active?: boolean; payload?: TooltipEntry[]; label?: string }) {
   if (!active || !payload || payload.length === 0) return null
 
   return (
     <div className="bg-background/95 backdrop-blur-md border border-border rounded-lg shadow-xl p-3 min-w-[180px]">
       <p className="text-[10px] text-muted-foreground mb-2 font-mono">{label}</p>
       <div className="space-y-1.5">
-        {payload.map((entry: any, idx: number) => {
+        {payload.map((entry: TooltipEntry, idx: number) => {
           const isAnomaly = entry.payload.isAnomaly && entry.dataKey === entry.name
           const isForecast = entry.payload.isForecast
 
@@ -50,7 +52,7 @@ function CustomTooltip({ active, payload, label, series }: any) {
 }
 
 // Config form component
-function ChartsConfigForm({ config, onChange, availableMetrics }: WidgetConfigFormProps) {
+function ChartsConfigForm({ config, onChange }: WidgetConfigFormProps) {
   return (
     <div className="space-y-4 pt-2">
       <div className="flex items-center justify-between">
@@ -93,11 +95,11 @@ function ChartsConfigForm({ config, onChange, availableMetrics }: WidgetConfigFo
 }
 
 // Custom legend with trend direction arrows
-function CustomLegend({ payload, trendDirections, forecastEnabled }: any) {
+function CustomLegend({ payload, trendDirections, forecastEnabled }: { payload?: { value: string; color: string }[]; trendDirections?: Record<string, 'up' | 'down' | 'flat'>; forecastEnabled?: boolean }) {
   if (!payload) return null
   return (
     <div className="flex flex-wrap gap-3 justify-center pt-2 text-xs">
-      {payload.map((entry: any) => {
+      {payload.map((entry: { value: string; color: string }) => {
         const trend = forecastEnabled ? trendDirections?.[entry.value] : null
         return (
           <div key={entry.value} className="flex items-center gap-1.5">
@@ -116,24 +118,24 @@ function CustomLegend({ payload, trendDirections, forecastEnabled }: any) {
 }
 
 // Render component
-function ChartsRender({ config, data, isLive, loading, trendDirections }: WidgetPluginProps) {
+function ChartsRender({ config, data, loading, trendDirections }: WidgetPluginProps) {
   // Pre-process data to inject Z-Score anomalies
   const processedData = useMemo(() => {
     if (!data || data.length === 0) return []
 
-    let result = data.map((pt: any) => ({ ...pt, isForecast: false, isAnomaly: false }))
+    let result = (data as Record<string, unknown>[]).map((pt) => ({ ...pt, isForecast: false, isAnomaly: false }))
 
     // 1. Anomaly Detection
     if (config.anomalyDetection) {
       config.series.forEach((s: SeriesConfig) => {
         const seriesKey = `${s.sensorName}:${s.metric}`
-        const values = data.map((pt: any) => Number(pt[seriesKey])).filter((val: number) => !isNaN(val))
+        const values = (data as Record<string, unknown>[]).map((pt) => Number(pt[seriesKey])).filter((val: number) => !isNaN(val))
         if (values.length > 0) {
           const anomalies = detectAnomalies(values, config.anomalyThreshold ?? 3.0)
           
           let valIndex = 0
-          result = result.map((pt: any) => {
-            const val = pt[seriesKey]
+          result = result.map((pt) => {
+            const val = (pt as Record<string, unknown>)[seriesKey]
             if (typeof val === 'number') {
               const isAnom = anomalies[valIndex++]
               return {
@@ -206,7 +208,7 @@ function ChartsRender({ config, data, isLive, loading, trendDirections }: Widget
               domain={['auto', 'auto']}
             />
           )}
-          <Tooltip content={<CustomTooltip series={config.series} />} />
+          <Tooltip content={<CustomTooltip />} />
           {config.showLegend && (
             <Legend
               content={<CustomLegend trendDirections={trendDirections} forecastEnabled={!!config.forecast} />}

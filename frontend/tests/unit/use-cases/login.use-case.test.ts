@@ -11,6 +11,9 @@ function buildDeps(overrides: Partial<{ token: string; throwOnLogin: boolean }> 
       return { access_token: overrides.token ?? 'token-abc' }
     }),
     register: vi.fn(),
+    getProfile: vi.fn(),
+    updateProfile: vi.fn(),
+    deleteProfile: vi.fn(),
   }
   const storage = { set: vi.fn() }
   return { repository, storage }

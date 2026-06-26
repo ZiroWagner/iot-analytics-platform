@@ -24,6 +24,7 @@ describe('useTelemetry hook', () => {
     setInitialState: ReturnType<typeof vi.fn>
     applyBatch: ReturnType<typeof vi.fn>
     clearDevices: ReturnType<typeof vi.fn>
+    clearRealtimePoints: ReturnType<typeof vi.fn>
     connected: boolean
   }
 

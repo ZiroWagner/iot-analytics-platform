@@ -61,24 +61,22 @@ export default function SettingsPage() {
     defaultValues: { currentPassword: "", newPassword: "", confirmPassword: "" },
   })
 
-  const loadProfile = async () => {
-    try {
-      setLoading(true)
-      const data = await httpAuthRepository.getProfile()
-      setProfile(data)
-      profileForm.setValue("name", data.name || "")
-    } catch (err) {
-      console.error("Error al cargar perfil:", err)
-      toast.error("No se pudo cargar el perfil de usuario")
-      router.push("/login")
-    } finally {
-      setLoading(false)
-    }
-  }
-
   useEffect(() => {
-    loadProfile()
-  }, [])
+    const load = async () => {
+      try {
+        const data = await httpAuthRepository.getProfile()
+        setProfile(data)
+        profileForm.setValue("name", data.name || "")
+      } catch (err) {
+        console.error("Error al cargar perfil:", err)
+        toast.error("No se pudo cargar el perfil de usuario")
+        router.push("/login")
+      } finally {
+        setLoading(false)
+      }
+    }
+    load()
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const onUpdateProfile = async (values: ProfileInput) => {
     try {
@@ -86,7 +84,9 @@ export default function SettingsPage() {
       const res = await httpAuthRepository.updateProfile({ name: values.name })
       tokenStorage.set(res.access_token)
       toast.success("Perfil actualizado correctamente")
-      await loadProfile()
+      const data = await httpAuthRepository.getProfile()
+      setProfile(data)
+      profileForm.setValue("name", data.name || "")
     } catch (err) {
       console.error("Error al actualizar perfil:", err)
       toast.error("Error al actualizar el perfil")

@@ -5,9 +5,8 @@ import { Activity } from "lucide-react"
 import { WidgetPlugin, WidgetPluginProps, WidgetConfigFormProps } from '../../domain/registry.types'
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import type { SeriesConfig } from '../../domain/types'
 
-function GaugeConfigForm({ config, onChange, availableMetrics }: WidgetConfigFormProps) {
+function GaugeConfigForm({ config, onChange }: WidgetConfigFormProps) {
   return (
     <div className="space-y-4 pt-2">
       <div className="grid grid-cols-2 gap-2">
@@ -59,11 +58,11 @@ function GaugeConfigForm({ config, onChange, availableMetrics }: WidgetConfigFor
   )
 }
 
-function GaugeRender({ config, data, isLive, loading }: WidgetPluginProps) {
+function GaugeRender({ config, data, loading }: WidgetPluginProps) {
   // Extract latest value from data
   const latestValue = React.useMemo(() => {
     if (!data || data.length === 0) return null
-    const latestPoint = data[data.length - 1]
+    const latestPoint = data[data.length - 1] as Record<string, unknown>
     
     // Find the first series key
     const firstSeries = config.series[0]

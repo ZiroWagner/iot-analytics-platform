@@ -12,6 +12,9 @@ describe('registerUseCase', () => {
     const repository: AuthRepository = {
       login: vi.fn(),
       register: vi.fn(async () => ({ access_token: token })),
+      getProfile: vi.fn(),
+      updateProfile: vi.fn(),
+      deleteProfile: vi.fn(),
     }
     const storage = { set: vi.fn() }
 
@@ -36,6 +39,9 @@ describe('registerUseCase', () => {
     const repository: AuthRepository = {
       login: vi.fn(),
       register: vi.fn(async () => ({ access_token: token })),
+      getProfile: vi.fn(),
+      updateProfile: vi.fn(),
+      deleteProfile: vi.fn(),
     }
     const storage = { set: vi.fn() }
 

@@ -5,9 +5,8 @@ import { TrendingUp, TrendingDown, AlertCircle } from "lucide-react"
 import { WidgetPlugin, WidgetPluginProps, WidgetConfigFormProps } from '../../domain/registry.types'
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import type { SeriesConfig } from '../../domain/types'
 
-function KPIConfigForm({ config, onChange, availableMetrics }: WidgetConfigFormProps) {
+function KPIConfigForm({ config, onChange }: WidgetConfigFormProps) {
   return (
     <div className="space-y-4 pt-2">
       <div className="grid grid-cols-2 gap-2">
@@ -36,7 +35,7 @@ function KPIConfigForm({ config, onChange, availableMetrics }: WidgetConfigFormP
   )
 }
 
-function KPIRender({ config, data, isLive, loading }: WidgetPluginProps) {
+function KPIRender({ config, data, loading }: WidgetPluginProps) {
   const seriesInfo = config.series[0]
   const key = seriesInfo ? `${seriesInfo.sensorName}:${seriesInfo.metric}` : ''
   const unit = seriesInfo?.unit || ''
@@ -47,7 +46,7 @@ function KPIRender({ config, data, isLive, loading }: WidgetPluginProps) {
       return { latest: null, trendPct: 0, isUp: true, sparklinePath: '', isWarning: false, isCritical: false }
     }
 
-    const values = data.map((pt: any) => Number(pt[key])).filter((val: number) => !isNaN(val))
+    const values = (data as Record<string, unknown>[]).map((pt) => Number(pt[key])).filter((val: number) => !isNaN(val))
     if (values.length === 0) {
       return { latest: null, trendPct: 0, isUp: true, sparklinePath: '', isWarning: false, isCritical: false }
     }
@@ -104,12 +103,6 @@ function KPIRender({ config, data, isLive, loading }: WidgetPluginProps) {
         Sin telemetría.
       </div>
     )
-  }
-
-  const getCardBorderColor = () => {
-    if (isCritical) return 'border-red-500/30 text-red-500'
-    if (isWarning) return 'border-yellow-500/30 text-yellow-500'
-    return 'border-border/50 text-purple-400'
   }
 
   return (

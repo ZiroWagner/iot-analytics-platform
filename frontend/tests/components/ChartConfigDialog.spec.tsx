@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest'
-import { render, screen, waitFor, within } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { ChartConfigDialog } from '@/features/analytics/presentation/components/ChartConfigDialog'
 import { widgetRegistry } from '@/features/analytics/domain/widget-registry'
@@ -62,7 +62,7 @@ describe('ChartConfigDialog', () => {
         open={true}
         onOpenChange={vi.fn()}
         metrics={mockMetrics}
-        existingConfig={{ id: 'w-1', title: 'Test', series: [], size: 'md', timeRange: '15m', showGrid: true, showLegend: true, showReferenceLines: false, yAxisAutoRange: true, refreshInterval: 3000 } as any}
+        existingConfig={{ id: 'w-1', title: 'Test', series: [], size: 'md' as const, timeRange: '15m' as const, showGrid: true, showLegend: true, showReferenceLines: false, yAxisAutoRange: true, refreshInterval: 3000 }}
         onSave={vi.fn()}
       />
     )

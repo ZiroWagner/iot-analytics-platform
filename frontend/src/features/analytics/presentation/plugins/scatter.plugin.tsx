@@ -7,10 +7,9 @@ import {
 } from "recharts"
 import { Grid } from "lucide-react"
 import { WidgetPlugin, WidgetPluginProps, WidgetConfigFormProps } from '../../domain/registry.types'
-import { Label } from "@/components/ui/label"
-import type { SeriesConfig } from '../../domain/types'
 
-function ScatterConfigForm({ config, onChange }: WidgetConfigFormProps) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function ScatterConfigForm(_props: WidgetConfigFormProps) {
   return (
     <div className="space-y-4 pt-2">
       <p className="text-xs text-muted-foreground">
@@ -20,21 +19,21 @@ function ScatterConfigForm({ config, onChange }: WidgetConfigFormProps) {
   )
 }
 
-function ScatterTooltip({ active, payload }: any) {
+function ScatterTooltip({ active, payload }: { active?: boolean; payload?: { payload: Record<string, unknown> }[] }) {
   if (!active || !payload || payload.length === 0) return null
 
   const dataPoint = payload[0].payload
   return (
     <div className="bg-background/95 backdrop-blur-md border border-border rounded-lg shadow-xl p-3 text-xs">
-      <p className="text-[10px] text-muted-foreground mb-1.5 font-mono">{dataPoint.timeLabel}</p>
+      <p className="text-[10px] text-muted-foreground mb-1.5 font-mono">{dataPoint.timeLabel as string}</p>
       <div className="space-y-1">
         <div>
-          <span className="text-muted-foreground">Eje X ({dataPoint.xName}): </span>
-          <span className="font-semibold font-mono">{dataPoint.xVal.toFixed(2)}</span>
+          <span className="text-muted-foreground">Eje X ({dataPoint.xName as string}): </span>
+          <span className="font-semibold font-mono">{(dataPoint.xVal as number).toFixed(2)}</span>
         </div>
         <div>
-          <span className="text-muted-foreground">Eje Y ({dataPoint.yName}): </span>
-          <span className="font-semibold font-mono">{dataPoint.yVal.toFixed(2)}</span>
+          <span className="text-muted-foreground">Eje Y ({dataPoint.yName as string}): </span>
+          <span className="font-semibold font-mono">{(dataPoint.yVal as number).toFixed(2)}</span>
         </div>
       </div>
     </div>
@@ -55,7 +54,7 @@ function pearsonCorrelation(x: number[], y: number[]): number {
   return num / den
 }
 
-function ScatterRender({ config, data, isLive, loading }: WidgetPluginProps) {
+function ScatterRender({ config, data, loading }: WidgetPluginProps) {
   const xSeries = config.series[0]
   const ySeries = config.series[1]
 
@@ -71,11 +70,11 @@ function ScatterRender({ config, data, isLive, loading }: WidgetPluginProps) {
     const xValues: number[] = []
     const yValues: number[] = []
 
-    data.forEach((pt: any) => {
+    ;(data as Record<string, unknown>[]).forEach((pt: Record<string, unknown>) => {
       const xVal = Number(pt[xKey])
       const yVal = Number(pt[yKey])
       if (isNaN(xVal) || isNaN(yVal)) return
-      points.push({ xVal, yVal, xName: xSeries.metric, yName: ySeries.metric, timeLabel: pt.timeLabel })
+      points.push({ xVal, yVal, xName: xSeries.metric, yName: ySeries.metric, timeLabel: pt.timeLabel as string })
       xValues.push(xVal)
       yValues.push(yVal)
     })
@@ -101,7 +100,7 @@ function ScatterRender({ config, data, isLive, loading }: WidgetPluginProps) {
   if (!xSeries || !ySeries) {
     return (
       <div className="h-[280px] w-full flex items-center justify-center text-muted-foreground text-xs text-center p-4">
-        Añade exactamente 2 series en la pestaña "Series" para habilitar la dispersión XY.
+        Añade exactamente 2 series en la pestaña &quot;Series&quot; para habilitar la dispersión XY.
       </div>
     )
   }

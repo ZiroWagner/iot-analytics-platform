@@ -178,8 +178,8 @@ interface VisualStepProps {
   updateSeries: (id: string, updates: Partial<SeriesConfig>) => void
   widgetType: string
   setWidgetType: (type: string) => void
-  pluginConfig: Record<string, any>
-  setPluginConfig: (cfg: Record<string, any>) => void
+  pluginConfig: Record<string, unknown>
+  setPluginConfig: (cfg: Record<string, unknown>) => void
   availableMetrics: AvailableMetric[]
 }
 
@@ -187,6 +187,10 @@ function VisualStep({
   series, updateSeries, widgetType, setWidgetType,
   pluginConfig, setPluginConfig, availableMetrics
 }: VisualStepProps) {
+  const plugin = useMemo(() => {
+    return widgetRegistry.get(widgetType) ?? widgetRegistry.get('charts')!
+  }, [widgetType])
+
   if (series.length === 0) {
     return (
       <div className="space-y-4">
@@ -196,10 +200,6 @@ function VisualStep({
       </div>
     )
   }
-
-  const plugin = useMemo(() => {
-    return widgetRegistry.get(widgetType) ?? widgetRegistry.get('charts')!
-  }, [widgetType])
 
   const ConfigFormComponent = plugin.ConfigFormComponent
 
@@ -447,7 +447,7 @@ export function ChartConfigDialog({
   const [yMin, setYMin] = useState<string>(existingConfig?.yAxisMin?.toString() ?? '')
   const [yMax, setYMax] = useState<string>(existingConfig?.yAxisMax?.toString() ?? '')
   const [widgetType, setWidgetType] = useState<string>(existingConfig?.type ?? 'charts')
-  const [pluginConfig, setPluginConfig] = useState<Record<string, any>>(existingConfig ?? {})
+  const [pluginConfig, setPluginConfig] = useState<Record<string, unknown>>(existingConfig ?? {})
   const [selGateway, setSelGateway] = useState('')
   const [selSensor, setSelSensor] = useState('')
   const [selMetric, setSelMetric] = useState('')
@@ -525,7 +525,7 @@ export function ChartConfigDialog({
 
   const handleSave = () => {
     const config: ChartWidgetConfig = {
-      ...pluginConfig,
+      ...pluginConfig as ChartWidgetConfig,
       id: existingConfig?.id ?? `w_${crypto.randomUUID()}`,
       title: title || 'Sin título',
       series,

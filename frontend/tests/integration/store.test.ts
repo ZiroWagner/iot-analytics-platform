@@ -17,6 +17,10 @@ describe('useTelemetryStore', () => {
       consumerLag: 2,
       eventsPerSecond: 5,
       onlineDevices: 1,
+      timestamp: '2026-01-01T00:00:00Z',
+      pendingMessages: 0,
+      redisMemoryUsedBytes: 1024,
+      dbInsertLatencyMs: 5,
     }
 
     useTelemetryStore.getState().setConnected(true)

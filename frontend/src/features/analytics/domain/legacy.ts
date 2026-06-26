@@ -1,10 +1,8 @@
 import { CHART_COLORS } from './chart-colors'
 import {
   DEFAULT_WIDGET_CONFIG,
-  type ChartSeriesType,
   type ChartWidgetConfig,
   type LegacyChartConfig,
-  type YAxisPosition,
 } from './types'
 
 /** Detect if layout_config is in the legacy (pre-series) format. */
