@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useState, useCallback } from "react"
+import React, { useEffect, useState, useCallback, useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { Plus, BarChart3, Sparkles } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -8,6 +8,7 @@ import { toast } from "sonner"
 import { ChartWidget } from "./components/ChartWidget"
 import { ChartConfigDialog } from "./components/ChartConfigDialog"
 import { TimeRangeSelector } from "./components/TimeRangeSelector"
+import { RefreshIntervalSelector } from "./components/RefreshIntervalSelector"
 import { DeleteConfirmDialog } from "@/components/DeleteConfirmDialog"
 import type {
   AvailableMetric,
@@ -15,6 +16,7 @@ import type {
   LegacyChartConfig,
   TimeRangePreset,
 } from "../domain/types"
+import { TIME_RANGE_MS } from "../domain/types"
 import { isLegacyFormat, migrateLegacyConfig } from "../domain/legacy"
 import { httpAnalyticsRepository } from "../infrastructure/analytics.repository"
 
@@ -31,9 +33,12 @@ export function AnalyticsTab({ projectId }: { projectId: string }) {
   const [metrics, setMetrics] = useState<AvailableMetric[]>([])
   const [loadingConfig, setLoadingConfig] = useState(true)
   const [globalTimeRange, setGlobalTimeRange] = useState<TimeRangePreset>('15m')
+  const [globalRefreshInterval, setGlobalRefreshInterval] = useState(3000)
   const [globalCustomDate, setGlobalCustomDate] = useState<string>(
     new Date().toISOString().split('T')[0],
   )
+  const [globalRangeStart, setGlobalRangeStart] = useState<string>('')
+  const [globalRangeEnd, setGlobalRangeEnd] = useState<string>('')
 
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingWidget, setEditingWidget] = useState<ChartWidgetConfig | undefined>()
@@ -136,6 +141,37 @@ export function AnalyticsTab({ projectId }: { projectId: string }) {
     setDialogOpen(true)
   }
 
+  // Pre-compute time range once for all widgets
+  const timeParams = useMemo(() => {
+    if (globalTimeRange === 'custom') {
+      if (globalCustomDate) {
+        const [y, m, d] = globalCustomDate!.split('-').map(Number)
+        return {
+          from: new Date(y, m - 1, d).toISOString(),
+          to: new Date().toISOString(),
+        }
+      }
+      return { from: '', to: '' }
+    }
+    if (globalTimeRange === 'range') {
+      if (globalRangeStart && globalRangeEnd) {
+        const [ys, ms, ds] = globalRangeStart!.split('-').map(Number)
+        const [ye, me, de] = globalRangeEnd!.split('-').map(Number)
+        return {
+          from: new Date(ys, ms - 1, ds).toISOString(),
+          to: new Date(ye, me - 1, de).toISOString(),
+        }
+      }
+      return { from: '', to: '' }
+    }
+    const ms = TIME_RANGE_MS[globalTimeRange]
+    const now = Date.now()
+    return {
+      from: new Date(now - ms).toISOString(),
+      to: new Date(now).toISOString(),
+    }
+  }, [globalTimeRange, globalCustomDate, globalRangeStart, globalRangeEnd])
+
   const openCreateDialog = () => {
     setEditingWidget(undefined)
     setDialogOpen(true)
@@ -174,6 +210,13 @@ export function AnalyticsTab({ projectId }: { projectId: string }) {
             onChange={setGlobalTimeRange}
             customDate={globalCustomDate}
             onCustomDateChange={setGlobalCustomDate}
+            rangeStart={globalRangeStart}
+            rangeEnd={globalRangeEnd}
+            onRangeChange={(start, end) => { setGlobalRangeStart(start); setGlobalRangeEnd(end) }}
+          />
+          <RefreshIntervalSelector
+            value={globalRefreshInterval}
+            onChange={setGlobalRefreshInterval}
           />
           <Button
             className="bg-purple-600 hover:bg-purple-500 shadow-lg shadow-purple-500/20 h-8 text-xs"
@@ -211,8 +254,9 @@ export function AnalyticsTab({ projectId }: { projectId: string }) {
               <ChartWidget
                 projectId={projectId}
                 config={widget}
-                globalTimeRange={globalTimeRange}
-                globalCustomDate={globalCustomDate}
+                timeFrom={timeParams.from}
+                timeTo={timeParams.to}
+                refreshInterval={globalRefreshInterval}
                 onRemove={() => handleRemoveWidget(widget.id)}
                 onEdit={() => handleEditWidget(widget)}
               />

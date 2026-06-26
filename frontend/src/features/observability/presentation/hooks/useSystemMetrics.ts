@@ -2,9 +2,10 @@
 
 import { useCallback, useEffect, useState } from "react"
 import { httpObservabilityRepository } from "../../infrastructure/observability.repository"
+import { useTelemetryStore } from "@/features/telemetry"
 import type { SystemMetrics } from "../../domain/types"
 
-const DEFAULT_POLL_MS = 3000
+const FALLBACK_POLL_MS = 10000
 
 export interface UseSystemMetricsResult {
   metrics: SystemMetrics | null
@@ -12,21 +13,27 @@ export interface UseSystemMetricsResult {
   refresh: () => Promise<void>
 }
 
-/** Polls the global observability metrics endpoint (silent on error). */
+/**
+ * Reads system metrics from the WebSocket store (fastest path).
+ * Falls back to HTTP polling as a safety net.
+ */
 export function useSystemMetrics(
-  pollMs: number = DEFAULT_POLL_MS,
+  pollMs: number = FALLBACK_POLL_MS,
 ): UseSystemMetricsResult {
-  const [metrics, setMetrics] = useState<SystemMetrics | null>(null)
+  const wsMetrics = useTelemetryStore((s) => s.systemMetrics)
+  const [httpMetrics, setHttpMetrics] = useState<SystemMetrics | null>(null)
   const [loading, setLoading] = useState(true)
+  const [initialFetchDone, setInitialFetchDone] = useState(false)
 
   const fetch = useCallback(async () => {
     try {
       const data = await httpObservabilityRepository.metrics()
-      setMetrics(data)
+      setHttpMetrics(data)
     } catch {
       // silent retry on next tick
     } finally {
       setLoading(false)
+      setInitialFetchDone(true)
     }
   }, [])
 
@@ -40,5 +47,8 @@ export function useSystemMetrics(
     }
   }, [fetch, pollMs])
 
-  return { metrics, loading, refresh: fetch }
+  // Use WebSocket metrics when available, fall back to HTTP
+  const metrics = wsMetrics ?? httpMetrics
+
+  return { metrics, loading: loading && !initialFetchDone, refresh: fetch }
 }

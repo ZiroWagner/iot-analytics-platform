@@ -19,6 +19,7 @@ import type {
   ChartSeriesType, YAxisPosition, WidgetSize
 } from "../../domain/types"
 import { DEFAULT_WIDGET_CONFIG, SIZE_LABELS, CHART_TYPE_LABELS } from "../../domain/types"
+import { widgetRegistry } from "../../domain/widget-registry"
 
 type WizardStep = 'series' | 'visual' | 'advanced'
 
@@ -111,7 +112,10 @@ function SeriesStep({
       )}
 
       <div className="space-y-3 p-3 rounded-lg border border-dashed border-border/60 bg-accent/10">
-        <span className="text-xs font-medium text-muted-foreground">+ Añadir serie</span>
+        <span className="text-xs font-medium text-muted-foreground">Seleccionar métrica del sensor</span>
+        <p className="text-[10px] text-muted-foreground -mt-1 italic">
+          Elige un gateway, sensor y la métrica que deseas monitorear.
+        </p>
 
         <Select value={selGateway} onValueChange={(v) => { setSelGateway(v ?? ''); setSelSensor(''); setSelMetric('') }}>
           <SelectTrigger className="h-8 text-xs bg-background/60">
@@ -172,9 +176,17 @@ function SeriesStep({
 interface VisualStepProps {
   series: SeriesConfig[]
   updateSeries: (id: string, updates: Partial<SeriesConfig>) => void
+  widgetType: string
+  setWidgetType: (type: string) => void
+  pluginConfig: Record<string, any>
+  setPluginConfig: (cfg: Record<string, any>) => void
+  availableMetrics: AvailableMetric[]
 }
 
-function VisualStep({ series, updateSeries }: VisualStepProps) {
+function VisualStep({
+  series, updateSeries, widgetType, setWidgetType,
+  pluginConfig, setPluginConfig, availableMetrics
+}: VisualStepProps) {
   if (series.length === 0) {
     return (
       <div className="space-y-4">
@@ -185,78 +197,137 @@ function VisualStep({ series, updateSeries }: VisualStepProps) {
     )
   }
 
+  const plugin = useMemo(() => {
+    return widgetRegistry.get(widgetType) ?? widgetRegistry.get('charts')!
+  }, [widgetType])
+
+  const ConfigFormComponent = plugin.ConfigFormComponent
+
   return (
     <div className="space-y-4">
-      {series.map((s) => (
-        <div key={s.id} className="p-3 rounded-lg border border-border/50 bg-accent/10 space-y-3">
+      <div className="space-y-1.5">
+        <div className="flex items-center justify-between">
+          <label className="text-xs font-medium text-muted-foreground">Tipo de Visualización</label>
           <div className="flex items-center gap-2">
-            <span className="h-3 w-3 rounded-full" style={{ backgroundColor: s.color }} />
-            <span className="text-xs font-semibold">{s.metric}</span>
-            <span className="text-[10px] text-muted-foreground">— {s.sensorName}</span>
-          </div>
-
-          <div className="grid grid-cols-3 gap-2">
-            <div className="space-y-1">
-              <label className="text-[10px] text-muted-foreground">Tipo</label>
-              <div className="flex gap-1">
-                {(['line', 'bar', 'area'] as ChartSeriesType[]).map(type => (
-                  <Button
-                    key={type}
-                    variant="ghost"
-                    size="icon"
-                    className={cn(
-                      "h-7 w-7",
-                      s.chartType === type
-                        ? "bg-purple-500/20 text-purple-400 ring-1 ring-purple-500/30"
-                        : "text-muted-foreground"
-                    )}
-                    onClick={() => updateSeries(s.id, { chartType: type })}
-                    title={CHART_TYPE_LABELS[type]}
-                  >
-                    {getChartTypeIcon(type)}
-                  </Button>
-                ))}
-              </div>
-            </div>
-
-            <div className="space-y-1">
-              <label className="text-[10px] text-muted-foreground">Unidad</label>
-              <Input
-                value={s.unit}
-                onChange={e => updateSeries(s.id, { unit: e.target.value })}
-                placeholder="°C, %, hPa"
-                className="h-7 text-xs bg-background/60"
-              />
-            </div>
-
-            <div className="space-y-1">
-              <label className="text-[10px] text-muted-foreground">Eje Y</label>
-              <Select
-                value={s.yAxisId}
-                onValueChange={(v) => updateSeries(s.id, { yAxisId: (v ?? 'left') as YAxisPosition })}
-              >
-                <SelectTrigger className="h-7 text-xs bg-background/60">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="left" className="text-xs">Izquierdo</SelectItem>
-                  <SelectItem value="right" className="text-xs">Derecho</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className="space-y-1">
-            <label className="text-[10px] text-muted-foreground">Color</label>
-            <input
-              type="color"
-              value={s.color}
-              onChange={e => updateSeries(s.id, { color: e.target.value })}
-              className="h-7 w-full rounded cursor-pointer border border-border"
-            />
+            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-purple-500/15 text-purple-400 border border-purple-500/20">
+              {widgetRegistry.get(widgetType)?.name ?? widgetType}
+            </span>
+            {series.filter(s => s.metric).length > 0 && (
+              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-accent text-muted-foreground border border-border/30">
+                {series.filter(s => s.metric).length} serie{series.filter(s => s.metric).length !== 1 ? 's' : ''}
+              </span>
+            )}
           </div>
         </div>
-      ))}
+        <Select value={widgetType} onValueChange={(val) => setWidgetType(val || 'charts')}>
+          <SelectTrigger className="h-9 bg-background/60">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {widgetRegistry.getAll().map((p) => (
+              <SelectItem key={p.type} value={p.type} className="text-xs">
+                {p.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <p className="text-[10px] text-muted-foreground italic mt-0.5">
+          {plugin.description}
+        </p>
+      </div>
+
+      {/* Render plugin specific configuration */}
+      {ConfigFormComponent && (
+        <div className="p-3 rounded-lg border border-border/40 bg-accent/5">
+          <label className="text-[11px] font-bold text-muted-foreground block mb-2 uppercase tracking-wider">
+            Opciones del Widget
+          </label>
+          <ConfigFormComponent
+            config={pluginConfig}
+            onChange={(updated) => setPluginConfig(updated)}
+            availableMetrics={availableMetrics}
+          />
+        </div>
+      )}
+
+      {/* Only show series chart customizations for charts (Recharts) */}
+      {widgetType === 'charts' && (
+        <div className="space-y-3">
+          <label className="text-xs font-semibold text-muted-foreground block">
+            Estilo de Series Individuales
+          </label>
+          {series.map((s) => (
+            <div key={s.id} className="p-3 rounded-lg border border-border/50 bg-accent/10 space-y-3">
+              <div className="flex items-center gap-2">
+                <span className="h-3 w-3 rounded-full" style={{ backgroundColor: s.color }} />
+                <span className="text-xs font-semibold">{s.metric}</span>
+                <span className="text-[10px] text-muted-foreground">— {s.sensorName}</span>
+              </div>
+
+              <div className="grid grid-cols-3 gap-2">
+                <div className="space-y-1">
+                  <label className="text-[10px] text-muted-foreground">Tipo</label>
+                  <div className="flex gap-1">
+                    {(['line', 'bar', 'area'] as ChartSeriesType[]).map(type => (
+                      <Button
+                        key={type}
+                        variant="ghost"
+                        size="icon"
+                        className={cn(
+                          "h-7 w-7",
+                          s.chartType === type
+                            ? "bg-purple-500/20 text-purple-400 ring-1 ring-purple-500/30"
+                            : "text-muted-foreground"
+                        )}
+                        onClick={() => updateSeries(s.id, { chartType: type })}
+                        title={CHART_TYPE_LABELS[type]}
+                      >
+                        {getChartTypeIcon(type)}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[10px] text-muted-foreground">Unidad</label>
+                  <Input
+                    value={s.unit}
+                    onChange={e => updateSeries(s.id, { unit: e.target.value })}
+                    placeholder="°C, %, hPa"
+                    className="h-7 text-xs bg-background/60"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[10px] text-muted-foreground">Eje Y</label>
+                  <Select
+                    value={s.yAxisId}
+                    onValueChange={(v) => updateSeries(s.id, { yAxisId: (v ?? 'left') as YAxisPosition })}
+                  >
+                    <SelectTrigger className="h-7 text-xs bg-background/60">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="left" className="text-xs">Izquierdo</SelectItem>
+                      <SelectItem value="right" className="text-xs">Derecho</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[10px] text-muted-foreground">Color</label>
+                <input
+                  type="color"
+                  value={s.color}
+                  onChange={e => updateSeries(s.id, { color: e.target.value })}
+                  className="h-7 w-full rounded cursor-pointer border border-border"
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
@@ -279,7 +350,8 @@ interface AdvancedStepProps {
 }
 
 function AdvancedStep({
-  size, setSize, showGrid, setShowGrid, showLegend, setShowLegend,
+  size, setSize,
+  showGrid, setShowGrid, showLegend, setShowLegend,
   showRefLines, setShowRefLines, yAxisAuto, setYAxisAuto,
   yMin, setYMin, yMax, setYMax,
 }: AdvancedStepProps) {
@@ -303,7 +375,7 @@ function AdvancedStep({
         {[
           { label: 'Grilla', value: showGrid, set: setShowGrid },
           { label: 'Leyenda', value: showLegend, set: setShowLegend },
-          { label: 'Ref. lines', value: showRefLines, set: setShowRefLines },
+          { label: 'Líneas ref.', value: showRefLines, set: setShowRefLines },
         ].map(t => (
           <button
             key={t.label}
@@ -330,7 +402,7 @@ function AdvancedStep({
             )}
             onClick={() => setYAxisAuto(!yAxisAuto)}
           >
-            {yAxisAuto ? 'Auto' : 'Manual'}
+            {yAxisAuto ? 'Automático' : 'Manual'}
           </button>
         </div>
         {!yAxisAuto && (
@@ -374,6 +446,8 @@ export function ChartConfigDialog({
   const [yAxisAuto, setYAxisAuto] = useState(existingConfig?.yAxisAutoRange ?? true)
   const [yMin, setYMin] = useState<string>(existingConfig?.yAxisMin?.toString() ?? '')
   const [yMax, setYMax] = useState<string>(existingConfig?.yAxisMax?.toString() ?? '')
+  const [widgetType, setWidgetType] = useState<string>(existingConfig?.type ?? 'charts')
+  const [pluginConfig, setPluginConfig] = useState<Record<string, any>>(existingConfig ?? {})
   const [selGateway, setSelGateway] = useState('')
   const [selSensor, setSelSensor] = useState('')
   const [selMetric, setSelMetric] = useState('')
@@ -391,6 +465,8 @@ export function ChartConfigDialog({
       setYAxisAuto(existingConfig?.yAxisAutoRange ?? true)
       setYMin(existingConfig?.yAxisMin?.toString() ?? '')
       setYMax(existingConfig?.yAxisMax?.toString() ?? '')
+      setWidgetType(existingConfig?.type ?? 'charts')
+      setPluginConfig(existingConfig ?? {})
       setSelGateway('')
       setSelSensor('')
       setSelMetric('')
@@ -449,18 +525,20 @@ export function ChartConfigDialog({
 
   const handleSave = () => {
     const config: ChartWidgetConfig = {
+      ...pluginConfig,
       id: existingConfig?.id ?? `w_${crypto.randomUUID()}`,
       title: title || 'Sin título',
       series,
       size,
-      timeRange: existingConfig?.timeRange ?? DEFAULT_WIDGET_CONFIG.timeRange,
       showGrid,
       showLegend,
       showReferenceLines: showRefLines,
+      timeRange: DEFAULT_WIDGET_CONFIG.timeRange,
+      refreshInterval: DEFAULT_WIDGET_CONFIG.refreshInterval,
       yAxisAutoRange: yAxisAuto,
       yAxisMin: yMin ? Number(yMin) : undefined,
       yAxisMax: yMax ? Number(yMax) : undefined,
-      refreshInterval: existingConfig?.refreshInterval ?? DEFAULT_WIDGET_CONFIG.refreshInterval,
+      type: widgetType,
     }
     onSave(config)
     onOpenChange(false)
@@ -472,6 +550,8 @@ export function ChartConfigDialog({
     setTitle('')
     setSeries([])
     setSize('md')
+    setWidgetType('charts')
+    setPluginConfig({})
     setSelGateway('')
     setSelSensor('')
     setSelMetric('')
@@ -504,7 +584,6 @@ export function ChartConfigDialog({
             Configura las series de datos y la visualización del gráfico.
           </DialogDescription>
         </DialogHeader>
-
         <div className="flex items-center px-6 py-3 border-b border-border/50 bg-accent/20">
           {steps.map((s, i) => (
             <React.Fragment key={s.key}>
@@ -545,7 +624,15 @@ export function ChartConfigDialog({
           )}
 
           {step === 'visual' && (
-            <VisualStep series={series} updateSeries={updateSeries} />
+            <VisualStep
+              series={series}
+              updateSeries={updateSeries}
+              widgetType={widgetType}
+              setWidgetType={setWidgetType}
+              pluginConfig={pluginConfig}
+              setPluginConfig={setPluginConfig}
+              availableMetrics={metrics}
+            />
           )}
 
           {step === 'advanced' && (

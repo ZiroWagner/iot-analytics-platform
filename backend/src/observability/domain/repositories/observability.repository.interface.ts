@@ -8,6 +8,8 @@ export interface ObservabilityRepositoryInterface {
   getEventsPerSecond(): Promise<number>;
   countOnlineDevices(): Promise<number>;
   countOnlineDevicesForUser(userId: string): Promise<number>;
+  getPendingMessages(): Promise<number>;
+  getRedisMemoryUsage(): Promise<number>;
   scanActiveDeviceIds(): Promise<string[]>;
   getDeviceStates(deviceIds: string[]): Promise<
     Array<{

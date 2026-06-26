@@ -16,7 +16,7 @@ import { ApiKeyGuard } from './guards/api-key.guard';
 @ApiTags('Ingest')
 @UseGuards(ThrottlerGuard)
 @UseGuards(ApiKeyGuard)
-@Throttle({ short: { limit: 10, ttl: 1000 }, long: { limit: 60, ttl: 60000 } })
+@Throttle({ short: { limit: 30, ttl: 1000 }, long: { limit: 300, ttl: 60000 } })
 @Controller('ingest')
 export class IngestController {
   constructor(private readonly processIngestUseCase: ProcessIngestUseCase) {}

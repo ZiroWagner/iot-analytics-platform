@@ -14,8 +14,10 @@ import { TelemetryDomainService } from '@/telemetry/domain/services/telemetry-do
 import { TelemetryEvent } from '@/telemetry/domain/entities/telemetry-event.entity';
 import { TELEMETRY_ADAPTER_TOKEN } from '@/telemetry/infrastructure/adapters/redis-telemetry.adapter';
 import type { TelemetryAdapterInterface } from '@/telemetry/infrastructure/adapters/redis-telemetry.adapter';
+import { GetSystemMetricsUseCase } from '@/observability/application/use-cases/get-system-metrics.use-case';
 
 const FLUSH_INTERVAL_MS = 500;
+const SYSTEM_METRICS_INTERVAL_MS = 5000;
 
 @WsGateway({
   cors: {
@@ -38,6 +40,7 @@ export class TelemetryGateway
   constructor(
     @Inject(TELEMETRY_ADAPTER_TOKEN)
     private readonly telemetryAdapter: TelemetryAdapterInterface,
+    private readonly getSystemMetricsUseCase: GetSystemMetricsUseCase,
   ) {}
 
   afterInit() {
@@ -65,6 +68,18 @@ export class TelemetryGateway
       () => this.flushBuffer(),
       FLUSH_INTERVAL_MS,
     );
+
+    // Emit system metrics to all connected clients every 5 seconds
+    setInterval(async () => {
+      try {
+        const metrics = await this.getSystemMetricsUseCase.execute();
+        if (metrics) {
+          this.server.emit('system_metrics', metrics.toPlain());
+        }
+      } catch {
+        // Silent — metrics emission is non-critical
+      }
+    }, SYSTEM_METRICS_INTERVAL_MS);
   }
 
   handleConnection(client: Socket) {

@@ -133,6 +133,13 @@ export function useRealtimeSeries(
     }
   }, [realtimePoints])
 
+  // After 8 seconds of no new data, mark as stale
+  useEffect(() => {
+    if (lastUpdate === null) return
+    const timer = setTimeout(() => setLastUpdate(null), 8000)
+    return () => clearTimeout(timer)
+  }, [lastUpdate])
+
   return {
     data: mergedData,
     isRealtime: lastUpdate !== null,

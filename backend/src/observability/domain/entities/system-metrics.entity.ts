@@ -5,6 +5,9 @@ export class SystemMetrics {
     public readonly eventsPerSecond: number,
     public readonly onlineDevices: number,
     public readonly timestamp: string,
+    public readonly pendingMessages: number = 0,
+    public readonly redisMemoryUsedBytes: number = 0,
+    public readonly dbInsertLatencyMs: number = 0,
   ) {}
 
   static create(props: {
@@ -12,6 +15,9 @@ export class SystemMetrics {
     consumerLag: number;
     eventsPerSecond: number;
     onlineDevices: number;
+    pendingMessages?: number;
+    redisMemoryUsedBytes?: number;
+    dbInsertLatencyMs?: number;
   }): SystemMetrics {
     return new SystemMetrics(
       props.streamSize,
@@ -19,6 +25,9 @@ export class SystemMetrics {
       props.eventsPerSecond,
       props.onlineDevices,
       new Date().toISOString(),
+      props.pendingMessages ?? 0,
+      props.redisMemoryUsedBytes ?? 0,
+      props.dbInsertLatencyMs ?? 0,
     );
   }
 
@@ -28,6 +37,9 @@ export class SystemMetrics {
     eventsPerSecond: number;
     onlineDevices: number;
     timestamp: string;
+    pendingMessages: number;
+    redisMemoryUsedBytes: number;
+    dbInsertLatencyMs: number;
   } {
     return {
       streamSize: this.streamSize,
@@ -35,6 +47,9 @@ export class SystemMetrics {
       eventsPerSecond: this.eventsPerSecond,
       onlineDevices: this.onlineDevices,
       timestamp: this.timestamp,
+      pendingMessages: this.pendingMessages,
+      redisMemoryUsedBytes: this.redisMemoryUsedBytes,
+      dbInsertLatencyMs: this.dbInsertLatencyMs,
     };
   }
 }

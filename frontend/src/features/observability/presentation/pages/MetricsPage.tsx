@@ -15,22 +15,35 @@ import {
   Radio,
   RefreshCw,
   Server,
+  Timer,
   Wifi,
   Zap,
+  Database,
+  Clock,
 } from "lucide-react"
 import { useSocketStatus, useTelemetry } from "@/features/telemetry"
-import { getLagColorClass } from "../../domain/rules"
+import {
+  getLagColorClass,
+  getPendingColorClass,
+  getRedisMemoryColorClass,
+  formatRedisMemory,
+} from "../../domain/rules"
 import { useSystemMetrics } from "../hooks/useSystemMetrics"
 
 export function MetricsPage() {
   const { metrics, loading, refresh } = useSystemMetrics()
 
-  // Ensure the WebSocket is established and connection status tracked,
-  // even though this page does not subscribe to any project room.
   useTelemetry(null)
   const connected = useSocketStatus()
 
   const lagValue = metrics?.consumerLag ?? 0
+  const pendingValue = metrics?.pendingMessages ?? 0
+  const redisMem = metrics?.redisMemoryUsedBytes ?? 0
+
+  const streamTarget = 50000
+  const streamPct = metrics?.streamSize != null && streamTarget > 0
+    ? Math.round((metrics.streamSize / streamTarget) * 100)
+    : 0
 
   return (
     <div className="flex flex-col h-full space-y-6">
@@ -73,8 +86,21 @@ export function MetricsPage() {
             <div className="text-3xl font-bold tabular-nums">
               {loading ? "—" : (metrics?.streamSize ?? 0).toLocaleString()}
             </div>
+            <div className="flex items-center gap-2 mt-1">
+              <div className="flex-1 h-1.5 rounded-full bg-accent/50 overflow-hidden">
+                <div
+                  className={`h-full rounded-full transition-all duration-500 ${
+                    streamPct > 90 ? "bg-red-500" : streamPct > 70 ? "bg-orange-500" : "bg-emerald-500"
+                  }`}
+                  style={{ width: `${Math.min(streamPct, 100)}%` }}
+                />
+              </div>
+              <span className="text-[10px] text-muted-foreground tabular-nums">
+                {streamPct}% / {streamTarget.toLocaleString()}
+              </span>
+            </div>
             <p className="text-xs text-muted-foreground mt-1">
-              mensajes en Redis Stream
+              mensajes en Redis Stream (MAXLEN ~{streamTarget.toLocaleString()})
             </p>
           </CardContent>
         </Card>
@@ -93,7 +119,7 @@ export function MetricsPage() {
               {loading ? "—" : lagValue.toLocaleString()}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              mensajes pendientes de procesar
+              mensajes sin procesar (lag)
             </p>
           </CardContent>
         </Card>
@@ -125,6 +151,65 @@ export function MetricsPage() {
               {loading ? "—" : metrics?.onlineDevices ?? 0}
             </div>
             <p className="text-xs text-muted-foreground mt-1">con TTL activo en Redis</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-3">
+        <Card className="bg-surface-container-low border-border/50 hover:shadow-lg hover:shadow-rose-500/5 transition-all">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Mensajes Pendientes
+            </CardTitle>
+            <Timer className="h-4 w-4 text-rose-500" />
+          </CardHeader>
+          <CardContent>
+            <div
+              className={`text-3xl font-bold tabular-nums ${getPendingColorClass(pendingValue)}`}
+            >
+              {loading ? "—" : pendingValue.toLocaleString()}
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              sin XACK (XPENDING)
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-surface-container-low border-border/50 hover:shadow-lg hover:shadow-cyan-500/5 transition-all">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Memoria Redis
+            </CardTitle>
+            <Database className="h-4 w-4 text-cyan-500" />
+          </CardHeader>
+          <CardContent>
+            <div
+              className={`text-3xl font-bold tabular-nums ${getRedisMemoryColorClass(redisMem)}`}
+            >
+              {loading ? "—" : formatRedisMemory(redisMem)}
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              {redisMem > 0
+                ? `< ${formatRedisMemory(500 * 1024 * 1024)} ideal`
+                : 'usada por Redis'}
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-surface-container-low border-border/50 hover:shadow-lg hover:shadow-amber-500/5 transition-all">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Inserción DB
+            </CardTitle>
+            <Clock className="h-4 w-4 text-amber-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold tabular-nums text-amber-500">
+              {loading ? "—" : metrics?.dbInsertLatencyMs != null ? `${metrics.dbInsertLatencyMs} ms` : '—'}
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              tiempo bulk insert a PostgreSQL
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -167,7 +252,11 @@ export function MetricsPage() {
             </div>
             <div className="flex items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-blue-500" />
-              Throttling: 500ms batch por proyecto
+              Métricas vía WebSocket (5s)
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-emerald-500" />
+              XTRIM automático ~50k
             </div>
           </div>
         </CardContent>

@@ -46,6 +46,28 @@ export class RedisObservabilityRepository implements ObservabilityRepositoryInte
     }
   }
 
+  async getPendingMessages(): Promise<number> {
+    try {
+      const pending = (await (this.redisService.client as any).xpending(
+        STREAM_NAME,
+        GROUP_NAME,
+      )) as [string, string, string, string][];
+      return Array.isArray(pending) ? Number(pending[1] ?? 0) : 0;
+    } catch {
+      return 0;
+    }
+  }
+
+  async getRedisMemoryUsage(): Promise<number> {
+    try {
+      const info = await this.redisService.client.info('memory');
+      const match = info.match(/used_memory:(\d+)/);
+      return match ? parseInt(match[1], 10) : 0;
+    } catch {
+      return 0;
+    }
+  }
+
   async getEventsPerSecond(): Promise<number> {
     try {
       const nowSec = Math.floor(Date.now() / 1000);

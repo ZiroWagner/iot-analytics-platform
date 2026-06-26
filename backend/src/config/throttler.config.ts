@@ -5,12 +5,12 @@ export const throttlerConfig: ThrottlerModuleOptions = {
     {
       name: 'short',
       ttl: 1000,
-      limit: 5,
+      limit: 15,
     },
     {
       name: 'long',
       ttl: 60000,
-      limit: 100,
+      limit: 300,
     },
   ],
   errorMessage: 'Too many requests, please try again later.',

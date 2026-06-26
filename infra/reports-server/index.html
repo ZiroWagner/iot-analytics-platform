@@ -1,117 +1,121 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Reportes - IOT Analytics Platform</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reportes - IOT Analytics Platform</title>
+  <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-<div class="container">
-  <header>
-    <h1>Reportes de An&aacute;lisis</h1>
-    <p class="subtitle">IOT Analytics Platform &mdash; Pipeline CI/CD</p>
-    <p class="timestamp" id="timestamp">Cargando...</p>
-  </header>
+  <div class="container">
+    <header>
+      <h1>Reportes de An&aacute;lisis</h1>
+      <p class="subtitle">IOT Analytics Platform &mdash; Pipeline CI/CD</p>
+      <p class="timestamp" id="timestamp">Cargando...</p>
+    </header>
 
-  <div class="cards" id="cardsContainer">
-    <a href="reports/zap-frontend-report.html" class="card" target="_blank">
-      <div class="card-icon shield">&#x1F6E1;</div>
-      <h2>ZAP Frontend</h2>
-      <p>Escaneo de seguridad OWASP ZAP &mdash; Frontend</p>
-      <span class="tag">HTML</span>
-    </a>
+    <div class="cards" id="cardsContainer">
+      <a href="reports/zap-frontend-report.html" class="card" target="_blank">
+        <div class="card-icon shield">&#x1F6E1;</div>
+        <h2>ZAP Frontend</h2>
+        <p>Escaneo de seguridad OWASP ZAP &mdash; Frontend</p>
+        <span class="tag">HTML</span>
+      </a>
 
-    <a href="reports/zap-backend-report.html" class="card" target="_blank">
-      <div class="card-icon shield">&#x1F6E1;</div>
-      <h2>ZAP Backend</h2>
-      <p>Escaneo de seguridad OWASP ZAP &mdash; Backend</p>
-      <span class="tag">HTML</span>
-    </a>
+      <a href="reports/zap-backend-report.html" class="card" target="_blank">
+        <div class="card-icon shield">&#x1F6E1;</div>
+        <h2>ZAP Backend</h2>
+        <p>Escaneo de seguridad OWASP ZAP &mdash; Backend</p>
+        <span class="tag">HTML</span>
+      </a>
 
-    <div class="card card-file" id="cnes-docx">
-      <div class="card-icon doc">&#x1F4C4;</div>
-      <h2>CNES Reporte Word</h2>
-      <p class="card-desc">Reporte de calidad SonarQube en formato DOCX</p>
-      <div class="card-actions">
-        <a href="reports" class="card-btn download-btn" download>Descargar</a>
-        <a href="preview.html?file=reports/" class="card-btn preview-btn">Vista Previa</a>
+      <div class="card card-file" id="cnes-docx">
+        <div class="card-icon doc">&#x1F4C4;</div>
+        <h2>CNES Reporte Word</h2>
+        <p class="card-desc">Reporte de calidad SonarQube en formato DOCX</p>
+        <div class="card-actions">
+          <a href="reports" class="card-btn download-btn" download>Descargar</a>
+          <a href="preview.html?file=reports/" class="card-btn preview-btn">Vista Previa</a>
+        </div>
+        <span class="tag">DOCX</span>
       </div>
-      <span class="tag">DOCX</span>
+
+      <div class="card card-file" id="cnes-xlsx">
+        <div class="card-icon sheet">&#x1F4CA;</div>
+        <h2>CNES Reporte Excel</h2>
+        <p class="card-desc">Issues de SonarQube en formato XLSX</p>
+        <div class="card-actions">
+          <a href="reports" class="card-btn download-btn" download>Descargar</a>
+          <a href="preview.html?file=reports/" class="card-btn preview-btn">Vista Previa</a>
+        </div>
+        <span class="tag">XLSX</span>
+      </div>
+
+      <a href="http://localhost:3002/d/k6-load-testing-results/k6-load-testing-results?orgId=1&from=now-1h&to=now&timezone=browser&var-Measurement=http_req_duration&refresh=5s"
+        class="card" target="_blank">
+        <div class="card-icon chart">&#x1F4C8;</div>
+        <h2>K6 Dashboard</h2>
+        <p>Dashboard de rendimiento en Grafana</p>
+        <span class="tag">Grafana</span>
+      </a>
+
+      <a href="print.html" class="card" target="_blank">
+        <div class="card-icon print">&#x1F5A8;</div>
+        <h2>Exportar a PDF</h2>
+        <p>Vista imprimible de todos los reportes</p>
+        <span class="tag">PDF</span>
+      </a>
     </div>
 
-    <div class="card card-file" id="cnes-xlsx">
-      <div class="card-icon sheet">&#x1F4CA;</div>
-      <h2>CNES Reporte Excel</h2>
-      <p class="card-desc">Issues de SonarQube en formato XLSX</p>
-      <div class="card-actions">
-        <a href="reports" class="card-btn download-btn" download>Descargar</a>
-        <a href="preview.html?file=reports/" class="card-btn preview-btn">Vista Previa</a>
-      </div>
-      <span class="tag">XLSX</span>
-    </div>
-
-    <a href="http://localhost:3002" class="card" target="_blank">
-      <div class="card-icon chart">&#x1F4C8;</div>
-      <h2>K6 Dashboard</h2>
-      <p>Dashboard de rendimiento en Grafana</p>
-      <span class="tag">Grafana</span>
-    </a>
-
-    <a href="print.html" class="card" target="_blank">
-      <div class="card-icon print">&#x1F5A8;</div>
-      <h2>Exportar a PDF</h2>
-      <p>Vista imprimible de todos los reportes</p>
-      <span class="tag">PDF</span>
-    </a>
+    <footer>
+      <p>IOT Analytics Platform &mdash; Reportes generados autom&aacute;ticamente por el pipeline CI/CD</p>
+    </footer>
   </div>
 
-  <footer>
-    <p>IOT Analytics Platform &mdash; Reportes generados autom&aacute;ticamente por el pipeline CI/CD</p>
-  </footer>
-</div>
+  <script>
+    (function () {
+      document.getElementById('timestamp').textContent =
+        'Generado: ' + new Date().toLocaleString('es-CL', { timeZone: 'America/Santiago' });
 
-<script>
-(function() {
-  document.getElementById('timestamp').textContent =
-    'Generado: ' + new Date().toLocaleString('es-CL', { timeZone: 'America/Santiago' });
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', 'reports/', true);
+      xhr.onload = function () {
+        if (xhr.status !== 200) return;
+        var html = xhr.responseText;
+        var files = [];
+        var linkRegex = /<a\s+href="([^"]+\.(docx|xlsx))"[^>]*>([^<]+)<\/a>\s*(\d{2}-\w{3}-\d{4}\s+\d{2}:\d{2})\s+([\d.]+[KMG]?)/gi;
+        var match;
+        while ((match = linkRegex.exec(html)) !== null) {
+          files.push({ href: match[1], ext: match[2], name: match[3], date: match[4], size: match[5] });
+        }
 
-  var xhr = new XMLHttpRequest();
-  xhr.open('GET', 'reports/', true);
-  xhr.onload = function() {
-    if (xhr.status !== 200) return;
-    var html = xhr.responseText;
-    var files = [];
-    var linkRegex = /<a\s+href="([^"]+\.(docx|xlsx))"[^>]*>([^<]+)<\/a>\s*(\d{2}-\w{3}-\d{4}\s+\d{2}:\d{2})\s+([\d.]+[KMG]?)/gi;
-    var match;
-    while ((match = linkRegex.exec(html)) !== null) {
-      files.push({ href: match[1], ext: match[2], name: match[3], date: match[4], size: match[5] });
-    }
+        function setFile(id, file) {
+          var el = document.getElementById(id);
+          if (!el || !file) return;
+          el.classList.add('available');
+          var name = file.name.replace(/\.(docx|xlsx)$/i, '');
+          el.querySelector('h2').textContent = name;
+          var parts = name.split('-');
+          if (parts.length >= 3) {
+            var datePart = parts.slice(0, 3).join('-');
+            el.querySelector('.card-desc').textContent = 'Generado: ' + datePart + ' &mdash; Tama&ntilde;o: ' + file.size;
+          } else {
+            el.querySelector('.card-desc').textContent = 'Tama&ntilde;o: ' + file.size;
+          }
+          el.querySelector('.download-btn').href = 'reports/' + file.href;
+          el.querySelector('.preview-btn').href = 'preview.html?file=reports/' + file.href;
+        }
 
-    function setFile(id, file) {
-      var el = document.getElementById(id);
-      if (!el || !file) return;
-      el.classList.add('available');
-      var name = file.name.replace(/\.(docx|xlsx)$/i, '');
-      el.querySelector('h2').textContent = name;
-      var parts = name.split('-');
-      if (parts.length >= 3) {
-        var datePart = parts.slice(0, 3).join('-');
-        el.querySelector('.card-desc').textContent = 'Generado: ' + datePart + ' &mdash; Tama&ntilde;o: ' + file.size;
-      } else {
-        el.querySelector('.card-desc').textContent = 'Tama&ntilde;o: ' + file.size;
-      }
-      el.querySelector('.download-btn').href = 'reports/' + file.href;
-      el.querySelector('.preview-btn').href = 'preview.html?file=reports/' + file.href;
-    }
-
-    var docx = files.find(function(f) { return f.ext === 'docx'; });
-    var xlsx = files.find(function(f) { return f.ext === 'xlsx'; });
-    setFile('cnes-docx', docx);
-    setFile('cnes-xlsx', xlsx);
-  };
-  xhr.send();
-})();
-</script>
+        var docx = files.find(function (f) { return f.ext === 'docx'; });
+        var xlsx = files.find(function (f) { return f.ext === 'xlsx'; });
+        setFile('cnes-docx', docx);
+        setFile('cnes-xlsx', xlsx);
+      };
+      xhr.send();
+    })();
+  </script>
 </body>
+
 </html>

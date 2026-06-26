@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { RedisModule } from '@/redis/redis.module';
+import { ObservabilityModule } from '@/observability/observability.module';
 
 // Gateway (interfaces/ws)
 import { TelemetryGateway } from './interfaces/ws/telemetry.gateway';
@@ -11,7 +12,7 @@ import {
 } from './infrastructure/adapters/redis-telemetry.adapter';
 
 @Module({
-  imports: [RedisModule],
+  imports: [RedisModule, ObservabilityModule],
   providers: [
     // Adapters
     {

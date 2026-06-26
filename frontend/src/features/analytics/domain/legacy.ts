@@ -19,21 +19,24 @@ export function isLegacyFormat(config: unknown[]): boolean {
 export function migrateLegacyConfig(
   legacy: LegacyChartConfig[],
 ): ChartWidgetConfig[] {
-  return legacy.map((old, idx) => ({
-    id: old.id,
-    title: old.title,
-    series: [
-      {
-        id: `s_${old.id}`,
-        sensorId: old.sensorId,
-        sensorName: old.sensorName,
-        metric: old.metric,
-        chartType: 'line' as ChartSeriesType,
-        color: CHART_COLORS[idx % CHART_COLORS.length],
-        yAxisId: 'left' as YAxisPosition,
-        unit: '',
-      },
-    ],
-    ...DEFAULT_WIDGET_CONFIG,
-  }))
+  return legacy.map((old, idx) => {
+    return {
+      ...DEFAULT_WIDGET_CONFIG,
+      id: old.id,
+      title: old.title,
+      series: [
+        {
+          id: `s_${old.id}`,
+          sensorId: old.sensorId,
+          sensorName: old.sensorName,
+          metric: old.metric,
+          chartType: 'line' as const,
+          color: CHART_COLORS[idx % CHART_COLORS.length],
+          yAxisId: 'left' as const,
+          unit: '',
+        },
+      ],
+      type: 'charts',
+    } as ChartWidgetConfig
+  })
 }

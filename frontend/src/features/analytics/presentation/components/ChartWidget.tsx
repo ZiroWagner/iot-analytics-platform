@@ -1,107 +1,39 @@
 "use client"
 
-import React, { useEffect, useState, useCallback, useMemo } from "react"
+import React, { useEffect, useState, useCallback, useMemo, useRef } from "react"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import {
-  ComposedChart, Line, Bar, Area,
-  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  Legend, Brush, ReferenceLine
-} from "recharts"
-import {
-  X, Settings2, Grid3X3, TrendingUp,
+  X, Settings2,
   BarChart3, LineChart as LineChartIcon, AreaChart as AreaChartIcon, Zap
 } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { getAreaFillColor } from "../../domain/chart-colors"
 import type {
-  ChartWidgetConfig, TimeseriesPoint, MetricStats,
-  TimeRangePreset, SeriesConfig
+  ChartWidgetConfig, TimeseriesPoint,
 } from "../../domain/types"
-import { TIME_RANGE_MS } from "../../domain/types"
 import { httpAnalyticsRepository } from "../../infrastructure/analytics.repository"
 import { useRealtimeSeries, useSocketStatus } from "@/features/telemetry"
+import { widgetRegistry } from "../../domain/widget-registry"
+import { projectFutureValues } from "../../domain/math-utils"
 
 
 interface ChartWidgetProps {
   projectId: string
   config: ChartWidgetConfig
-  globalTimeRange: TimeRangePreset
-  globalCustomDate?: string
+  timeFrom: string
+  timeTo: string
+  refreshInterval: number
   onRemove: () => void
   onEdit: () => void
 }
 
-interface CustomTooltipProps {
-  active?: boolean
-  payload?: Array<{ dataKey: string; value: number; color: string }>
-  label?: string
-  series: SeriesConfig[]
-}
-
-function CustomTooltip({ active, payload, label, series }: CustomTooltipProps) {
-  if (!active || !payload || payload.length === 0) return null
-
-  return (
-    <div className="bg-background/95 backdrop-blur-md border border-border rounded-lg shadow-xl p-3 min-w-[180px]">
-      <p className="text-[10px] text-muted-foreground mb-2 font-mono">{label}</p>
-      <div className="space-y-1.5">
-        {payload.map((entry) => {
-          const seriesConfig = series.find(s => `${s.sensorName}:${s.metric}` === entry.dataKey)
-          const unit = seriesConfig?.unit || ''
-          return (
-            <div key={entry.dataKey} className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-2">
-                <span
-                  className="h-2.5 w-2.5 rounded-full shrink-0"
-                  style={{ backgroundColor: entry.color }}
-                />
-                <span className="text-xs text-muted-foreground truncate max-w-[120px]">
-                  {entry.dataKey}
-                </span>
-              </div>
-              <span className="text-xs font-semibold font-mono tabular-nums">
-                {typeof entry.value === 'number' ? entry.value.toFixed(2) : '—'}
-                {unit && <span className="text-[10px] text-muted-foreground ml-0.5">{unit}</span>}
-              </span>
-            </div>
-          )
-        })}
-      </div>
-    </div>
-  )
-}
-
-export function ChartWidget({ projectId, config, globalTimeRange, globalCustomDate, onRemove, onEdit }: ChartWidgetProps) {
+export function ChartWidget({ projectId, config, timeFrom, timeTo, refreshInterval, onRemove, onEdit }: ChartWidgetProps) {
   const [historicalData, setHistoricalData] = useState<TimeseriesPoint[]>([])
-  const [stats, setStats] = useState<MetricStats[]>([])
   const [loading, setLoading] = useState(true)
-  const [showGrid, setShowGrid] = useState(config.showGrid)
-  const [showRefLines, setShowRefLines] = useState(config.showReferenceLines)
+  const isFirstLoad = useRef(true)
 
   const wsConnected = useSocketStatus()
 
-  const effectiveTimeRange = config.timeRange === '15m' ? globalTimeRange : config.timeRange
-
-  const getTimeParams = useCallback(() => {
-    if (effectiveTimeRange === 'custom') {
-      if (globalCustomDate) {
-        return {
-          from: new Date(`${globalCustomDate}T00:00:00.000Z`).toISOString(),
-          to: new Date(`${globalCustomDate}T23:59:59.999Z`).toISOString()
-        }
-      }
-      return { from: config.customFrom, to: config.customTo }
-    }
-    const ms = TIME_RANGE_MS[effectiveTimeRange]
-    const now = Date.now()
-    return {
-      from: new Date(now - ms).toISOString(),
-      to: new Date(now).toISOString(),
-    }
-  }, [effectiveTimeRange, config.customFrom, config.customTo, globalCustomDate])
-
-  // Fetch historical data once (initial load)
+  // Fetch historical data (initial load + time range changes)
   const fetchHistoricalData = useCallback(async () => {
     if (config.series.length === 0) return
 
@@ -109,39 +41,26 @@ export function ChartWidget({ projectId, config, globalTimeRange, globalCustomDa
       const seriesParam = JSON.stringify(
         config.series.map(s => ({ sensorId: s.sensorId, metric: s.metric }))
       )
-      const timeParams = getTimeParams()
       const params: Record<string, string> = { series: seriesParam, limit: '150' }
-      if (timeParams.from) params.from = timeParams.from
-      if (timeParams.to) params.to = timeParams.to
+      if (timeFrom) params.from = timeFrom
+      if (timeTo) params.to = timeTo
 
       const result = await httpAnalyticsRepository.multiTimeseries(projectId, params)
-      setHistoricalData(result)
+      const showDate = timeFrom && timeTo &&
+        (new Date(timeTo).getTime() - new Date(timeFrom).getTime()) > 86400000
+      const enriched = result.map(pt => ({
+        ...pt,
+        timeLabel: showDate
+          ? new Date(pt.timestamp).toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+          : new Date(pt.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+      }))
+      setHistoricalData(enriched)
     } catch {
       // Retry on next fallback
     } finally {
       setLoading(false)
     }
-  }, [projectId, config.series, getTimeParams])
-
-  // Fetch stats (only when needed)
-  const fetchStats = useCallback(async () => {
-    if (!showRefLines || config.series.length === 0) return
-
-    try {
-      const timeParams = getTimeParams()
-      const results = await Promise.all(
-        config.series.map(s => {
-          const params: Record<string, string> = { sensorId: s.sensorId, metric: s.metric }
-          if (timeParams.from) params.from = timeParams.from
-          if (timeParams.to) params.to = timeParams.to
-          return httpAnalyticsRepository.stats(projectId, params)
-        })
-      )
-      setStats(results)
-    } catch {
-      // Non-critical
-    }
-  }, [projectId, config.series, showRefLines, getTimeParams])
+  }, [projectId, config.series, timeFrom, timeTo])
 
   // Merge historical data with realtime WebSocket points
   const { data: data, isRealtime } = useRealtimeSeries(
@@ -149,165 +68,66 @@ export function ChartWidget({ projectId, config, globalTimeRange, globalCustomDa
     historicalData,
   )
 
-  // Initial load: fetch historical data and stats
+  // Initial load immediately, subsequent changes debounced
   useEffect(() => {
-    const timeout = setTimeout(() => {
+    if (isFirstLoad.current) {
+      isFirstLoad.current = false
       fetchHistoricalData()
-      fetchStats()
-    }, 0)
+      return
+    }
+    const timeout = setTimeout(fetchHistoricalData, 300)
     return () => clearTimeout(timeout)
-  }, [fetchHistoricalData, fetchStats])
-
-  // Fallback: resync historical data every 30s to catch up if WS missed events
-  useEffect(() => {
-    const interval = setInterval(fetchHistoricalData, 30000)
-    return () => clearInterval(interval)
   }, [fetchHistoricalData])
 
-  const hasMultipleYAxes = useMemo(() => {
-    const axes = new Set(config.series.map(s => s.yAxisId))
-    return axes.size > 1
-  }, [config.series])
+  // Fallback poll to re-sync if WS missed events
+  useEffect(() => {
+    if (refreshInterval === 0) return
+    const interval = setInterval(fetchHistoricalData, refreshInterval)
+    return () => clearInterval(interval)
+  }, [fetchHistoricalData, refreshInterval])
 
-  const renderSeries = () => {
-    return config.series.map((s) => {
-      const seriesKey = `${s.sensorName}:${s.metric}`
-      const props = {
-        dataKey: seriesKey,
-        stroke: s.color,
-        fill: s.chartType === 'area' ? getAreaFillColor(s.color) : s.color,
-        yAxisId: hasMultipleYAxes ? s.yAxisId : 'left',
-        isAnimationActive: false,
+  // Compute trend directions from merged data
+  const trendDirections = useMemo(() => {
+    if (!config.forecast || !data || data.length < 2) return {} as Record<string, 'up' | 'down' | 'flat'>
+    const directions: Record<string, 'up' | 'down' | 'flat'> = {}
+    const forecastPointsCount = 10
+    const degree = 2
+    config.series.forEach((s) => {
+      const key = `${s.sensorName}:${s.metric}`
+      const values = data.map((pt: TimeseriesPoint) => Number(pt[key as keyof TimeseriesPoint])).filter((val: number) => !isNaN(val))
+      if (values.length < 2) {
+        directions[key] = 'flat'
+        return
       }
-
-      switch (s.chartType) {
-        case 'bar':
-          return <Bar key={seriesKey} {...props} radius={[2, 2, 0, 0]} fillOpacity={0.8} barSize={8} />
-        case 'area':
-          return (
-            <Area
-              key={seriesKey}
-              {...props}
-              type="monotone"
-              strokeWidth={2}
-              fillOpacity={0.15}
-              fill={s.color}
-            />
-          )
-        case 'line':
-        default:
-          return (
-            <Line
-              key={seriesKey}
-              {...props}
-              type="monotone"
-              strokeWidth={2}
-              dot={false}
-              activeDot={{ r: 3, strokeWidth: 0 }}
-            />
-          )
+      const forecast = projectFutureValues(values, forecastPointsCount, degree)
+      if (forecast.length >= 2) {
+        const first = forecast[0]
+        const last = forecast[forecast.length - 1]
+        const diff = last - first
+        const threshold = Math.max(Math.abs((first + last) / 2) * 0.01, 0.1)
+        directions[key] = diff > threshold ? 'up' : diff < -threshold ? 'down' : 'flat'
+      } else {
+        directions[key] = 'flat'
       }
     })
-  }
+    return directions
+  }, [config.forecast, config.series, data])
 
-  const renderReferenceLines = () => {
-    if (!showRefLines || stats.length === 0) return null
+  const plugin = useMemo(() => {
+    return widgetRegistry.get(config.type ?? 'charts') ?? widgetRegistry.get('charts')!
+  }, [config.type])
 
-    return stats.map((st, idx) => {
-      const s = config.series[idx]
-      if (!s) return null
-      return (
-        <React.Fragment key={`ref-${s.id}`}>
-          <ReferenceLine
-            y={st.avg}
-            yAxisId={hasMultipleYAxes ? s.yAxisId : 'left'}
-            stroke={s.color}
-            strokeDasharray="6 3"
-            strokeOpacity={0.5}
-            label={{
-              value: `μ=${st.avg.toFixed(1)}`,
-              position: 'right',
-              fill: s.color,
-              fontSize: 9,
-            }}
-          />
-        </React.Fragment>
-      )
-    })
-  }
+  const RenderComponent = plugin?.RenderComponent
 
-  let chartContent = (
-    <div className="w-full h-[280px]">
-      <ResponsiveContainer width="100%" height="100%">
-        <ComposedChart data={data} margin={{ top: 10, right: hasMultipleYAxes ? 40 : 10, left: -10, bottom: 0 }}>
-          {showGrid && (
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border) / 0.3)" />
-          )}
-          <XAxis
-            dataKey="timeLabel"
-            tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.8 }}
-            tickMargin={8}
-            stroke="hsl(var(--border))"
-            axisLine={{ strokeOpacity: 0.3 }}
-          />
-          <YAxis
-            yAxisId="left"
-            tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.8 }}
-            stroke="hsl(var(--border))"
-            axisLine={{ strokeOpacity: 0.3 }}
-            domain={config.yAxisAutoRange ? ['auto', 'auto'] : [config.yAxisMin ?? 'auto', config.yAxisMax ?? 'auto']}
-          />
-          {hasMultipleYAxes && (
-            <YAxis
-              yAxisId="right"
-              orientation="right"
-              tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.8 }}
-              stroke="hsl(var(--border))"
-              axisLine={{ strokeOpacity: 0.3 }}
-              domain={['auto', 'auto']}
-            />
-          )}
-          <Tooltip content={<CustomTooltip series={config.series} />} />
-          {config.showLegend && (
-            <Legend
-              wrapperStyle={{ fontSize: 10, paddingTop: 8 }}
-              iconSize={8}
-              iconType="circle"
-            />
-          )}
-          {renderSeries()}
-          {renderReferenceLines()}
-          {data.length > 20 && (
-            <Brush
-              dataKey="timeLabel"
-              height={22}
-              stroke="hsl(var(--border))"
-              fill="hsl(var(--card))"
-              travellerWidth={8}
-              startIndex={Math.max(0, data.length - 50)}
-            />
-          )}
-        </ComposedChart>
-      </ResponsiveContainer>
-    </div>
-  )
-
-  if (loading && historicalData.length === 0) {
-    chartContent = (
-      <div className="h-full w-full flex items-center justify-center">
-        <div className="flex flex-col items-center gap-2">
-          <div className="h-8 w-8 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
-          <span className="text-xs text-muted-foreground">Cargando datos...</span>
-        </div>
-      </div>
-    )
-  } else if (data.length === 0 && historicalData.length === 0) {
-    chartContent = (
-      <div className="h-full w-full flex items-center justify-center text-muted-foreground text-xs">
-        Sin datos para el rango seleccionado.
-      </div>
-    )
-  }
+  const chartContent = RenderComponent ? (
+    <RenderComponent
+      config={config}
+      data={data}
+      isLive={isRealtime}
+      loading={loading}
+      trendDirections={trendDirections}
+    />
+  ) : null
 
   return (
     <Card className="border-border/60 shadow-md hover:shadow-lg transition-shadow duration-300 flex flex-col group relative overflow-hidden bg-card/50 backdrop-blur-sm">
@@ -316,14 +136,18 @@ export function ChartWidget({ projectId, config, globalTimeRange, globalCustomDa
       <CardHeader className="pb-1 pt-3 px-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 min-w-0 flex-1">
-            <div className="flex items-center gap-1 shrink-0">
-              {config.series.slice(0, 3).map((s) => (
-                <span key={s.id} title={s.chartType} style={{ color: s.color }}>
-                  {s.chartType === 'line' && <LineChartIcon className="h-3.5 w-3.5" />}
-                  {s.chartType === 'bar' && <BarChart3 className="h-3.5 w-3.5" />}
-                  {s.chartType === 'area' && <AreaChartIcon className="h-3.5 w-3.5" />}
-                </span>
-              ))}
+            <div className="flex items-center gap-1 shrink-0 text-purple-400">
+              {plugin.icon ? (
+                React.createElement(plugin.icon, { className: "h-3.5 w-3.5" })
+              ) : (
+                config.series.slice(0, 3).map((s) => (
+                  <span key={s.id} title={s.chartType} style={{ color: s.color }}>
+                    {s.chartType === 'line' && <LineChartIcon className="h-3.5 w-3.5" />}
+                    {s.chartType === 'bar' && <BarChart3 className="h-3.5 w-3.5" />}
+                    {s.chartType === 'area' && <AreaChartIcon className="h-3.5 w-3.5" />}
+                  </span>
+                ))
+              )}
             </div>
             <h3 className="text-sm font-semibold truncate">{config.title}</h3>
             {isRealtime && wsConnected && (
@@ -335,28 +159,6 @@ export function ChartWidget({ projectId, config, globalTimeRange, globalCustomDa
           </div>
 
           <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-            <Button
-              variant="ghost" size="icon"
-              className={cn(
-                "h-6 w-6 transition-colors",
-                showGrid ? "bg-purple-500/20 text-purple-400" : "text-muted-foreground hover:text-foreground"
-              )}
-              onClick={() => setShowGrid(!showGrid)}
-              title="Toggle grid"
-            >
-              <Grid3X3 className="h-3 w-3" />
-            </Button>
-            <Button
-              variant="ghost" size="icon"
-              className={cn(
-                "h-6 w-6 transition-colors",
-                showRefLines ? "bg-purple-500/20 text-purple-400" : "text-muted-foreground hover:text-foreground"
-              )}
-              onClick={() => setShowRefLines(!showRefLines)}
-              title="Toggle reference lines"
-            >
-              <TrendingUp className="h-3 w-3" />
-            </Button>
             <Button
               variant="ghost" size="icon"
               className="h-6 w-6 text-muted-foreground hover:text-foreground"
@@ -377,15 +179,24 @@ export function ChartWidget({ projectId, config, globalTimeRange, globalCustomDa
         </div>
 
         <div className="flex flex-wrap gap-1 mt-1.5">
-          {config.series.map((s) => (
-            <span
-              key={s.id}
-              className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full bg-accent/50 text-muted-foreground"
-            >
-              <span className="h-1.5 w-1.5 rounded-full shrink-0" style={{ backgroundColor: s.color }} />
-              {s.metric}{s.unit ? ` (${s.unit})` : ''}
-            </span>
-          ))}
+          {config.series.map((s) => {
+            const key = `${s.sensorName}:${s.metric}`
+            const trend = trendDirections[key]
+            return (
+              <span
+                key={s.id}
+                className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full bg-accent/50 text-muted-foreground"
+              >
+                <span className="h-1.5 w-1.5 rounded-full shrink-0" style={{ backgroundColor: s.color }} />
+                {s.metric}{s.unit ? ` (${s.unit})` : ''}
+                {trend && (
+                  <span className={trend === 'up' ? 'text-emerald-400' : trend === 'down' ? 'text-red-400' : 'text-muted-foreground'}>
+                    {trend === 'up' ? '\u2191' : trend === 'down' ? '\u2193' : '\u2192'}
+                  </span>
+                )}
+              </span>
+            )
+          })}
         </div>
       </CardHeader>
 

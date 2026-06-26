@@ -13,7 +13,7 @@ function getSocketUrl(): string {
   if (typeof window === 'undefined') {
     return getApiBaseUrl()
   }
-  return process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:3001'
+  return process.env.NEXT_PUBLIC_WS_URL ?? 'http://backend:3001'
 }
 
 /**
@@ -23,7 +23,7 @@ function getSocketUrl(): string {
 export function getSocket(): Socket {
   if (!globalSocket) {
     globalSocket = io(getSocketUrl(), {
-      transports: ['websocket', 'polling'],
+      transports: ['websocket'],
       reconnection: true,
       reconnectionAttempts: Infinity,
       reconnectionDelay: 1000,

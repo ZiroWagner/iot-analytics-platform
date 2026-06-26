@@ -13,6 +13,7 @@ import { DataPointInsert } from '@/ingest/domain/entities/data-point-insert.enti
 const BLOCK_TIMEOUT_MS = 2000;
 const BATCH_SIZE = 100;
 const ERROR_RETRY_DELAY_MS = 1000;
+const STREAM_TRIM_LENGTH = 50000;
 
 @Injectable()
 export class StreamIngestProcessor implements OnModuleInit, OnModuleDestroy {
@@ -96,8 +97,12 @@ export class StreamIngestProcessor implements OnModuleInit, OnModuleDestroy {
 
     if (dataPoints.length > 0) {
       try {
+        const dbStart = Date.now();
         await this.prisma.dataPoint.createMany({ data: dataPoints });
-        this.logger.log(`Persisted ${dataPoints.length} data points to DB`);
+        const dbLatency = Date.now() - dbStart;
+        this.logger.log(
+          `Persisted ${dataPoints.length} data points to DB in ${dbLatency}ms`,
+        );
       } catch (error) {
         this.logger.error('Failed to bulk insert data points', error);
         return;
@@ -112,6 +117,18 @@ export class StreamIngestProcessor implements OnModuleInit, OnModuleDestroy {
         this.groupName,
         ...messageIds,
       );
+    }
+
+    // Trim stream to prevent unbounded growth
+    try {
+      await (this.redisService.client as any).xtrim(
+        this.streamName,
+        'MAXLEN',
+        '~',
+        STREAM_TRIM_LENGTH,
+      );
+    } catch {
+      // Non-critical
     }
   }
 

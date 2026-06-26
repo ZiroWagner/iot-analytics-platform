@@ -13,7 +13,7 @@ export class GetSystemMetricsUseCase {
 
   async execute(userId?: string): Promise<SystemMetrics | null> {
     try {
-      const [streamSize, consumerLag, eventsPerSecond, onlineDevices] =
+      const [streamSize, consumerLag, eventsPerSecond, onlineDevices, pendingMessages, redisMemoryUsedBytes] =
         await Promise.all([
           this.observabilityRepository.getStreamLength(),
           this.observabilityRepository.getConsumerLag(),
@@ -21,6 +21,8 @@ export class GetSystemMetricsUseCase {
           userId
             ? this.observabilityRepository.countOnlineDevicesForUser(userId)
             : this.observabilityRepository.countOnlineDevices(),
+          this.observabilityRepository.getPendingMessages(),
+          this.observabilityRepository.getRedisMemoryUsage(),
         ]);
 
       return ObservabilityDomainService.buildSystemMetrics({
@@ -28,6 +30,8 @@ export class GetSystemMetricsUseCase {
         consumerLag,
         eventsPerSecond,
         onlineDevices,
+        pendingMessages,
+        redisMemoryUsedBytes,
       });
     } catch {
       return null;

@@ -13,6 +13,10 @@ interface SystemMetrics {
   consumerLag: number
   eventsPerSecond: number
   onlineDevices: number
+  timestamp: string
+  pendingMessages: number
+  redisMemoryUsedBytes: number
+  dbInsertLatencyMs: number
 }
 
 /** Raw sensor reading extracted from telemetry events for chart consumers */

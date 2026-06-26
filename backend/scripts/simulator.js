@@ -2,7 +2,7 @@ import http from "node:http";
 
 // CONFIGURACIÓN (REEMPLAZA ESTA API KEY POR LA GENERADA EN EL DASHBOARD)
 const API_KEY = "iot_b476334fcfbf2b22cb3b6061b17295cc";
-const INGEST_URL = "http://localhost:3001/api/v1/ingest";
+const INGEST_URL = "http://backend:3001/api/v1/ingest";
 const INTERVAL_MS = 1000;
 
 function getRandomArbitrary(min, max) {

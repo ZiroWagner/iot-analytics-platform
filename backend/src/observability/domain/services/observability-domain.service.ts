@@ -6,6 +6,9 @@ export class ObservabilityDomainService {
     consumerLag: number;
     eventsPerSecond: number;
     onlineDevices: number;
+    pendingMessages?: number;
+    redisMemoryUsedBytes?: number;
+    dbInsertLatencyMs?: number;
   }): SystemMetrics {
     return SystemMetrics.create(props);
   }

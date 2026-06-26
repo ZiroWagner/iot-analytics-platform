@@ -8,7 +8,7 @@ export type YAxisPosition = 'left' | 'right'
 export type WidgetSize = 'sm' | 'md' | 'lg' | 'full'
 
 /** Preset time ranges */
-export type TimeRangePreset = '5m' | '15m' | '1h' | '6h' | '24h' | 'custom'
+export type TimeRangePreset = '5m' | '15m' | '1h' | '6h' | '24h' | 'custom' | 'range'
 
 /** Individual data series within a chart widget */
 export interface SeriesConfig {
@@ -38,6 +38,8 @@ export interface ChartWidgetConfig {
   yAxisMin?: number
   yAxisMax?: number
   refreshInterval: number
+  type?: string
+  [key: string]: any
 }
 
 /** Available metric discovered from sensor data */
@@ -77,7 +79,7 @@ export interface LegacyChartConfig {
 }
 
 /** Time range in milliseconds for each preset */
-export const TIME_RANGE_MS: Record<Exclude<TimeRangePreset, 'custom'>, number> = {
+export const TIME_RANGE_MS: Record<Exclude<TimeRangePreset, 'custom' | 'range'>, number> = {
   '5m': 5 * 60 * 1000,
   '15m': 15 * 60 * 1000,
   '1h': 60 * 60 * 1000,
