@@ -4,6 +4,7 @@ import { TELEMETRY_ADAPTER_TOKEN } from '@/telemetry/infrastructure/adapters/red
 import { GetSystemMetricsUseCase } from '@/observability/application/use-cases/get-system-metrics.use-case';
 
 describe('TelemetryGateway', () => {
+  let module: TestingModule;
   let gateway: TelemetryGateway;
   let adapter: any;
   let mockServer: any;
@@ -19,7 +20,7 @@ describe('TelemetryGateway', () => {
       emit: jest.fn(),
     };
 
-    const module: TestingModule = await Test.createTestingModule({
+    module = await Test.createTestingModule({
       providers: [
         TelemetryGateway,
         { provide: TELEMETRY_ADAPTER_TOKEN, useValue: adapter },
@@ -131,6 +132,84 @@ describe('TelemetryGateway', () => {
       );
 
       jest.useRealTimers();
+    });
+
+    it('should log error for invalid Pub/Sub message', () => {
+      jest.useFakeTimers();
+      let subscriberCallback: any;
+      adapter.subscribe.mockImplementation((channel, cb) => {
+        subscriberCallback = cb;
+      });
+
+      const loggerErrorSpy = jest.spyOn((gateway as any).logger, 'error');
+      gateway.afterInit();
+
+      subscriberCallback('invalid-json');
+
+      expect(loggerErrorSpy).toHaveBeenCalledWith(
+        'Failed to parse Pub/Sub message',
+      );
+
+      jest.useRealTimers();
+    });
+  });
+
+  describe('System metrics', () => {
+    it('should emit system_metrics when use case returns data', async () => {
+      const mockUseCase = module.get(GetSystemMetricsUseCase);
+      mockUseCase.execute.mockResolvedValue({
+        streamSize: 100,
+        consumerLag: 10,
+        eventsPerSecond: 50,
+        onlineDevices: 5,
+        pendingMessages: 3,
+        redisMemoryUsedBytes: 1024,
+        dbInsertLatencyMs: 2,
+        timestamp: new Date().toISOString(),
+        toPlain: () => ({
+          streamSize: 100,
+          consumerLag: 10,
+          eventsPerSecond: 50,
+          onlineDevices: 5,
+          pendingMessages: 3,
+          redisMemoryUsedBytes: 1024,
+          dbInsertLatencyMs: 2,
+          timestamp: new Date().toISOString(),
+        }),
+      });
+
+      await (gateway as any).emitSystemMetrics();
+
+      expect(mockServer.emit).toHaveBeenCalledWith(
+        'system_metrics',
+        expect.objectContaining({ streamSize: 100 }),
+      );
+    });
+
+    it('should not emit when use case returns null', async () => {
+      const mockUseCase = module.get(GetSystemMetricsUseCase);
+      mockUseCase.execute.mockResolvedValue(null);
+
+      mockServer.emit.mockClear();
+      await (gateway as any).emitSystemMetrics();
+
+      expect(mockServer.emit).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Subscription errors', () => {
+    it('should log error when buildInitialState fails', async () => {
+      const client = { id: 'c1', join: jest.fn(), emit: jest.fn() } as any;
+      adapter.buildInitialState.mockRejectedValue(new Error('db error'));
+
+      const loggerErrorSpy = jest.spyOn((gateway as any).logger, 'error');
+
+      await gateway.handleSubscribe(client, { projectId: 'p1' });
+
+      expect(loggerErrorSpy).toHaveBeenCalledWith(
+        expect.stringContaining('Failed to build initial state for project p1'),
+        expect.any(Error),
+      );
     });
   });
 });

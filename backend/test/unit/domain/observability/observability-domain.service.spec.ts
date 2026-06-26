@@ -117,6 +117,12 @@ describe('ObservabilityDomainService', () => {
         ObservabilityDomainService.extractStreamLength(['length', 'nan']),
       ).toBe(0);
     });
+
+    it('returns 0 when length key is absent', () => {
+      expect(
+        ObservabilityDomainService.extractStreamLength(['groups', '1']),
+      ).toBe(0);
+    });
   });
 
   describe('buildDeviceStateUpdate', () => {

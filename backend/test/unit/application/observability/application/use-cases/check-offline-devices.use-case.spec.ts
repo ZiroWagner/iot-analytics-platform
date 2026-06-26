@@ -67,6 +67,28 @@ describe('CheckOfflineDevicesUseCase', () => {
     expect(repository.markDeviceOffline).toHaveBeenCalledWith('d3');
   });
 
+  it('should skip devices that are not online', async () => {
+    repository.scanActiveDeviceIds.mockResolvedValue(['d4']);
+    repository.getDeviceStates.mockResolvedValue([
+      { deviceId: 'd4', status: 'offline', lastSeenAt: null, projectId: 'p1' },
+    ]);
+
+    await useCase.execute();
+    expect(repository.markDeviceOffline).not.toHaveBeenCalled();
+  });
+
+  it('should use unknown projectId when not provided for stale devices', async () => {
+    const now = Date.now();
+    repository.scanActiveDeviceIds.mockResolvedValue(['d5']);
+    repository.getDeviceStates.mockResolvedValue([
+      { deviceId: 'd5', status: 'online', lastSeenAt: new Date(now - 30000).toISOString() },
+    ]);
+
+    await useCase.execute();
+    expect(repository.markDeviceOffline).toHaveBeenCalledWith('d5');
+    expect(repository.broadcastOfflineEvent).toHaveBeenCalledWith('d5', 'unknown');
+  });
+
   it('should catch and log errors', async () => {
     repository.scanActiveDeviceIds.mockRejectedValue(new Error('scan failed'));
     const loggerSpy = jest.spyOn((useCase as any).logger, 'error');

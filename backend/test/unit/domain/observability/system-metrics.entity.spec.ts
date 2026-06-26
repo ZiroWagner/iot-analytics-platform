@@ -60,6 +60,20 @@ describe('SystemMetrics Entity', () => {
     });
   });
 
+  describe('defaults', () => {
+    it('defaults optional fields to 0 when not provided', () => {
+      const metrics = SystemMetrics.create({
+        streamSize: 10,
+        consumerLag: 5,
+        eventsPerSecond: 100,
+        onlineDevices: 3,
+      });
+      expect(metrics.pendingMessages).toBe(0);
+      expect(metrics.redisMemoryUsedBytes).toBe(0);
+      expect(metrics.dbInsertLatencyMs).toBe(0);
+    });
+  });
+
   describe('toPlain', () => {
     it('converts system metrics to a plain object', () => {
       const metrics = SystemMetrics.create({
