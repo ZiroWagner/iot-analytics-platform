@@ -13,6 +13,8 @@ describe('GetSystemMetricsUseCase', () => {
       getEventsPerSecond: jest.fn().mockResolvedValue(5),
       countOnlineDevices: jest.fn().mockResolvedValue(2),
       countOnlineDevicesForUser: jest.fn().mockResolvedValue(1),
+      getPendingMessages: jest.fn().mockResolvedValue(0),
+      getRedisMemoryUsage: jest.fn().mockResolvedValue(0),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -38,7 +40,7 @@ describe('GetSystemMetricsUseCase', () => {
   });
 
   it('should return null on error', async () => {
-    repository.getStreamLength.mockRejectedValue(new Error('fail'));
+    repository.getStreamLength = jest.fn(() => Promise.reject(new Error('fail')));
     const result = await useCase.execute();
     expect(result).toBeNull();
   });
